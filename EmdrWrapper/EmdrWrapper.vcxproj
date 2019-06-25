@@ -134,6 +134,7 @@
     <ClInclude Include="Arduino.h" />
     <ClInclude Include="EmdrWrapper.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="HardwareSerial.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

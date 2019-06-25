@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,10 +22,14 @@ namespace EmdrEmulator
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Timer _timer;
+
         public MainWindow()
         {
             InitializeComponent();
             EmdrWrapper.Sketch.setup();
+            EmdrWrapper.Sketch.serialWriteEvent += (text) => Debug.WriteLine($"Serial.write: {text}");
+            _timer = new Timer(state => EmdrWrapper.Sketch.loop(), null, 0, 10000);
         }
     }
 }
