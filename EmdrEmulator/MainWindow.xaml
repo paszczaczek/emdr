@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EmdrEmulator"
         mc:Ignorable="d"
+        d:DataContext="{x:Static local:MyDataContext.DesignTime}"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button/>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ScrollViewer x:Name="serialMonitorScrollViewer" Grid.Row="1">
+            <TextBlock x:Name="serialMonitor" Text="{Binding SerialMonitor}"/>
+        </ScrollViewer>
     </Grid>
 </Window>
