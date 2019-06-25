@@ -17,6 +17,6 @@ public:
 	}
 
 	long Period = 0;
-	TimerCallback *target;
+	TimerCallback *target = nullptr;
 	Callback callback = nullptr;
 };

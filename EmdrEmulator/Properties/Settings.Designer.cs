@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace emdr_emulator.Properties
+namespace EmdrEmulator.Properties
 {
 
 

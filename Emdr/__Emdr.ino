@@ -1,11 +1,9 @@
 /*
- Name:		emdr_vMicro.ino
- Created:	6/24/2019 5:01:41 PM
+ Name:		Emdr.ino
+ Created:	6/25/2019 11:32:48 AM
  Author:	marcin
 */
 
-/*
- * moved to ../emdr.cpp
 // the setup function runs once when you press reset or power the board
 void setup() {
 
@@ -15,4 +13,3 @@ void setup() {
 void loop() {
   
 }
-*/

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace emdr_emulator
+namespace EmdrEmulator
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -23,6 +23,7 @@ namespace emdr_emulator
         public MainWindow()
         {
             InitializeComponent();
+            EmdrWrapper.Sketch.setup();
         }
     }
 }
