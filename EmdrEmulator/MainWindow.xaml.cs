@@ -25,18 +25,18 @@ namespace EmdrEmulator
     public partial class MainWindow : Window
     {
         private Timer _timer;
-        private MyDataContext myDataContext = new MyDataContext();
+        private Model model = new Model();
 
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = myDataContext;
+            DataContext = model;
 
             // logowanie Serial.write()
             EmdrWrapper.Sketch.serialWriteEvent +=
                 (text) => Dispatcher.Invoke(() =>
                 {
-                    myDataContext.SerialMonitor += $"{text}\n";
+                    model.SerialMonitor += $"{text}\n";
                     serialMonitorScrollViewer.ScrollToBottom();
                 });
 
@@ -46,24 +46,33 @@ namespace EmdrEmulator
             // okresowe uruchamianie funcji loop()
             _timer = new Timer(state => EmdrWrapper.Sketch.loop(), null, 0, 100);
         }
-    }
 
-    public class MyDataContext : DataContextBase
-    {
-        private string _serialMonitor;
-        public string SerialMonitor {
-            get => _serialMonitor;
-            set => SetProperty(ref _serialMonitor, value);
-        }
-
-        public static MyDataContext DesignTime
+        public class Model : ModelBase
         {
-            get
+            private string _serialMonitor;
+            public string SerialMonitor
             {
-                var dataContext = new MyDataContext();
-                dataContext.SerialMonitor = "setup\nloop\n";
+                get => _serialMonitor;
+                set => SetProperty(ref _serialMonitor, value);
+            }
 
-                return dataContext;
+            private StripLed.Model _stripLedModel;
+            public StripLed.Model StripLedModel
+            {
+                get => _stripLedModel;
+                set => SetProperty(ref _stripLedModel, value);
+            }
+
+            public static Model DesignTime
+            {
+                get
+                {
+                    var dataContext = new Model();
+                    dataContext.SerialMonitor = "setup\nloop\nFastLED.show";
+                    dataContext.StripLedModel = StripLed.Model.DesignTime;
+
+                    return dataContext;
+                }
             }
         }
     }

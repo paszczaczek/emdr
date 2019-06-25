@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace EmdrEmulator
 {
-    public class DataContextBase : INotifyPropertyChanged
+    public class ModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
