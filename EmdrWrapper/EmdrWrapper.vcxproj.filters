@@ -33,11 +33,20 @@
     <ClInclude Include="HardwareSerial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Strip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FastLED.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pixeltypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EmdrWrapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,6 +54,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Emdr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Strip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FastLED.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HardwareSerial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

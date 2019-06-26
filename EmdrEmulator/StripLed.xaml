@@ -9,31 +9,36 @@
              d:DataContext="{x:Static local:StripLed+Model.DesignTime}"
              >
     <ItemsControl ItemsSource="{Binding Leds}">
+        <ItemsControl.Resources>
+            <system:Double x:Key="radius">10</system:Double>
+            <system:Double x:Key="fontSize">10</system:Double>
+        </ItemsControl.Resources>
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Grid>
+                <Grid HorizontalAlignment="Right">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Ellipse x:Name="el" Grid.Row="0" Stroke="Gray" Fill="{Binding Brush}" Width="50" Height="{Binding Width, RelativeSource={RelativeSource Self}}" Margin="0"/>
-                    <TextBlock Grid.Row="1" Text="{Binding Number}" HorizontalAlignment="Center"/>
+                    <Ellipse x:Name="el" Grid.Row="0" Stroke="Black" Fill="{Binding Brush}" Width="{Binding Mode=OneWay, Source={StaticResource radius}}" Height="{Binding Mode=OneWay, Source={StaticResource radius}}" Margin="0"/>
+                    <TextBlock Grid.Row="1" Text="{Binding Number}" FontSize="{Binding Mode=OneWay, Source={StaticResource fontSize}}" HorizontalAlignment="Center" />
                 </Grid>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-                <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Top" FlowDirection="LeftToRight" Margin="0"/>
+                <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Top" FlowDirection="LeftToRight" />
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemContainerStyle>
             <Style>
-                <Setter Property="Control.Margin" Value="5 5 5 2"/>
+                <Setter Property="Control.Margin" Value="2 2 2 2"/>
+                <Setter Property="Control.Width" Value="16"/>
             </Style>
         </ItemsControl.ItemContainerStyle>
         <ItemsControl.Template>
             <ControlTemplate TargetType="ItemsControl">
-                <Border  BorderBrush="Black" BorderThickness="1" CornerRadius="5">
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="5">
                     <ItemsPresenter/>
                 </Border>
             </ControlTemplate>

@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\emdr.ino" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Emdr.vsarduino.h">
@@ -27,9 +28,15 @@
     <ClInclude Include="..\Emdr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Strip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Strip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

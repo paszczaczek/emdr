@@ -1,4 +1,8 @@
-#include "Arduino.h"
+#include <Arduino.h>
+#include "Strip.h"
+#include "Emdr.h"
+
+Strip strip;
 
 // the setup function runs once when you press reset or power the board
 void setup() 
@@ -10,4 +14,5 @@ void setup()
 void loop() 
 {
 	Serial.write("loop");
+	strip.Loop();
 }

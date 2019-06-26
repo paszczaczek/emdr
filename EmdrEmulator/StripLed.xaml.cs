@@ -50,16 +50,16 @@ namespace EmdrEmulator
                 set => SetProperty(ref _leds, value);
             }
 
+
             public static Model DesignTime
             {
                 get
                 {
                     var dataContext = new Model();
-                    dataContext.Leds.Add(new Led(0, Brushes.DarkSalmon));
-                    dataContext.Leds.Add(new Led(1, Brushes.DarkSeaGreen));
-                    dataContext.Leds.Add(new Led(2, Brushes.DarkViolet));
-                    dataContext.Leds.Add(new Led(3, Brushes.Black));
-                    dataContext.Leds.Add(new Led(4, Brushes.White));
+                    dataContext.Leds.Add(new Led(0, Brushes.Red));
+                    dataContext.Leds.Add(new Led(10, Brushes.Green));
+                    dataContext.Leds.Add(new Led(50, Brushes.Blue));
+                    dataContext.Leds.Add(new Led(180, Brushes.White));
 
                     return dataContext;
                 }

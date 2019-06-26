@@ -131,16 +131,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Emdr.h" />
+    <ClInclude Include="..\Strip.h" />
     <ClInclude Include="Arduino.h" />
+    <ClInclude Include="controller.h" />
     <ClInclude Include="EmdrWrapper.h" />
+    <ClInclude Include="FastLED.h" />
+    <ClInclude Include="pixeltypes.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="HardwareSerial.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
+    <ClCompile Include="..\Strip.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="EmdrWrapper.cpp" />
+    <ClCompile Include="FastLED.cpp" />
+    <ClCompile Include="HardwareSerial.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
