@@ -42,8 +42,14 @@ Strip::~Strip()
 	delete[] leds;
 }
 
-void Strip::Loop() 
+void Strip::Loop()
 {
-	leds[ledCurrent++].r = 255;
+	if (ledCurrent < ledsCount)
+	{
+		leds[ledCurrent].r = 255;
+		leds[ledCurrent].g = 0;
+		leds[ledCurrent].b = 0;
+		ledCurrent++;
+	}
 	FastLED.show();
 }

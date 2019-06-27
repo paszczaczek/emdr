@@ -32,45 +32,53 @@ namespace EmdrEmulator
             InitializeComponent();
             DataContext = model;
 
-            // logowanie Serial.write()
-            EmdrWrapper.Sketch.serialWriteEvent +=
-                (text) => Dispatcher.Invoke(() =>
-                {
-                    model.SerialMonitor += $"{text}\n";
-                    serialMonitorScrollViewer.ScrollToBottom();
-                });
+            // obsługa Serial.write()
+            EmdrWrapper.Sketch.serialWriteEvent += SerialWriteHandler;
 
-            // wyświetlanie FastLED
-            unsafe
-            {
-                EmdrWrapper.Sketch.fastLEDShowEvent +=
-                    (leds, ledsCount) => Dispatcher.Invoke(() =>
-                    {
-                        var stripModel = new StripLed.Model();
-                        for (int i = 0; i < ledsCount; i++)
-                        {
-                            byte* led = leds + i * 3;
-                            Color color = Color.FromRgb(led[0], led[1], led[2]);
-                            stripModel.Leds.Add(new StripLed.Led(i, new SolidColorBrush(color)));
-                        }
-                        model.StripLedModel = stripModel;
-                    });
-            }
+            // obsługa FastLED.show()
+            unsafe { EmdrWrapper.Sketch.fastLEDShowEvent += FastLEDShowHandler; }
 
             // uruchomienie funkcji setup()
             EmdrWrapper.Sketch.setup();
 
             // okresowe uruchamianie funcji loop()
-            bool timerWorking = false;
-            _timer = new Timer(state =>
-            {
-                if (timerWorking)
-                    return;
-                timerWorking = true;
-                EmdrWrapper.Sketch.loop();
-                timerWorking = false;
-            }, null, 0, 1000);
+            _timer = new Timer(LoopCallback, null, 0, 1000);
         }
+
+        private void SerialWriteHandler(string text)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                model.SerialMonitor += $"{text}\n";
+                serialMonitorScrollViewer.ScrollToBottom();
+            });
+        }
+
+        private unsafe void FastLEDShowHandler(byte* leds, int ledsCount)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var stripModel = new StripLed.Model();
+                for (int i = 0; i < ledsCount; i++)
+                {
+                    byte* led = leds + i * 3;
+                    Color color = Color.FromRgb(led[0], led[1], led[2]);
+                    stripModel.Leds.Add(new StripLed.Led(i, new SolidColorBrush(color)));
+                }
+                model.StripLedModel = stripModel;
+            });
+        }
+
+        private static bool _loopCallbackWorking = false;
+        private TimerCallback LoopCallback = (object state) =>
+        {
+            if (_loopCallbackWorking)
+                return;
+            Debug.WriteLine(DateTime.Now.Millisecond);
+            _loopCallbackWorking = true;
+            EmdrWrapper.Sketch.loop();
+            _loopCallbackWorking = false;
+        };
 
         public class Model : ModelBase
         {

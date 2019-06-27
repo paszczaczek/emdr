@@ -109,7 +109,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\emdr.ino" />
-    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Emdr.h" />

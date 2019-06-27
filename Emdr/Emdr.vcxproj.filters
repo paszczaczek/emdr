@@ -16,7 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\emdr.ino" />
-    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Emdr.vsarduino.h">
