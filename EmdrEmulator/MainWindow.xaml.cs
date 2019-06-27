@@ -33,19 +33,19 @@ namespace EmdrEmulator
             DataContext = model;
 
             // obsługa Serial.write()
-            EmdrWrapper.Sketch.serialWriteEvent += SerialWriteHandler;
+            EmdrWrapper.Sketch.serialWriteEvent += SerialWriteEventHandler;
 
             // obsługa FastLED.show()
-            unsafe { EmdrWrapper.Sketch.fastLEDShowEvent += FastLEDShowHandler; }
+            unsafe { EmdrWrapper.Sketch.fastLEDShowEvent += FastLEDShowEventHandler; }
 
             // uruchomienie funkcji setup()
             EmdrWrapper.Sketch.setup();
 
             // okresowe uruchamianie funcji loop()
-            _timer = new Timer(LoopCallback, null, 0, 1000);
+            _timer = new Timer(LoopCallback, null, 0, 20);
         }
 
-        private void SerialWriteHandler(string text)
+        private void SerialWriteEventHandler(string text)
         {
             Dispatcher.Invoke(() =>
             {
@@ -54,18 +54,32 @@ namespace EmdrEmulator
             });
         }
 
-        private unsafe void FastLEDShowHandler(byte* leds, int ledsCount)
+        private unsafe void FastLEDShowEventHandler(byte* ledsData, int ledsCount)
         {
             Dispatcher.Invoke(() =>
             {
-                var stripModel = new StripLed.Model();
-                for (int i = 0; i < ledsCount; i++)
+                if (model.StripModel.Leds.Count != ledsCount)
                 {
-                    byte* led = leds + i * 3;
-                    Color color = Color.FromRgb(led[0], led[1], led[2]);
-                    stripModel.Leds.Add(new StripLed.Led(i, new SolidColorBrush(color)));
+                    // nowy strip
+                    var stripModel = new Strip.Model();
+                    for (int i = 0; i < ledsCount; i++)
+                    {
+                        byte* rgb = ledsData + i * 3;
+                        Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
+                        stripModel.Leds.Add(new Strip.Led(i, new SolidColorBrush(color)));
+                    }
+                    model.StripModel = stripModel;
                 }
-                model.StripLedModel = stripModel;
+                else
+                {
+                    // aktualizacja kolorow w strip
+                    for (int i = 0; i < ledsCount; i++)
+                    {
+                        byte* rgb = ledsData + i * 3;
+                        Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
+                        model.StripModel.Leds[i].Brush.Color = color;
+                    }
+                }
             });
         }
 
@@ -74,7 +88,6 @@ namespace EmdrEmulator
         {
             if (_loopCallbackWorking)
                 return;
-            Debug.WriteLine(DateTime.Now.Millisecond);
             _loopCallbackWorking = true;
             EmdrWrapper.Sketch.loop();
             _loopCallbackWorking = false;
@@ -89,11 +102,11 @@ namespace EmdrEmulator
                 set => SetProperty(ref _serialMonitor, value);
             }
 
-            private StripLed.Model _stripLedModel = new StripLed.Model();
-            public StripLed.Model StripLedModel
+            private Strip.Model _stripModel = new Strip.Model();
+            public Strip.Model StripModel
             {
-                get => _stripLedModel;
-                set => SetProperty(ref _stripLedModel, value);
+                get => _stripModel;
+                set => SetProperty(ref _stripModel, value);
             }
 
             public static Model DesignTime
@@ -102,7 +115,7 @@ namespace EmdrEmulator
                 {
                     var model = new Model();
                     model.SerialMonitor = "setup\nloop\nFastLED.show";
-                    model.StripLedModel = StripLed.Model.DesignTime;
+                    model.StripModel = Strip.Model.DesignTime;
 
                     return model;
                 }

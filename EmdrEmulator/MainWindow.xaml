@@ -12,7 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <local:StripLed DataContext="{Binding StripLedModel}" Grid.Row="0"/>
+        <local:Strip DataContext="{Binding StripModel}" Grid.Row="0"/>
         <ScrollViewer x:Name="serialMonitorScrollViewer" Grid.Row="1">
             <TextBlock x:Name="serialMonitor" Text="{Binding SerialMonitor}"/>
         </ScrollViewer>

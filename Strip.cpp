@@ -29,12 +29,19 @@
 //#include <power_mgt.h>
 
 #include "Strip.h"
+#include "EventHandler.h"
+#include "EventArgs.h"
 
 Strip::Strip()
+	: movingEventHandler(this, &Strip::onMovingEvent)
 {
 	leds = new CRGB[ledsCount];
 	FastLED.addLeds<WS2811, 7, GRB>(leds, ledsCount);
 	//FastLED.showColor(CRGB::Black);
+
+	movingTimer.elapsed += movingEventHandler;
+	movingTimer.interval = 20;
+	movingTimer.Start();
 }
 
 Strip::~Strip()
@@ -44,12 +51,36 @@ Strip::~Strip()
 
 void Strip::Loop()
 {
-	if (ledCurrent < ledsCount)
+	movingTimer.Loop();
+}
+
+void Strip::onMovingEvent(TimerEventArgs& args)
+{
+	auto ledNext = ledCurrent;
+
+	if (movingDirection == MovingDirection::RIGTH)
+		if (ledCurrent < ledsCount - args.elapsedIntervals)
+			ledNext += args.elapsedIntervals;
+		else
+			movingDirection = MovingDirection::LEFT;
+	else
+		if (ledCurrent > args.elapsedIntervals - 1)
+			ledNext -= args.elapsedIntervals;
+		else
+			movingDirection = MovingDirection::RIGTH;
+
+	if (ledNext != ledCurrent)
 	{
-		leds[ledCurrent].r = 255;
-		leds[ledCurrent].g = 0;
-		leds[ledCurrent].b = 0;
-		ledCurrent++;
+		(leds + ledCurrent)->r = 255;
+		(leds + ledCurrent)->g = 255;
+		(leds + ledCurrent)->b = 255;
+
+		(leds + ledNext)->r = 255;
+		(leds + ledNext)->g = 0;
+		(leds + ledNext)->b = 0;
 	}
+
 	FastLED.show();
+
+	ledCurrent = ledNext;
 }

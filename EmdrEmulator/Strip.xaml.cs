@@ -18,16 +18,15 @@ namespace EmdrEmulator
     /// <summary>
     /// Interaction logic for StripLed.xaml
     /// </summary>
-    public partial class StripLed : UserControl
+    public partial class Strip : UserControl
     {
         private Model model = new Model();
 
-        public StripLed()
+        public Strip()
         {
             InitializeComponent();
             DataContext = model;
         }
-
 
         public class Led
         {
@@ -49,7 +48,6 @@ namespace EmdrEmulator
                 get => _leds;
                 set => SetProperty(ref _leds, value);
             }
-
 
             public static Model DesignTime
             {

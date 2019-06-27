@@ -131,7 +131,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Emdr.h" />
+    <ClInclude Include="..\Event.h" />
+    <ClInclude Include="..\EventArgs.h" />
+    <ClInclude Include="..\EventHandler.h" />
     <ClInclude Include="..\Strip.h" />
+    <ClInclude Include="..\Timer.h" />
     <ClInclude Include="Arduino.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="EmdrWrapper.h" />
@@ -144,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\Strip.cpp" />
+    <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="FastLED.cpp" />
     <ClCompile Include="HardwareSerial.cpp" />
