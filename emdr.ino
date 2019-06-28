@@ -1,10 +1,11 @@
 // IRremote
-#include <boarddefs.h>
-#include <IRremote.h>
-#include <IRremoteInt.h>
-#include <ir_Lego_PF_BitStreamEncoder.h>
+//#include <boarddefs.h>
+//#include <IRremote.h>
+//#include <IRremoteInt.h>
+//#include <ir_Lego_PF_BitStreamEncoder.h>
 
 // FastLED
+#define FASTLED_INTERNAL
 #include <bitswap.h>
 #include <chipsets.h>
 #include <color.h>
@@ -47,7 +48,7 @@
 //const int IR_RECV_PIN = 4;
 //IRrecv irrecv(IR_RECV_PIN);
 
-const int LEDS_COUNT = 10;
+const int LEDS_COUNT = 186;
 const int LEDS_DATA_PIN = 7;
 const EOrder LEDS_COLOR_ORDER = GRB;
 
@@ -73,13 +74,15 @@ void setup() {
 void loop() {
   for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++) {
     leds[ledNo] = CRGB::Orange;
-    FastLED.delay(100);
+    FastLED.show();
+    //FastLED.delay(100);
     leds[ledNo] = CRGB::Black;
     FastLED.show();
   }
   for (int ledNo = LEDS_COUNT - 2; ledNo >= 1; ledNo--) {
     leds[ledNo] = CRGB::Orange;
-    FastLED.delay(100);
+    FastLED.show();
+    //FastLED.delay(100);
     leds[ledNo] = CRGB::Black;
     FastLED.show();
   }
