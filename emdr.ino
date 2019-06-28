@@ -1,9 +1,3 @@
-// IRremote
-//#include <boarddefs.h>
-//#include <IRremote.h>
-//#include <IRremoteInt.h>
-//#include <ir_Lego_PF_BitStreamEncoder.h>
-
 // FastLED
 #define FASTLED_INTERNAL
 #include <bitswap.h>
@@ -44,45 +38,102 @@
 // wtyczka ~900mA -> 15 diod
 // 330ohm, 100uF
 
-// infrared received pin
-//const int IR_RECV_PIN = 4;
-//IRrecv irrecv(IR_RECV_PIN);
-
-const int LEDS_COUNT = 186;
+const int LEDS_COUNT = 180;
 const int LEDS_DATA_PIN = 7;
 const EOrder LEDS_COLOR_ORDER = GRB;
-
 CRGB leds[LEDS_COUNT];
 
 void setup() {
   // put your setup code here, to run once:
   // fastled
-  //delay(1000); // power-up safety delay
+  // delay(1000); // power-up safety delay
+  Serial.begin(115200);
   FastLED.addLeds<WS2811, LEDS_DATA_PIN, LEDS_COLOR_ORDER>(leds, LEDS_COUNT);
   FastLED.setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(2);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 400);
 
   ledsOff();
-
-  // infrated
-  //irrecv.enableIRIn();
-  // serial monitor
-  //Serial.begin(9600);
 }
 
 void loop() {
+  unsigned long now = millis();
+//  moving_point(now);
+//  moving_point1();
+//  switchPoint();
+  still_point();
+}
+
+void moving_point(unsigned long now) {
+  static const unsigned int step_interval = 0;
+  static unsigned long fired_at;
+  static enum struct DIR { RIGHT, LEFT } dir = DIR::RIGHT;
+  static const byte first_led_no = 5;
+  static const byte last_led_no = LEDS_COUNT - 1;
+  static byte curr_led_no = first_led_no;
+
+  // czy juz czas?
+  if (now - fired_at < step_interval)
+    return;
+
+  // zgas poprzednia diode
+  leds[curr_led_no] = CRGB::Black;
+  
+  // wyznacz kolejna diode do zapalenia
+  if (dir == DIR::RIGHT) {
+    if (curr_led_no < last_led_no) {
+      curr_led_no++;
+    } else {
+      curr_led_no--;
+      dir = DIR::LEFT;
+    }
+  } else if (dir == DIR::LEFT) {
+    if (curr_led_no > first_led_no) {
+      curr_led_no--;
+    } else {
+      curr_led_no++;
+      dir = DIR::RIGHT;
+    }
+  }
+
+  // zapal dolejna diode
+  leds[curr_led_no] = CRGB::Orange;
+
+  FastLED.show();
+  fired_at = now;
+}
+
+
+void still_point() {
+  FastLED.setBrightness(1);
+  //leds[LEDS_COUNT/2 +30] = CRGB::Orange;
+  leds[89] = CRGB::Red;
+  FastLED.show();
+}
+
+void switchPoint() {
+  const byte left = 5, right = LEDS_COUNT - 1;
+  static byte curr = right;
+  leds[curr] = CRGB::Black;
+  curr = curr == left ? right : left;
+  leds[curr] = CRGB::Orange;
+  FastLED.delay(1000);
+}
+
+
+void moving_point1() {
   for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++) {
     leds[ledNo] = CRGB::Orange;
-    FastLED.show();
-    //FastLED.delay(100);
+    if (ledNo == 0 || ledNo == LEDS_COUNT - 1)
+      FastLED.delay(500);
+    else
+      FastLED.show();
     leds[ledNo] = CRGB::Black;
     FastLED.show();
   }
-  for (int ledNo = LEDS_COUNT - 2; ledNo >= 1; ledNo--) {
+  for (int ledNo = LEDS_COUNT - 1; ledNo >= 0; ledNo--) {
     leds[ledNo] = CRGB::Orange;
     FastLED.show();
-    //FastLED.delay(100);
     leds[ledNo] = CRGB::Black;
     FastLED.show();
   }
@@ -90,23 +141,8 @@ void loop() {
 
 void ledsOff() {
   for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
-    leds[ledNo] = CRGB::Black;
+    leds[ledNo] = CRGB::Blue;
+  leds[0] = CRGB::Blue;
   FastLED.delay(1000);
+  leds[0] = CRGB::Black;
 }
-
-void ledsSplash() {
-  for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
-    leds[ledNo] = CRGB::White;
-  FastLED.delay(1000);
-  for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
-    leds[ledNo] = CRGB::Black;
-  FastLED.delay(1000);
-}
-
-//void ircheck() {
-//  decode_results result;
-//  if (irrecv.decode(&result)) {
-//    Serial.println(result.value, HEX);
-//    irrecv.resume();
-//  }
-//}
