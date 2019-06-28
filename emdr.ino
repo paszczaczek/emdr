@@ -1,9 +1,3 @@
-// IRremote
-//#include <boarddefs.h>
-//#include <IRremote.h>
-//#include <IRremoteInt.h>
-//#include <ir_Lego_PF_BitStreamEncoder.h>
-
 // FastLED
 #define FASTLED_INTERNAL
 #include <bitswap.h>
@@ -44,45 +38,36 @@
 // wtyczka ~900mA -> 15 diod
 // 330ohm, 100uF
 
-// infrared received pin
-//const int IR_RECV_PIN = 4;
-//IRrecv irrecv(IR_RECV_PIN);
-
-const int LEDS_COUNT = 186;
+const int LEDS_COUNT = 180;
 const int LEDS_DATA_PIN = 7;
 const EOrder LEDS_COLOR_ORDER = GRB;
-
 CRGB leds[LEDS_COUNT];
 
 void setup() {
   // put your setup code here, to run once:
   // fastled
-  //delay(1000); // power-up safety delay
+  delay(1000); // power-up safety delay
   FastLED.addLeds<WS2811, LEDS_DATA_PIN, LEDS_COLOR_ORDER>(leds, LEDS_COUNT);
   FastLED.setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(2);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 400);
 
   ledsOff();
-
-  // infrated
-  //irrecv.enableIRIn();
-  // serial monitor
-  //Serial.begin(9600);
 }
 
 void loop() {
   for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++) {
     leds[ledNo] = CRGB::Orange;
-    FastLED.show();
-    //FastLED.delay(100);
+    if (ledNo == 0 || ledNo == LEDS_COUNT -1)
+      FastLED.delay(500);
+    else
+      FastLED.show();
     leds[ledNo] = CRGB::Black;
     FastLED.show();
   }
-  for (int ledNo = LEDS_COUNT - 2; ledNo >= 1; ledNo--) {
+  for (int ledNo = LEDS_COUNT - 1; ledNo >= 0; ledNo--) {
     leds[ledNo] = CRGB::Orange;
     FastLED.show();
-    //FastLED.delay(100);
     leds[ledNo] = CRGB::Black;
     FastLED.show();
   }
@@ -91,22 +76,6 @@ void loop() {
 void ledsOff() {
   for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
     leds[ledNo] = CRGB::Black;
+  leds[0] = CRGB::Blue;
   FastLED.delay(1000);
 }
-
-void ledsSplash() {
-  for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
-    leds[ledNo] = CRGB::White;
-  FastLED.delay(1000);
-  for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
-    leds[ledNo] = CRGB::Black;
-  FastLED.delay(1000);
-}
-
-//void ircheck() {
-//  decode_results result;
-//  if (irrecv.decode(&result)) {
-//    Serial.println(result.value, HEX);
-//    irrecv.resume();
-//  }
-//}
