@@ -137,6 +137,7 @@
     <ClInclude Include="..\Strip.h" />
     <ClInclude Include="..\Timer.h" />
     <ClInclude Include="Arduino.h" />
+    <ClInclude Include="ArduinoSTL.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="EmdrWrapper.h" />
     <ClInclude Include="FastLED.h" />

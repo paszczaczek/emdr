@@ -56,31 +56,35 @@ namespace EmdrEmulator
 
         private unsafe void FastLEDShowEventHandler(byte* ledsData, int ledsCount)
         {
-            Dispatcher.Invoke(() =>
+            try
             {
-                if (model.StripModel.Leds.Count != ledsCount)
+                Dispatcher.Invoke(() =>
                 {
-                    // nowy strip
-                    var stripModel = new Strip.Model();
-                    for (int i = 0; i < ledsCount; i++)
+                    if (model.StripModel.Leds.Count != ledsCount)
                     {
-                        byte* rgb = ledsData + i * 3;
-                        Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
-                        stripModel.Leds.Add(new Strip.Led(i, new SolidColorBrush(color)));
+                        // nowy strip
+                        var stripModel = new Strip.Model();
+                        for (int i = 0; i < ledsCount; i++)
+                        {
+                            byte* rgb = ledsData + i * 3;
+                            Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
+                            stripModel.Leds.Add(new Strip.Led(i, new SolidColorBrush(color)));
+                        }
+                        model.StripModel = stripModel;
                     }
-                    model.StripModel = stripModel;
-                }
-                else
-                {
-                    // aktualizacja kolorow w strip
-                    for (int i = 0; i < ledsCount; i++)
+                    else
                     {
-                        byte* rgb = ledsData + i * 3;
-                        Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
-                        model.StripModel.Leds[i].Brush.Color = color;
+                        // aktualizacja kolorow w strip
+                        for (int i = 0; i < ledsCount; i++)
+                        {
+                            byte* rgb = ledsData + i * 3;
+                            Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
+                            model.StripModel.Leds[i].Brush.Color = color;
+                        }
                     }
-                }
-            });
+                });
+            }
+            catch (TaskCanceledException ex) { }
         }
 
         private static bool _loopCallbackWorking = false;

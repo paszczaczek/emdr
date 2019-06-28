@@ -1,4 +1,5 @@
 #pragma once
+#include <ArduinoSTL.h>
 #include <vector>
 #include "EventHandler.h"
 
@@ -13,7 +14,7 @@ public:
 		return *this;
 	}
 
-	void Emit(TEventArgs& eventArgs)
+	void Emit(TEventArgs&& eventArgs)
 	{
 		for (auto iter = eventHandlers.begin(); iter < eventHandlers.end(); iter++)
 			(*iter)->Execute(eventArgs);

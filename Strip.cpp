@@ -69,18 +69,17 @@ void Strip::onMovingEvent(TimerEventArgs& args)
 		else
 			movingDirection = MovingDirection::RIGTH;
 
-	if (ledNext != ledCurrent)
-	{
-		(leds + ledCurrent)->r = 255;
-		(leds + ledCurrent)->g = 255;
-		(leds + ledCurrent)->b = 255;
+	if (ledNext == ledCurrent)
+		return;
 
-		(leds + ledNext)->r = 255;
-		(leds + ledNext)->g = 0;
-		(leds + ledNext)->b = 0;
-	}
+	(leds + ledCurrent)->r = 255;
+	(leds + ledCurrent)->g = 255;
+	(leds + ledCurrent)->b = 255;
+
+	(leds + ledNext)->r = 255;
+	(leds + ledNext)->g = 0;
+	(leds + ledNext)->b = 0;
 
 	FastLED.show();
-
 	ledCurrent = ledNext;
 }
