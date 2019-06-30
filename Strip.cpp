@@ -37,10 +37,10 @@ Strip::Strip()
 {
 	leds = new CRGB[ledsCount];
 	FastLED.addLeds<WS2811, 7, GRB>(leds, ledsCount);
-	//FastLED.showColor(CRGB::Black);
+	FastLED.showColor(CRGB::Black);
 
 	movingTimer.elapsed += movingEventHandler;
-	movingTimer.interval = 20;
+	movingTimer.interval = 1000;
 	movingTimer.Start();
 }
 
@@ -58,6 +58,8 @@ void Strip::onMovingEvent(TimerEventArgs& args)
 {
 	auto ledNext = ledCurrent;
 
+  Serial.write("onMovindEvent");
+
 	if (movingDirection == MovingDirection::RIGTH)
 		if (ledCurrent < ledsCount - args.elapsedIntervals)
 			ledNext += args.elapsedIntervals;
@@ -73,10 +75,10 @@ void Strip::onMovingEvent(TimerEventArgs& args)
 		return;
 
 	(leds + ledCurrent)->r = 255;
-	(leds + ledCurrent)->g = 255;
-	(leds + ledCurrent)->b = 255;
+	(leds + ledCurrent)->g = 0;
+	(leds + ledCurrent)->b = 0;
 
-	(leds + ledNext)->r = 255;
+	(leds + ledNext)->r = 0;
 	(leds + ledNext)->g = 0;
 	(leds + ledNext)->b = 0;
 
