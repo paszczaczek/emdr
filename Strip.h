@@ -16,10 +16,11 @@ public:
 	void Loop();
 
 private:
+	CLEDController *ledsController;
+
 	uint8_t ledCurrent = 0;
 	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;;
 
-	EventHandler<TimerEventArgs, Strip> movingEventHandler;
 	Timer movingTimer;
 	void onMovingEvent(TimerEventArgs& args);
 };

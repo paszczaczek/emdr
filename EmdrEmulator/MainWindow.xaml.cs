@@ -84,7 +84,7 @@ namespace EmdrEmulator
                     }
                 });
             }
-            catch (TaskCanceledException ex) { }
+            catch (TaskCanceledException) { }
         }
 
         private static bool _loopCallbackWorking = false;

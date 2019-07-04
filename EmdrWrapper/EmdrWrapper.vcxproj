@@ -93,6 +93,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShowIncludes>true</ShowIncludes>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -138,21 +139,26 @@
     <ClInclude Include="..\Timer.h" />
     <ClInclude Include="Arduino.h" />
     <ClInclude Include="ArduinoSTL.h" />
+    <ClInclude Include="color.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="EmdrWrapper.h" />
     <ClInclude Include="FastLED.h" />
+    <ClInclude Include="math8.h" />
     <ClInclude Include="pixeltypes.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="HardwareSerial.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="WrapperController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\Strip.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="controller.cpp" />
     <ClCompile Include="FastLED.cpp" />
     <ClCompile Include="HardwareSerial.cpp" />
+    <ClCompile Include="pixeltypes.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

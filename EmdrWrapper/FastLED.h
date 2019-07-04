@@ -1,6 +1,8 @@
 #pragma once
+#include <vector>
 #include "controller.h"
 #include "pixeltypes.h"
+#include "WrapperController.h"
 /*
 #ifndef __INC_FASTSPI_LED2_H
 #define __INC_FASTSPI_LED2_H
@@ -193,10 +195,9 @@ class CFastLED {
 	power_func m_pPowerFunc;	///< function for overriding brightness when using FastLED.show();
 
 	*/
-public:
+public:	
 	/*
 	CFastLED();
-
 
 	/// Add a CLEDController instance to the world.  Exposed to the public to allow people to implement their own
 	/// CLEDController objects or instances.  There are two ways to call this method (as well as the other addLeds)
@@ -209,10 +210,13 @@ public:
 	/// @param nLedsOrOffset - number of leds (3 argument version) or offset into the data array
 	/// @param nLedsIfOffset - number of leds (4 argument version)
 	/// @returns a reference to the added controller
-	static CLEDController &addLeds(CLEDController *pLed, struct CRGB *data, int nLedsOrOffset, int nLedsIfOffset = 0);
+	*/
+	static CLEDController &addLeds(CLEDController *pLed, struct CRGB *data, int nLedsOrOffset, int nLedsIfOffset = 0) {
 
+	}
+	/*
 	/// @name Adding SPI based controllers
-  //@{
+    //@{
 	/// Add an SPI based  CLEDController instance to the world.
 	/// There are two ways to call this method (as well as the other addLeds)
 	/// variations.  The first is with 2 arguments, in which case the arguments are  a pointer to
@@ -309,12 +313,17 @@ public:
 	/// @tparam RGB_ORDER - the rgb ordering for the leds (e.g. what order red, green, and blue data is written out in)
 	/// @returns a reference to the added controller
 	*/
+	static std::vector<WrapperController*> controllers;
 	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
 	static CLEDController &addLeds(struct CRGB *data, int nLedsOrOffset, int nLedsIfOffset = 0) {
 		//static CHIPSET<DATA_PIN, RGB_ORDER> c;
 		//return addLeds(&c, data, nLedsOrOffset, nLedsIfOffset);
-		static CLEDController controler;
-		return controler;
+
+		WrapperController *controller = new WrapperController();
+		controller->setLeds(data, nLedsOrOffset);
+		controllers.push_back(controller);
+
+		return *controller;
 	}
 	/*
 
@@ -572,19 +581,21 @@ public:
 	/// Get how many controllers have been registered
   /// @returns the number of controllers (strips) that have been added with addLeds
 	int count();
-
+	*/
 	/// Get a reference to a registered controller
   /// @returns a reference to the Nth controller
-	CLEDController & operator[](int x);
-
+	CLEDController & operator[](int x) {
+		return *controllers[x];
+	}
+	/*
 	/// Get the number of leds in the first controller
   /// @returns the number of LEDs in the first controller
 	int size() { return (*this)[0].size(); }
 
-	/// Get a pointer to led data for the first controller
-  /// @returns pointer to the CRGB buffer for the first controller
-	CRGB *leds() { return (*this)[0].leds(); }
 	*/
+	/// Get a pointer to led data for the first controller
+    /// @returns pointer to the CRGB buffer for the first controller
+	CRGB *leds() { return (*this)[0].leds(); }
 };
 
 /*

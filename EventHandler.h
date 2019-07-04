@@ -9,25 +9,25 @@ public:
 };
 
 
-template<class TEventArgs, class TTarget>
+template<class TTarget, class TEventArgs>
 class EventHandler : public EventHandlerBase<TEventArgs>
 {
 private:
-	typedef void(TTarget::*Callback)(TEventArgs&);
+	typedef void(TTarget::*Function)(TEventArgs&);
 
 public:
-	EventHandler(TTarget* target, Callback callback)
+	EventHandler(TTarget* target, Function callback)
 	{
 		this->target = target;
-		this->callback = callback;
+		this->function = callback;
 	}
 
 private:
 	void Execute(TEventArgs& eventArgs) override
 	{
-		(target->*callback)(eventArgs);
+		(target->*function)(eventArgs);
 	}
 
 	TTarget* target;
-	Callback callback;
+	Function function;
 };

@@ -28,19 +28,19 @@
 //#include <platforms.h>
 //#include <power_mgt.h>
 
+#include <pixeltypes.h>
 #include "Strip.h"
 #include "EventHandler.h"
 #include "EventArgs.h"
 
 Strip::Strip()
-	: movingEventHandler(this, &Strip::onMovingEvent)
 {
 	leds = new CRGB[ledsCount];
-	FastLED.addLeds<WS2811, 7, GRB>(leds, ledsCount);
-	FastLED.showColor(CRGB::Black);
+	ledsController = &FastLED.addLeds<WS2811, 7, GRB>(leds, ledsCount);
+	//ledsController->showColor(CRGB::Black);
 
-	movingTimer.elapsed += movingEventHandler;
-	movingTimer.interval = 1000;
+	movingTimer.elapsed += new EventHandler<Strip, TimerEventArgs>(this, &Strip::onMovingEvent);
+	movingTimer.interval = 20;
 	movingTimer.Start();
 }
 
