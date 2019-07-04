@@ -82,6 +82,7 @@
       <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_atmega328p__;__AVR_ATmega328P__;__AVR_ATmega328p__;_VMDEBUG=1;F_CPU=16000000L;ARDUINO=10809;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <ShowIncludes>true</ShowIncludes>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -112,12 +113,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Emdr.h" />
+    <ClInclude Include="..\MovingPointStripPlugin.h" />
+    <ClInclude Include="..\Plugin.h" />
     <ClInclude Include="..\Strip.h" />
+    <ClInclude Include="..\StripPlugin.h" />
     <ClInclude Include="..\Timer.h" />
     <ClInclude Include="__vm\.Emdr.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
+    <ClCompile Include="..\MovingPointStripPlugin.cpp" />
     <ClCompile Include="..\Strip.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

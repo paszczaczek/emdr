@@ -73,6 +73,15 @@
       <Filter>FastLED</Filter>
     </ClInclude>
     <ClInclude Include="EmdrWrapper.h" />
+    <ClInclude Include="..\MovingPointStripPlugin.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StripPlugin.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Plugin.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -98,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MovingPointStripPlugin.cpp">
+      <Filter>Emdr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

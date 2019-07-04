@@ -1,6 +1,5 @@
 #pragma once
 #include <ArduinoSTL.h>
-#include <vector>
 #include "EventHandler.h"
 
 template <class TEventArgs>

@@ -93,6 +93,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -134,7 +135,10 @@
     <ClInclude Include="..\Event.h" />
     <ClInclude Include="..\EventArgs.h" />
     <ClInclude Include="..\EventHandler.h" />
+    <ClInclude Include="..\MovingPointStripPlugin.h" />
+    <ClInclude Include="..\Plugin.h" />
     <ClInclude Include="..\Strip.h" />
+    <ClInclude Include="..\StripPlugin.h" />
     <ClInclude Include="..\Timer.h" />
     <ClInclude Include="Arduino.h" />
     <ClInclude Include="ArduinoSTL.h" />
@@ -150,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
+    <ClCompile Include="..\MovingPointStripPlugin.cpp" />
     <ClCompile Include="..\Strip.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />

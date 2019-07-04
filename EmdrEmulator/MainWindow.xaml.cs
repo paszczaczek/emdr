@@ -68,7 +68,7 @@ namespace EmdrEmulator
                             = UpdateModel(ledsData, ledsCount, model.EmdrStripModel);
                 });
             }
-            catch (TaskCanceledException ex) { }
+            catch (TaskCanceledException) {}
         }
 
         private unsafe Strip.Model UpdateModel(byte* ledsData, int ledsCount, Strip.Model model)

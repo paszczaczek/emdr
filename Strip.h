@@ -1,18 +1,15 @@
 #pragma once
 #define FASTLED_INTERNAL
 #include <FastLED.h>
-//#include <pixeltypes.h>
-#include "Timer.h"
-#include "EventArgs.h"
+#include <ArduinoSTL.h>
+#include "StripPlugin.h"
 
 class Strip
 {
 public:
-	CRGB *leds = nullptr;
 	int ledsCount = 0;
 	CLEDController *ledsController = nullptr;
 
-	Strip();
 	~Strip();
 
 	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
@@ -24,13 +21,11 @@ public:
 		ledsController->clearLedData();
 	}
 
+	void AddPlugin(StripPlugin *plugin);
 	void Loop();
 
 private:
-
-	uint8_t ledCurrent = 0;
-	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;;
-
-	Timer movingTimer;
-	void onMovingEvent(TimerEventArgs& args);
+	CRGB *leds = nullptr;
+	int ledCurrent = 0;
+	std::vector<StripPlugin*> plugins;
 };

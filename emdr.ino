@@ -1,1 +1,1 @@
-// setup() and loop() in Emdr.cpp
+// setup() and loop() defined in Emdr.cpp

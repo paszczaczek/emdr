@@ -16,9 +16,13 @@
     <ClInclude Include="..\Emdr.h" />
     <ClInclude Include="..\Strip.h" />
     <ClInclude Include="..\Timer.h" />
+    <ClInclude Include="..\Plugin.h" />
+    <ClInclude Include="..\StripPlugin.h" />
+    <ClInclude Include="..\MovingPointStripPlugin.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\Strip.cpp" />
+    <ClCompile Include="..\MovingPointStripPlugin.cpp" />
   </ItemGroup>
 </Project>
