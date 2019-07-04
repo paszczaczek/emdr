@@ -6,7 +6,7 @@ std::vector<WrapperController*> CFastLED::controllers;
 
 void CFastLED::show()
 {
-	EmdrWrapper::Sketch::OnFastLEDShow();
+	//EmdrWrapper::Sketch::OnFastLEDShow();
 }
 
 CFastLED FastLED;

@@ -30,11 +30,6 @@ namespace EmdrWrapper {
 
 		delegate void fastLEDShowDelegate(const uint8_t *leds, int ledsCount);
 		static event fastLEDShowDelegate^ fastLEDShowEvent;
-		static void OnFastLEDShow()
-		{
-			//pin_ptr<uint8_t> pinned = strip.leds->raw;
-			//fastLEDShowEvent(pinned, strip.ledsCount);
-		}
 		static void OnFastLEDShow(const uint8_t *leds, int nLeds)
 		{
 			pin_ptr<const uint8_t> pinned = leds;
