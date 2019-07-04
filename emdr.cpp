@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include "Strip.h"
 #include "Emdr.h"
 

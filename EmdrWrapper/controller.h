@@ -79,17 +79,17 @@ public:
 
 	/// show function w/integer brightness, will scale for color correction and temperature
 	void showColor(const struct CRGB &data, int nLeds, uint8_t brightness) {
-		//showColor(data, nLeds, getAdjustment(brightness));
+		showColor(data, nLeds, getAdjustment(brightness));
 	}
 	/// show function using the "attached to this controller" led data
-	//void showLeds(uint8_t brightness = 255) {
-		//show(m_Data, m_nLeds, getAdjustment(brightness));
-	//}
+	void showLeds(uint8_t brightness = 255) {
+		show(m_Data, m_nLeds, getAdjustment(brightness));
+	}
 
 	/// show the given color on the led strip
-	//void showColor(const struct CRGB & data, uint8_t brightness = 255) {
-	//	showColor(data, m_nLeds, getAdjustment(brightness));
-	//}
+	void showColor(const struct CRGB & data, uint8_t brightness = 255) {
+		showColor(data, m_nLeds, getAdjustment(brightness));
+	}
 
 	/*
 	/// get the first led controller in the chain of controllers

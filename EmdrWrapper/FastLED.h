@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "controller.h"
-#include "pixeltypes.h"
+//#include "pixeltypes.h"
 #include "WrapperController.h"
 /*
 #ifndef __INC_FASTSPI_LED2_H

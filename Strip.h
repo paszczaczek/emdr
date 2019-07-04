@@ -1,7 +1,7 @@
 #pragma once
 #define FASTLED_INTERNAL
 #include <FastLED.h>
-#include <pixeltypes.h>
+//#include <pixeltypes.h>
 #include "Timer.h"
 #include "EventArgs.h"
 

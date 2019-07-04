@@ -1,7 +1,9 @@
 #pragma once
-#include "../emdr.h"
+#include <stdint.h>
+//#include "FastLED.h"
+#include "../Emdr.h"
 
-using namespace System;
+using System::String;
 
 // https://www.codeproject.com/Articles/19354/Quick-C-CLI-Learn-C-CLI-in-less-than-10-minutes#A8
 namespace EmdrWrapper {
@@ -26,12 +28,17 @@ namespace EmdrWrapper {
 			serialWriteEvent(gcnew String(text));
 		}
 
-		delegate void fastLEDShowDelegate(uint8_t *leds, int ledsCount);
+		delegate void fastLEDShowDelegate(const uint8_t *leds, int ledsCount);
 		static event fastLEDShowDelegate^ fastLEDShowEvent;
 		static void OnFastLEDShow()
 		{
-			pin_ptr<uint8_t> pinned = strip.leds->raw;
-			fastLEDShowEvent(pinned, strip.ledsCount);
+			//pin_ptr<uint8_t> pinned = strip.leds->raw;
+			//fastLEDShowEvent(pinned, strip.ledsCount);
+		}
+		static void OnFastLEDShow(const uint8_t *leds, int nLeds)
+		{
+			pin_ptr<const uint8_t> pinned = leds;
+			fastLEDShowEvent(pinned, nLeds);
 		}
 	};
 }
