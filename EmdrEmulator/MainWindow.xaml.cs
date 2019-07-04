@@ -60,7 +60,7 @@ namespace EmdrEmulator
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (ledsCount == 1)
+                    if (ledsCount == 3)
                         model.RemoteControlStripModel 
                         = UpdateModel(ledsData, ledsCount, model.RemoteControlStripModel);
                     else
@@ -68,7 +68,7 @@ namespace EmdrEmulator
                             = UpdateModel(ledsData, ledsCount, model.EmdrStripModel);
                 });
             }
-            catch (TaskCanceledException) { }
+            catch (TaskCanceledException ex) { }
         }
 
         private unsafe Strip.Model UpdateModel(byte* ledsData, int ledsCount, Strip.Model model)

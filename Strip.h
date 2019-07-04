@@ -9,8 +9,8 @@ class Strip
 {
 public:
 	CRGB *leds = nullptr;
-	int ledsCount = 180;
-	CLEDController *ledsController;
+	int ledsCount = 0;
+	CLEDController *ledsController = nullptr;
 
 	Strip();
 	~Strip();
@@ -19,10 +19,9 @@ public:
 	void SetController(int ledsCount)
 	{
 		leds = new CRGB[ledsCount];
-		memset(leds, 0, sizeof(CRGB) * ledsCount);
 		this->ledsCount = ledsCount;
 		ledsController = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>(leds, ledsCount);
-		ledsController->showColor(CRGB::Black);
+		ledsController->clearLedData();
 	}
 
 	void Loop();

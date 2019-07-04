@@ -105,14 +105,13 @@ public:
 		return *this;
 	}
 
-	/*
 	/// zero out the led data managed by this controller
 	void clearLedData() {
 		if (m_Data) {
-			memset8((void*)m_Data, 0, sizeof(struct CRGB) * m_nLeds);
+			//memset8((void*)m_Data, 0, sizeof(struct CRGB) * m_nLeds);
+			memset((void*)m_Data, 0, sizeof(struct CRGB) * m_nLeds);
 		}
 	}
-	*/
 
 	/// How many leds does this controller manage?
 	virtual int size() { return m_nLeds; }

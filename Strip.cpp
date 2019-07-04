@@ -45,5 +45,6 @@ void Strip::onMovingEvent(TimerEventArgs& args)
 	leds[ledNext] = CRGB::Red;
 
 	ledsController->showLeds();
+
 	ledCurrent = ledNext;
 }
