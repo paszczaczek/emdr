@@ -93,7 +93,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ShowIncludes>true</ShowIncludes>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -143,7 +143,6 @@
     <ClInclude Include="controller.h" />
     <ClInclude Include="EmdrWrapper.h" />
     <ClInclude Include="FastLED.h" />
-    <ClInclude Include="math8.h" />
     <ClInclude Include="pixeltypes.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="HardwareSerial.h" />
@@ -155,7 +154,6 @@
     <ClCompile Include="..\Strip.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="controller.cpp" />
     <ClCompile Include="FastLED.cpp" />
     <ClCompile Include="HardwareSerial.cpp" />
     <ClCompile Include="pixeltypes.cpp" />

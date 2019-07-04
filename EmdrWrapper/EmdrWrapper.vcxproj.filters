@@ -13,62 +13,66 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="FastLED">
+      <UniqueIdentifier>{19323050-c177-4e61-abf4-cc717f55bda3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arduino">
+      <UniqueIdentifier>{ec72302a-0c3f-4119-b2cc-47341c6cf8d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emdr">
+      <UniqueIdentifier>{f383b8cd-f3a2-4a6d-bdd1-ba509068932f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EmdrWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Emdr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Arduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HardwareSerial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Strip.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FastLED.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pixeltypes.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="color.h">
+      <Filter>FastLED</Filter>
     </ClInclude>
     <ClInclude Include="controller.h">
-      <Filter>Header Files</Filter>
+      <Filter>FastLED</Filter>
     </ClInclude>
-    <ClInclude Include="..\Timer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="FastLED.h">
+      <Filter>FastLED</Filter>
     </ClInclude>
-    <ClInclude Include="..\EventHandler.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="pixeltypes.h">
+      <Filter>FastLED</Filter>
     </ClInclude>
-    <ClInclude Include="..\EventArgs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Event.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Arduino.h">
+      <Filter>Arduino</Filter>
     </ClInclude>
     <ClInclude Include="ArduinoSTL.h">
-      <Filter>Header Files</Filter>
+      <Filter>Arduino</Filter>
     </ClInclude>
-    <ClInclude Include="color.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Emdr.h">
+      <Filter>Emdr</Filter>
     </ClInclude>
-    <ClInclude Include="math8.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Event.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EventArgs.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EventHandler.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="HardwareSerial.h">
+      <Filter>Arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Strip.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Timer.h">
+      <Filter>Emdr</Filter>
     </ClInclude>
     <ClInclude Include="WrapperController.h">
-      <Filter>Header Files</Filter>
+      <Filter>FastLED</Filter>
     </ClInclude>
+    <ClInclude Include="EmdrWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -77,26 +81,23 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Emdr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Strip.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Arduino.cpp">
+      <Filter>Arduino</Filter>
     </ClCompile>
     <ClCompile Include="FastLED.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>FastLED</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Emdr.cpp">
+      <Filter>Emdr</Filter>
     </ClCompile>
     <ClCompile Include="HardwareSerial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Arduino.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="controller.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Arduino</Filter>
     </ClCompile>
     <ClCompile Include="pixeltypes.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>FastLED</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Strip.cpp">
+      <Filter>Emdr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
