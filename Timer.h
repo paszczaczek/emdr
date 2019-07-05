@@ -45,6 +45,7 @@ public:
 	}
 
 private:
+	// TODO: poprawiæ: unsigned = -1
 	unsigned long startedAt = -1;
 	unsigned long elapsedAt = -1;
 };

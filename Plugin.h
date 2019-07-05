@@ -3,8 +3,7 @@
 class Plugin
 {
 public:
+	virtual ~Plugin() {}
 	bool isEnabled = true;
-
-public:
 	virtual void Loop() = 0;
 };
