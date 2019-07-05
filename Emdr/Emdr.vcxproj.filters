@@ -19,6 +19,9 @@
     <ClInclude Include="..\Plugin.h" />
     <ClInclude Include="..\StripPlugin.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
+    <ClInclude Include="..\RemoteController.h" />
+    <ClInclude Include="..\Event.h" />
+    <ClInclude Include="..\RemoteControllerStripPlugin.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />

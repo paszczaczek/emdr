@@ -5,7 +5,7 @@
 
 MovingPointStripPlugin::MovingPointStripPlugin()
 {
-	movingTimer.elapsed += new EventHandler<MovingPointStripPlugin, TimerEventArgs>
+	movingTimer.elapsed += new EventHandler<MovingPointStripPlugin, Timer::EventArgs>
 		(this, &MovingPointStripPlugin::onMovingEvent);
 	movingTimer.interval = 100;
 	movingTimer.Start();
@@ -16,7 +16,7 @@ void MovingPointStripPlugin::Loop()
 	movingTimer.Loop();
 }
 
-void MovingPointStripPlugin::onMovingEvent(TimerEventArgs& args)
+void MovingPointStripPlugin::onMovingEvent(Timer::EventArgs& args)
 {
 	auto ledNext = ledCurrent;
 

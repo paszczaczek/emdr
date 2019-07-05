@@ -1,7 +1,9 @@
 #pragma once
 #include <stdint.h>
-//#include "FastLED.h"
-#include "../Emdr.h"
+#include "Emdr.h"
+
+#include "Event.h"
+#include "RemoteController.h"
 
 using System::String;
 
@@ -19,6 +21,11 @@ namespace EmdrWrapper {
 		static void loop() 
 		{ 
 			::loop(); 
+		}
+
+		static void RemoteControllerCodeReceived(int code) 
+		{
+			remoteController.ProcessCode(code);
 		}
 
 		delegate void serialWriteDelegate(String^ text);

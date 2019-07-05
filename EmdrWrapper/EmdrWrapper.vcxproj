@@ -92,7 +92,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
@@ -133,10 +133,11 @@
   <ItemGroup>
     <ClInclude Include="..\Emdr.h" />
     <ClInclude Include="..\Event.h" />
-    <ClInclude Include="..\EventArgs.h" />
     <ClInclude Include="..\EventHandler.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
     <ClInclude Include="..\Plugin.h" />
+    <ClInclude Include="..\RemoteController.h" />
+    <ClInclude Include="..\RemoteControllerStripPlugin.h" />
     <ClInclude Include="..\Strip.h" />
     <ClInclude Include="..\StripPlugin.h" />
     <ClInclude Include="..\Timer.h" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\MovingPointStripPlugin.cpp" />
+    <ClCompile Include="..\RemoteController.cpp" />
     <ClCompile Include="..\Strip.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />

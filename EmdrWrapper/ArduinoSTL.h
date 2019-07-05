@@ -1,2 +1,3 @@
 #pragma once
-// potrzebny, bo wystêpuje na Arduino
+#include <vector>
+#include <map>

@@ -1,5 +1,4 @@
 #pragma once
-#include "EventArgs.h"
 
 template<class TEventArgs>
 class EventHandlerBase

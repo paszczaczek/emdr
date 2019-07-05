@@ -54,9 +54,6 @@
     <ClInclude Include="..\Event.h">
       <Filter>Emdr</Filter>
     </ClInclude>
-    <ClInclude Include="..\EventArgs.h">
-      <Filter>Emdr</Filter>
-    </ClInclude>
     <ClInclude Include="..\EventHandler.h">
       <Filter>Emdr</Filter>
     </ClInclude>
@@ -80,6 +77,12 @@
       <Filter>Emdr</Filter>
     </ClInclude>
     <ClInclude Include="..\Plugin.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RemoteController.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RemoteControllerStripPlugin.h">
       <Filter>Emdr</Filter>
     </ClInclude>
   </ItemGroup>
@@ -109,6 +112,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MovingPointStripPlugin.cpp">
+      <Filter>Emdr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RemoteController.cpp">
       <Filter>Emdr</Filter>
     </ClCompile>
   </ItemGroup>

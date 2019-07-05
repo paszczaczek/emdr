@@ -6,17 +6,23 @@
         xmlns:local="clr-namespace:EmdrEmulator"
         mc:Ignorable="d"
         d:DataContext="{x:Static local:MainWindow+Model.DesignTime}"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" 
+        Background="Black">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <local:Strip DataContext="{Binding EmdrStripModel}" Grid.Row="0"/>
-        <local:Strip DataContext="{Binding RemoteControlStripModel}" Grid.Row="1"/>
-        <ScrollViewer x:Name="serialMonitorScrollViewer" Grid.Row="2">
-            <TextBlock x:Name="serialMonitor" Text="{Binding SerialMonitor}"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <local:Strip DataContext="{Binding EmdrStripModel}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Top"/>
+        <local:Strip DataContext="{Binding RemoteControlStripModel}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"/>
+        <local:RemoteController Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <ScrollViewer x:Name="serialMonitorScrollViewer" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
+            <TextBlock Text="{Binding SerialMonitor}"/>
         </ScrollViewer>
     </Grid>
 </Window>

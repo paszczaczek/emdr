@@ -54,10 +54,9 @@ namespace EmdrEmulator
                 get
                 {
                     var dataContext = new Model();
-                    dataContext.Leds.Add(new LedModel(0, Brushes.Red));
-                    dataContext.Leds.Add(new LedModel(10, Brushes.Green));
-                    dataContext.Leds.Add(new LedModel(50, Brushes.Blue));
-                    dataContext.Leds.Add(new LedModel(180, Brushes.White));
+                    for (int i = 0; i < 10; i++)
+                        dataContext.Leds.Add(new LedModel(i, Brushes.Black));
+                    dataContext.Leds[0].Brush = Brushes.Yellow;
 
                     return dataContext;
                 }
@@ -68,13 +67,13 @@ namespace EmdrEmulator
                 get
                 {
                     var dataContext = new Model();
-                    dataContext.Leds.Add(new LedModel(0, Brushes.Blue));
+                    dataContext.Leds.Add(new LedModel(0, Brushes.Red));
+                    dataContext.Leds.Add(new LedModel(1, Brushes.Black));
+                    dataContext.Leds.Add(new LedModel(2, Brushes.Black));
 
                     return dataContext;
                 }
             }
-
-
         }
     }
 }

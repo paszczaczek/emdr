@@ -10,7 +10,7 @@ public:
 
 private:
 	Timer movingTimer;
-	void onMovingEvent(TimerEventArgs& args);
+	void onMovingEvent(Timer::EventArgs& args);
 	int ledCurrent = 0;
 	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;;
 };
