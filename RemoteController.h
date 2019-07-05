@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 #include <vector>
 #include <map>
 #include "Event.h"
@@ -27,11 +28,15 @@ public:
 
 	void ProcessCode(int code)
 	{
+		Button button = UNSUPPORTED;
 		auto it = codeMapper.find(code);
-		if (it == codeMapper.end())
-			return;
-
-		Button button = it->second;
+		if (it != codeMapper.end())
+			button = it->second;
+		else {
+			char msg[32] = "";
+			snprintf(msg, sizeof(msg), "unsup. RC code: %d", code);
+			Serial.write(msg);
+		}
 		buttonPressed.Emit(EventArgs(button));
 	}
 

@@ -24,18 +24,27 @@ public:
 		elapsedAt = startedAt = millis();
 	}
 
+	void Stop() 
+	{
+		startedAt = elapsedAt = -1;
+	}
+
 	void Loop() 
 	{
+		if (startedAt == -1)
+			return;
 		auto now = millis();
 		unsigned int elapsedIntervals = (now - elapsedAt) / interval;
 		if (elapsedIntervals != 0)
 		{
 			elapsedAt += elapsedIntervals * interval;
 			elapsed.Emit(EventArgs(elapsedIntervals));
+			if (!autoReset)
+				Stop();
 		}
 	}
 
 private:
-	unsigned long startedAt = 0;
-	unsigned long elapsedAt = 0;
+	unsigned long startedAt = -1;
+	unsigned long elapsedAt = -1;
 };

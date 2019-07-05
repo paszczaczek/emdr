@@ -24,16 +24,16 @@
             </Style>
         </Grid.Resources>
         
-        <Button Grid.Row="0" Grid.Column="0" Content="00" Click="Button_Click"/>
-        <Button Grid.Row="0" Grid.Column="1" Content="01" Click="Button_Click"/>
-        <Button Grid.Row="0" Grid.Column="2" Content="02" Click="Button_Click"/>
+        <Button Grid.Row="0" Grid.Column="0" Content="1" Click="Button_Click"/>
+        <Button Grid.Row="0" Grid.Column="1" Content="2" Click="Button_Click"/>
+        <Button Grid.Row="0" Grid.Column="2" Content="3" Click="Button_Click"/>
 
-        <Button Grid.Row="1" Grid.Column="0" Content="10" Click="Button_Click"/>
-        <Button Grid.Row="1" Grid.Column="1" Content="11" Click="Button_Click"/>
-        <Button Grid.Row="1" Grid.Column="2" Content="12" Click="Button_Click"/>
-
-        <Button Grid.Row="2" Grid.Column="0" Content="20" Click="Button_Click"/>
-        <Button Grid.Row="2" Grid.Column="1" Content="21" Click="Button_Click"/>
-        <Button Grid.Row="2" Grid.Column="2" Content="22" Click="Button_Click"/>
+        <Button Grid.Row="1" Grid.Column="0" Content="" Click="Button_Click"/>
+        <Button Grid.Row="1" Grid.Column="1" Content="" Click="Button_Click"/>
+        <Button Grid.Row="1" Grid.Column="2" Content="" Click="Button_Click"/>
+                                                      
+        <Button Grid.Row="2" Grid.Column="0" Content="" Click="Button_Click"/>
+        <Button Grid.Row="2" Grid.Column="1" Content="" Click="Button_Click"/>
+        <Button Grid.Row="2" Grid.Column="2" Content="" Click="Button_Click"/>
     </Grid>
 </UserControl>

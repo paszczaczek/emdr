@@ -22,7 +22,7 @@
         <local:Strip DataContext="{Binding RemoteControlStripModel}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top"/>
         <local:RemoteController Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <ScrollViewer x:Name="serialMonitorScrollViewer" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
-            <TextBlock Text="{Binding SerialMonitor}"/>
+            <TextBlock Text="{Binding SerialMonitor}" Foreground="LightGray"/>
         </ScrollViewer>
     </Grid>
 </Window>
