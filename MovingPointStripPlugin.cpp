@@ -7,7 +7,7 @@ MovingPointStripPlugin::MovingPointStripPlugin()
 {
 	movingTimer.elapsed += new EventHandler<MovingPointStripPlugin, Timer::EventArgs>
 		(this, &MovingPointStripPlugin::onMovingEvent);
-	movingTimer.interval = 100;
+	movingTimer.interval = 1000;
 	movingTimer.Start();
 }
 
@@ -37,7 +37,11 @@ void MovingPointStripPlugin::onMovingEvent(Timer::EventArgs& args)
 	strip->ledsController->leds()[ledCurrent] = CRGB::Black;
 	strip->ledsController->leds()[ledNext] = CRGB::Orange;
 
-	strip->ledsController->showLeds();
+	Serial.print("MovingPointStripPlugin::onMovingEvent ");
+	Serial.println(ledCurrent, DEC);
+	// ledsController->showLeds() nie uwzglêdnia FastLED.setMaxPowerInVoltsAndMilliamps()!
+	// strip->ledsController->showLeds();
+	FastLED.show(2);
 
 	ledCurrent = ledNext;
 }

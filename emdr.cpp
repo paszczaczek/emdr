@@ -13,18 +13,28 @@ RemoteController remoteController;
 // the setup function runs once when you press reset or power the board
 void setup()
 {
-	Serial.write("setup");
+	Serial.begin(115200);
+	Serial.write("setup\n");
 	
-	emdrStrip.SetController<WS2811, 7, GRB>(180);
+	// Total maximum current draw when powered via external power supply
+	FastLED.setMaxPowerInVoltsAndMilliamps(5, 1000);
+
+	// Total maximum current draw from the Arduino when powered from a USB port
+	FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);
+	
+	// for safety
+	FastLED.setMaxPowerInVoltsAndMilliamps(5, 100);
+
+	emdrStrip.SetController<WS2811, 7, GRB>(3/*180*/);
 	emdrStrip.AddPlugin(new MovingPointStripPlugin);
 
-	remoteControllerStrip.SetController<WS2812B, 8, GRB>(3);
-	remoteControllerStrip.AddPlugin(new RemoteControllerStripPlugin);
+	//remoteControllerStrip.SetController<WS2812B, 8, GRB>(3);
+	//remoteControllerStrip.AddPlugin(new RemoteControllerStripPlugin);
 }
 
 // the loop function runs over and over again until power down or reset
 void loop()
 {
 	emdrStrip.Loop();
-	remoteControllerStrip.Loop();
+	//remoteControllerStrip.Loop();
 }
