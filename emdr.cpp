@@ -11,7 +11,6 @@
 #define MAX_CURRENT           100 // For safety
 
 Strip emdrStrip;
-Strip remoteControllerStrip;
 RemoteController remoteController;
 
 // the setup function runs once when you press reset or power the board
@@ -24,14 +23,12 @@ void setup()
 	//emdrStrip.SetController<WS2811, 7, GRB>(180);
 	emdrStrip.SetController<WS2811, 7, GRB>(3);
 	emdrStrip.AddPlugin(new MovingPointStripPlugin);
-
-	//remoteControllerStrip.SetController<WS2812B, 8, GRB>(3);
-	//remoteControllerStrip.AddPlugin(new RemoteControllerStripPlugin);
+	// zdjecie komentarza powoduje, ze na arduino diody sie nie swieca, wyjasnic
+	//emdrStrip.AddPlugin(new RemoteControllerStripPlugin<WS2811, 7, GRB>);
 }
 
 // the loop function runs over and over again until power down or reset
 void loop()
 {
 	emdrStrip.Loop();
-	//remoteControllerStrip.Loop();
 }

@@ -21,7 +21,7 @@ void MovingPointStripPlugin::onMovingEvent(Timer::EventArgs& args)
 	auto ledNext = ledCurrent;
 
 	if (movingDirection == MovingDirection::RIGTH)
-		if (ledCurrent < strip->ledsCount - (int)args.elapsedIntervals)
+		if (ledCurrent < strip->controller->size() - (int)args.elapsedIntervals)
 			ledNext += args.elapsedIntervals;
 		else
 			movingDirection = MovingDirection::LEFT;
@@ -34,15 +34,11 @@ void MovingPointStripPlugin::onMovingEvent(Timer::EventArgs& args)
 	if (ledNext == ledCurrent)
 		return;
 
-	strip->ledsController->leds()[ledCurrent] = CRGB::Black;
-	strip->ledsController->leds()[ledNext] = CRGB::Orange;
-
-	Serial.print("MovingPointStripPlugin::onMovingEvent ");
-	Serial.println(ledCurrent, DEC);
-	// ledsController->showLeds() nie uwzglêdnia FastLED.setMaxPowerInVoltsAndMilliamps()!
-	//strip->ledsController->showLeds();
-	FastLED.show(2);
-
+	strip->controller->leds()[ledCurrent] = CRGB::Black;
+	strip->controller->leds()[ledNext] = CRGB::Orange;
+	strip->updated = true;
+	Serial.println("MovingPointStripPlugin::onMovingEvent");
+		
 	ledCurrent = ledNext;
 }
 

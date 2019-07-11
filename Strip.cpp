@@ -1,3 +1,4 @@
+#include <FastLED.h>
 #include "Strip.h"
 #include "StripPlugin.h"
 
@@ -19,4 +20,12 @@ void Strip::Loop()
 {
 	for (auto plugin : plugins)
 		plugin->Loop();
+
+	if (updated)
+	{
+		// wlasciwsze byloby controller->showLeds(), ale to wywaolanie nie
+		// uwzglednia FastLED.setMaxPowerInVoltsAndMilliamps()
+		FastLED.show(2);
+		updated = false;
+	}
 }

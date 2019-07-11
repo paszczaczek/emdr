@@ -61,10 +61,18 @@ namespace EmdrEmulator
             {
                 Dispatcher.Invoke(() =>
                 {
-                    var stripModel = new Strip.Model();
-                    for (int i = 0; i < ledsCount; i++)
-                        stripModel.Leds.Add(new Strip.LedModel(i, new SolidColorBrush(Colors.Black)));
-                    model.Strip = stripModel;
+                    if (ledsCount > 1)
+                    {
+                        // strip
+                        var stripModel = new Strip.Model();
+                        for (int i = 0; i < ledsCount; i++)
+                            stripModel.Leds.Add(new Strip.LedModel(i, new SolidColorBrush(Colors.Black)));
+                        model.Strip = stripModel;
+                    }
+                    else
+                    {
+                        // remote controller
+                    }
                 });
             }
             catch (TaskCanceledException) { }
