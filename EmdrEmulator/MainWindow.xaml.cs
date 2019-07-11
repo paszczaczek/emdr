@@ -32,12 +32,12 @@ namespace EmdrEmulator
             InitializeComponent();
             DataContext = model;
 
-            // obsługa Serial.write()
-            EmdrWrapper.Serial.writeEvent += SerialWriteEventHandler;
+            // obsługa Serial
+            EmdrWrapper.Serial.writeEvent += Serial_WriteEventHandler;
 
-            // obsługa FastLED.show()
-            unsafe { EmdrWrapper.FastLED.addLedsEvent += FastLEDAddLedsEventHandler; }
-            unsafe { EmdrWrapper.FastLED.showEvent += FastLEDShowEventHandler; }
+            // obsługa FastLED
+            unsafe { EmdrWrapper.FastLED.addLedsEvent += FastLED_AddLedsEventHandler; }
+            unsafe { EmdrWrapper.FastLED.showEvent += FastLED_ShowEventHandler; }
 
             // uruchomienie funkcji setup()
             EmdrWrapper.Sketch.setup();
@@ -46,16 +46,16 @@ namespace EmdrEmulator
             _timer = new Timer(LoopCallback, null, 0, 20);
         }
 
-        private void SerialWriteEventHandler(string text)
+        private void Serial_WriteEventHandler(string text)
         {
             Dispatcher.Invoke(() =>
             {
-                model.SerialMonitor += $"{text}\n";
+                model.SerialMonitor += $"{text}";
                 serialMonitorScrollViewer.ScrollToBottom();
             });
         }
 
-        private unsafe void FastLEDAddLedsEventHandler(int ledsCount)
+        private unsafe void FastLED_AddLedsEventHandler(int ledsCount)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace EmdrEmulator
             catch (TaskCanceledException) { }
         }
 
-        private unsafe void FastLEDShowEventHandler(byte* ledsData, int ledsCount)
+        private unsafe void FastLED_ShowEventHandler(byte* ledsData, int ledsCount)
         {
             try
             {

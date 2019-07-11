@@ -21,7 +21,8 @@ void setup()
 	Serial.write("setup\n");
 	
 	FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_CURRENT);
-	emdrStrip.SetController<WS2811, 7, GRB>(/*3*/180);
+	//emdrStrip.SetController<WS2811, 7, GRB>(180);
+	emdrStrip.SetController<WS2811, 7, GRB>(3);
 	emdrStrip.AddPlugin(new MovingPointStripPlugin);
 
 	//remoteControllerStrip.SetController<WS2812B, 8, GRB>(3);
