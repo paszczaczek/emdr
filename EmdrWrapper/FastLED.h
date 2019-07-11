@@ -504,21 +504,23 @@ public:
 	/// Get the current global brightness setting
 	/// @returns the current global brightness value
 	uint8_t getBrightness() { return m_Scale; }
+	*/
 
 	/// Set the maximum power to be used, given in volts and milliamps.
 	/// @param volts - how many volts the leds are being driven at (usually 5)
 	/// @param milliamps - the maximum milliamps of power draw you want
-	inline void setMaxPowerInVoltsAndMilliamps(uint8_t volts, uint32_t milliamps) { setMaxPowerInMilliWatts(volts * milliamps); }
+	inline void setMaxPowerInVoltsAndMilliamps(uint8_t volts, uint32_t milliamps) { }
 
+	/*
 	/// Set the maximum power to be used, given in milliwatts
 	/// @param milliwatts - the max power draw desired, in milliwatts
 	inline void setMaxPowerInMilliWatts(uint32_t milliwatts) { m_pPowerFunc = &calculate_max_brightness_for_power_mW; m_nPowerData = milliwatts; }
+	*/
 
 	/// Update all our controllers with the current led colors, using the passed in brightness
 	/// @param scale temporarily override the scale
 	void show(uint8_t scale);
 
-	*/
 	/// Update all our controllers with the current led colors
 	void show(); // { show(m_Scale); }
 	/*

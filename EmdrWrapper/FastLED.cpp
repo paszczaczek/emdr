@@ -9,4 +9,10 @@ void CFastLED::show()
 	//EmdrWrapper::Sketch::OnFastLEDShow();
 }
 
+void CFastLED::show(uint8_t scale)
+{
+	//EmdrWrapper::Sketch::OnFastLEDShow();
+}
+
+
 CFastLED FastLED;

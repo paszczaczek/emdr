@@ -19,10 +19,10 @@ public:
 		this->ledsCount = ledsCount;
 		ledsController = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>(leds, ledsCount);
 		ledsController->clearLedData();
-		uint8_t max_brightness = calculate_max_brightness_for_power_vmA(
-			ledsController->leds(), ledsController->size(), 255, 5, 10);
-		Serial.print("max brightness: ");
-		Serial.println(max_brightness);
+		//uint8_t max_brightness = calculate_max_brightness_for_power_vmA(
+		//	ledsController->leds(), ledsController->size(), 255, 5, 10);
+		//Serial.print("max brightness: ");
+		//Serial.println(max_brightness);
 	}
 
 	void AddPlugin(StripPlugin *plugin);
