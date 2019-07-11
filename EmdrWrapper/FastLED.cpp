@@ -6,12 +6,12 @@ std::vector<WrapperController*> CFastLED::controllers;
 
 void CFastLED::show()
 {
-	//EmdrWrapper::Sketch::OnFastLEDShow();
+	EmdrWrapper::FastLED::OnShow(leds()->raw, size());
 }
 
 void CFastLED::show(uint8_t scale)
 {
-	//EmdrWrapper::Sketch::OnFastLEDShow();
+	EmdrWrapper::FastLED::OnShow(leds()->raw, size());
 }
 
 

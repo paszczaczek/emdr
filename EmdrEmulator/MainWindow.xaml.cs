@@ -33,10 +33,11 @@ namespace EmdrEmulator
             DataContext = model;
 
             // obsługa Serial.write()
-            EmdrWrapper.Sketch.serialWriteEvent += SerialWriteEventHandler;
+            EmdrWrapper.Serial.writeEvent += SerialWriteEventHandler;
 
             // obsługa FastLED.show()
-            unsafe { EmdrWrapper.Sketch.fastLEDShowEvent += FastLEDShowEventHandler; }
+            unsafe { EmdrWrapper.FastLED.addLedsEvent += FastLEDAddLedsEventHandler; }
+            unsafe { EmdrWrapper.FastLED.showEvent += FastLEDShowEventHandler; }
 
             // uruchomienie funkcji setup()
             EmdrWrapper.Sketch.setup();
@@ -54,49 +55,37 @@ namespace EmdrEmulator
             });
         }
 
+        private unsafe void FastLEDAddLedsEventHandler(int ledsCount)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    var stripModel = new Strip.Model();
+                    for (int i = 0; i < ledsCount; i++)
+                        stripModel.Leds.Add(new Strip.LedModel(i, new SolidColorBrush(Colors.Black)));
+                    model.Strip = stripModel;
+                });
+            }
+            catch (TaskCanceledException) { }
+        }
+
         private unsafe void FastLEDShowEventHandler(byte* ledsData, int ledsCount)
         {
             try
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (ledsCount == 3)
-                        model.RemoteControlStripModel 
-                        = UpdateModel(ledsData, ledsCount, model.RemoteControlStripModel);
-                    else
-                        model.EmdrStripModel
-                            = UpdateModel(ledsData, ledsCount, model.EmdrStripModel);
+                    // aktualizacja kolorow w strip
+                    for (int i = 0; i < ledsCount; i++)
+                    {
+                        byte* rgb = ledsData + i * 3;
+                        Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
+                        model.Strip.Leds[i].Brush.Color = color;
+                    }
                 });
             }
-            catch (TaskCanceledException) {}
-        }
-
-        private unsafe Strip.Model UpdateModel(byte* ledsData, int ledsCount, Strip.Model model)
-        {
-            if (model.Leds.Count != ledsCount)
-            {
-                // nowy strip
-                var stripModel = new Strip.Model();
-                for (int i = 0; i < ledsCount; i++)
-                {
-                    byte* rgb = ledsData + i * 3;
-                    Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
-                    stripModel.Leds.Add(new Strip.LedModel(i, new SolidColorBrush(color)));
-                }
-                return stripModel;
-            }
-            else
-            {
-                // aktualizacja kolorow w strip
-                for (int i = 0; i < ledsCount; i++)
-                {
-                    byte* rgb = ledsData + i * 3;
-                    Color color = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
-                    model.Leds[i].Brush.Color = color;
-                }
-                return model;
-            }
-
+            catch (TaskCanceledException) { }
         }
 
         private static bool _loopCallbackWorking = false;
@@ -118,18 +107,11 @@ namespace EmdrEmulator
                 set => SetProperty(ref _serialMonitor, value);
             }
 
-            private Strip.Model _emdrStripModel = new Strip.Model();
-            public Strip.Model EmdrStripModel
+            private Strip.Model _strip = new Strip.Model();
+            public Strip.Model Strip
             {
-                get => _emdrStripModel;
-                set => SetProperty(ref _emdrStripModel, value);
-            }
-
-            private Strip.Model _remoteControlStripModel = new Strip.Model();
-            public Strip.Model RemoteControlStripModel
-            {
-                get => _remoteControlStripModel;
-                set => SetProperty(ref _remoteControlStripModel, value);
+                get => _strip;
+                set => SetProperty(ref _strip, value);
             }
 
             public static Model DesignTime
@@ -138,8 +120,7 @@ namespace EmdrEmulator
                 {
                     var model = new Model();
                     model.SerialMonitor = "setup\nloop\nFastLED.show";
-                    model.EmdrStripModel = Strip.Model.EmdrDesignTime;
-                    model.RemoteControlStripModel = Strip.Model.RemoteControlDesignTime;
+                    model.Strip = EmdrEmulator.Strip.Model.EmdrDesignTime;
 
                     return model;
                 }

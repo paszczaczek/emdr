@@ -13,34 +13,53 @@ namespace EmdrWrapper {
 	public ref class Sketch
 	{
 	public:
-		static void setup() 
+		static void setup()
 		{
-			::setup(); 
+			::setup();
 		}
 
-		static void loop() 
-		{ 
-			::loop(); 
+		static void loop()
+		{
+			::loop();
 		}
+	};
 
-		static void RemoteControllerCodeReceived(int code) 
+	public ref class Serial 
+	{
+	public:
+		delegate void writeDelegate(String^ text);
+		static event writeDelegate^ writeEvent;
+		static void OnWrite(const char *text)
+		{
+			writeEvent(gcnew String(text));
+		}
+	};
+
+	public ref class RemoteController
+	{
+	public:
+		static void CodeReceived(int code)
 		{
 			remoteController.ProcessCode(code);
 		}
+	};
 
-		delegate void serialWriteDelegate(String^ text);
-		static event serialWriteDelegate^ serialWriteEvent;
-		static void OnSerialWrite(const char *text) 
+	public ref class FastLED
+	{
+	public:
+		delegate void addLedsDelegate(int ledsCount);
+		static event addLedsDelegate^ addLedsEvent;
+		static void OnAddLeds(int ledsCount)
 		{
-			serialWriteEvent(gcnew String(text));
+			addLedsEvent(ledsCount);
 		}
 
-		delegate void fastLEDShowDelegate(const uint8_t *leds, int ledsCount);
-		static event fastLEDShowDelegate^ fastLEDShowEvent;
-		static void OnFastLEDShow(const uint8_t *leds, int nLeds)
+		delegate void showDelegate(const uint8_t *leds, int ledsCount);
+		static event showDelegate^ showEvent;
+		static void OnShow(const uint8_t *leds, int nLeds)
 		{
 			pin_ptr<const uint8_t> pinned = leds;
-			fastLEDShowEvent(pinned, nLeds);
+			showEvent(pinned, nLeds);
 		}
 	};
 }

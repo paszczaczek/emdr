@@ -325,6 +325,8 @@ public:
 		controller->setLeds(data, nLedsOrOffset);
 		controllers.push_back(controller);
 
+		EmdrWrapper::FastLED::OnAddLeds(nLedsOrOffset);
+
 		return *controller;
 	}
 	/*
@@ -591,12 +593,11 @@ public:
 	CLEDController & operator[](int x) {
 		return *controllers[x];
 	}
-	/*
+	
 	/// Get the number of leds in the first controller
-  /// @returns the number of LEDs in the first controller
+    /// @returns the number of LEDs in the first controller
 	int size() { return (*this)[0].size(); }
 
-	*/
 	/// Get a pointer to led data for the first controller
     /// @returns pointer to the CRGB buffer for the first controller
 	CRGB *leds() { return (*this)[0].leds(); }

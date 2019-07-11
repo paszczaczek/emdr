@@ -40,7 +40,7 @@ void MovingPointStripPlugin::onMovingEvent(Timer::EventArgs& args)
 	Serial.print("MovingPointStripPlugin::onMovingEvent ");
 	Serial.println(ledCurrent, DEC);
 	// ledsController->showLeds() nie uwzglêdnia FastLED.setMaxPowerInVoltsAndMilliamps()!
-	// strip->ledsController->showLeds();
+	//strip->ledsController->showLeds();
 	FastLED.show(2);
 
 	ledCurrent = ledNext;

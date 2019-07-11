@@ -29,9 +29,9 @@ namespace EmdrEmulator
         {
             var button = (Button)sender;
             if (int.TryParse(button.Content.ToString(), out int code))
-                EmdrWrapper.Sketch.RemoteControllerCodeReceived(code);
+                EmdrWrapper.RemoteController.CodeReceived(code);
             else
-                EmdrWrapper.Sketch.RemoteControllerCodeReceived(-1);
+                EmdrWrapper.RemoteController.CodeReceived(-1);
         }
     }
 }
