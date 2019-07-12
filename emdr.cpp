@@ -12,6 +12,7 @@
 
 #define LED_TYPE WS2811
 #define LED_PIN       7
+#define LED_PIN_RC    8
 #define LED_ORDER   GRB
 //#define LED_COUNT	180 
 #define LED_COUNT	  3 
@@ -28,7 +29,7 @@ void setup()
 	FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_CURRENT);
 	emdrStrip.SetController<LED_TYPE, LED_PIN, LED_ORDER>(LED_COUNT);
 	emdrStrip.AddPlugin(new MovingPointStripPlugin);
-	emdrStrip.AddPlugin(new RemoteControllerStripPlugin<LED_TYPE, LED_PIN, LED_ORDER>);
+	emdrStrip.AddPlugin(new RemoteControllerStripPlugin<LED_TYPE, LED_PIN_RC, LED_ORDER>);
 }
 
 // the loop function runs over and over again until power down or reset

@@ -23,7 +23,7 @@ public:
 		flashTimer.interval = 1000;
 		flashTimer.autoReset = false;
 
-		buttonPressed = false;
+		buttonIndicator = (uint8_t)BUTTON_INDICATOR::UNSET;
 		buttonUnsupported = false;
 	}
 
@@ -34,7 +34,7 @@ public:
 		// https://github.com/FastLED/FastLED/issues/280
 		// Daniel Garcia: you can't have multiple controllers on the same pin
 		if (!controller)
-			controller = &FastLED.addLeds<CHIPSET, DATA_PIN+1, RGB_ORDER>
+			controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>
 			(strip->controller->leds(), ledsCount);
 
 		flashTimer.Loop();
@@ -44,15 +44,17 @@ public:
 private:
 	CLEDController *controller = nullptr;
 	const uint8_t ledsCount = 1;
-	const CRGB unset = CRGB::Beige;
 	Timer flashTimer;
-	uint8_t buttonPressed : 1;
+
+	enum class BUTTON_INDICATOR :uint8_t { UNSET = 0, ON = 1, OFF = 2};
+
+	uint8_t buttonIndicator : 2;
 	uint8_t buttonUnsupported : 1;
 
 	void onRemoteControllerButtonPressed(RemoteController::EventArgs &args)
 	{
 		// wciœniêto guzik na pilocie
-		buttonPressed = true;
+		buttonIndicator = (uint8_t)BUTTON_INDICATOR::ON;
 		buttonUnsupported = args.button == RemoteController::Button::UNSUPPORTED;
 		flashTimer.Start();
 	}
@@ -61,26 +63,36 @@ private:
 	{
 		// czas zgasiæ diodê sygnalizuj¹c¹ wciœniêcie guzika na pilocie
 		flashTimer.Stop();
-		buttonPressed = false;
-		buttonUnsupported = false;
+		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
 	}
 
 	void updateLeds()
 	{
 		// wyznacz kolor jaki ma miec dioda sygnalizujaca wcisniecie guzika na pilocie
-		CRGB led0HasToBe;
-		if (buttonPressed)
-			led0HasToBe = buttonUnsupported ? CRGB::Blue : CRGB::Red;
-		else
-			led0HasToBe = CRGB::Violet;
+		CRGB biColor;
+		switch (buttonIndicator) {
+		case (uint8_t)BUTTON_INDICATOR::ON: 
+			// wcisnieto guzik na pilocie - dioda ma sie swiecic
+			biColor = buttonUnsupported ? CRGB::Blue : CRGB::Red; 
+			break;
+		case (uint8_t)BUTTON_INDICATOR::OFF:
+			// wcisnieto guzik na pilocie ale czas swiecenia diody minal - wylaczyc diode
+			biColor = CRGB::Black;
+			buttonIndicator = (uint8_t)BUTTON_INDICATOR::UNSET;
+			break;
+		case (uint8_t)BUTTON_INDICATOR::UNSET:
+			// zaden guzik na pilocie nie byl wciskany - nie ingerujemy w swiecenie diody
+			return;
+		}
 
-		// czy kolor jest inny niz aktualny
-		CRGB &led0current = controller->leds()[0];
-		if (led0HasToBe.r != led0current.r ||
-			led0HasToBe.g != led0current.g ||
-			led0HasToBe.b != led0current.b)
+		// czy kolor zmienil sie?
+		CRGB &biColorCurrent = controller->leds()[0];
+		if (biColor.r != biColorCurrent.r ||
+			biColor.g != biColorCurrent.g ||
+			biColor.b != biColorCurrent.b)
 		{
-			led0current = led0HasToBe;
+			// tak
+			biColorCurrent = biColor;
 			controller->showLeds(2);
 		}
 	}
