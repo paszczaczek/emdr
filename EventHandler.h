@@ -5,6 +5,7 @@ class EventHandlerBase
 {
 public:
 	virtual void Execute(TEventArgs& eventArgs) = 0;
+  virtual ~EventHandlerBase() {}
 };
 
 

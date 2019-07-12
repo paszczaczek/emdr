@@ -17,7 +17,7 @@ public:
 			new EventHandler<RemoteControllerStripPlugin, RemoteController::EventArgs>
 			(this, &RemoteControllerStripPlugin::onRemoteControllerButtonPressed);
 
-		// ustaw timer do migania diod¹ po wciœniêciu guzika na pilocie
+		// ustaw timer do migania diodï¿½ po wciï¿½niï¿½ciu guzika na pilocie
 		flashTimer.elapsed += new EventHandler<RemoteControllerStripPlugin, Timer::EventArgs>
 			(this, &RemoteControllerStripPlugin::onTimerFlashEvent);
 		flashTimer.interval = 1000;
@@ -29,7 +29,7 @@ public:
 
 	virtual void Loop() override
 	{
-		// utwórz kontroler do aktualizacji ledsCount pierwszych diod obsugiwanych przez plugin pilota
+		// utwï¿½rz kontroler do aktualizacji ledsCount pierwszych diod obsugiwanych przez plugin pilota
 		// !!!
 		// https://github.com/FastLED/FastLED/issues/280
 		// Daniel Garcia: you can't have multiple controllers on the same pin
@@ -53,7 +53,7 @@ private:
 
 	void onRemoteControllerButtonPressed(RemoteController::EventArgs &args)
 	{
-		// wciœniêto guzik na pilocie
+		// wcisnieto guzik na pilocie
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::ON;
 		buttonUnsupported = args.button == RemoteController::Button::UNSUPPORTED;
 		flashTimer.Start();
@@ -61,7 +61,8 @@ private:
 
 	void onTimerFlashEvent(Timer::EventArgs& args)
 	{
-		// czas zgasiæ diodê sygnalizuj¹c¹ wciœniêcie guzika na pilocie
+    (void) args;
+		// czas zgasic diode sygnalizujaca wcisniecie guzika na pilocie
 		flashTimer.Stop();
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
 	}
@@ -69,7 +70,7 @@ private:
 	void updateLeds()
 	{
 		// wyznacz kolor jaki ma miec dioda sygnalizujaca wcisniecie guzika na pilocie
-		CRGB biColor;
+		CRGB biColor = CRGB::Black;
 		switch (buttonIndicator) {
 		case (uint8_t)BUTTON_INDICATOR::ON: 
 			// wcisnieto guzik na pilocie - dioda ma sie swiecic

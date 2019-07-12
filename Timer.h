@@ -31,7 +31,7 @@ public:
 
 	void Loop() 
 	{
-		if (startedAt == -1)
+		if (startedAt == (unsigned long)-1)
 			return;
 		auto now = millis();
 		unsigned int elapsedIntervals = (now - elapsedAt) / interval;
@@ -45,7 +45,6 @@ public:
 	}
 
 private:
-	// TODO: poprawiæ: unsigned = -1
 	unsigned long startedAt = -1;
 	unsigned long elapsedAt = -1;
 };
