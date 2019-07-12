@@ -10,6 +10,12 @@
 #define MAX_CURRENT_FROM_USB  500 // Total maximum current draw from the Arduino when powered from a USB port
 #define MAX_CURRENT           100 // For safety
 
+#define LED_TYPE WS2811
+#define LED_PIN       7
+#define LED_ORDER   GRB
+//#define LED_COUNT	180 
+#define LED_COUNT	  3 
+
 Strip emdrStrip;
 RemoteController remoteController;
 
@@ -20,11 +26,9 @@ void setup()
 	Serial.write("setup\n");
 	
 	FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_CURRENT);
-	//emdrStrip.SetController<WS2811, 7, GRB>(180);
-	emdrStrip.SetController<WS2811, 7, GRB>(3);
+	emdrStrip.SetController<LED_TYPE, LED_PIN, LED_ORDER>(LED_COUNT);
 	emdrStrip.AddPlugin(new MovingPointStripPlugin);
-	// zdjecie komentarza powoduje, ze na arduino diody sie nie swieca, wyjasnic
-	//emdrStrip.AddPlugin(new RemoteControllerStripPlugin<WS2811, 7, GRB>);
+	emdrStrip.AddPlugin(new RemoteControllerStripPlugin<LED_TYPE, LED_PIN, LED_ORDER>);
 }
 
 // the loop function runs over and over again until power down or reset

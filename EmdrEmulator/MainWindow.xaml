@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         d:DataContext="{x:Static local:MainWindow+Model.DesignTime}"
         Title="MainWindow" 
-        Background="Black">
+        Background="Black" Width="600" Height="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

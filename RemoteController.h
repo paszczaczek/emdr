@@ -34,8 +34,8 @@ public:
 			button = it->second;
 		else {
 			char msg[32] = "";
-			snprintf(msg, sizeof(msg), "unsup. RC code: %d", code);
-			Serial.write(msg);
+			snprintf(msg, sizeof(msg), "unsup. RC code: %d\n", code);
+			Serial.print(msg);
 		}
 		buttonPressed.Emit(EventArgs(button));
 	}

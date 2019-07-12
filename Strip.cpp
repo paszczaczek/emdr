@@ -23,9 +23,12 @@ void Strip::Loop()
 
 	if (updated)
 	{
-		// wlasciwsze byloby controller->showLeds(), ale to wywaolanie nie
-		// uwzglednia FastLED.setMaxPowerInVoltsAndMilliamps()
+		// controller->showLeds() nie uwzglednia FastLED.setMaxPowerInVoltsAndMilliamps() !
+		// z kolei FastLED.show() nie dziala, jak jest dodany drugi kontroler dla pilota 
 		FastLED.show(2);
+		//FastLED[2].showLeds(3);
+		//FastLED[1].showLeds(3);
+		//controller->showLeds(2);
 		updated = false;
 	}
 }
