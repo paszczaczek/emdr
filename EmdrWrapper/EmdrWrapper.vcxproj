@@ -155,9 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
-    <ClCompile Include="..\MovingPointStripPlugin.cpp" />
     <ClCompile Include="..\RemoteController.cpp" />
-    <ClCompile Include="..\Strip.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="FastLED.cpp" />

@@ -6,6 +6,7 @@ class Strip;
 class StripPlugin : public Plugin
 {
 public:
-	virtual ~StripPlugin() override {}
 	Strip *strip = nullptr;
+
+	virtual ~StripPlugin() override {};
 };

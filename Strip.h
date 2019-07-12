@@ -7,9 +7,6 @@
 class Strip
 {
 public:
-	CLEDController *controller = nullptr;
-	bool updated = false;
-
 	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
 	void SetController(int ledsCount)
 	{
@@ -19,9 +16,36 @@ public:
 		controller->clearLedData();
 	}
 
-	~Strip();
-	void AddPlugin(StripPlugin *plugin);
-	void Loop();
+	void AddPlugin(StripPlugin *plugin)
+	{
+		plugin->strip = this;
+		plugins.push_back(plugin);
+	}
+
+	void Loop()
+	{
+		for (auto plugin : plugins)
+			plugin->Loop();
+
+		if (updated)
+		{
+			// controller->showLeds() nie uwzglednia FastLED.setMaxPowerInVoltsAndMilliamps() !
+			//controller->showLeds(2);
+			FastLED.show(2);
+			updated = false;
+		}
+	}
+
+	~Strip()
+	{
+		for (auto plugin : plugins)
+			delete plugin;
+
+		delete[] leds;
+	}
+
+	bool updated = false;
+	CLEDController *controller = nullptr;
 
 private:
 	CRGB *leds = nullptr;

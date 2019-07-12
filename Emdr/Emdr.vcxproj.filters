@@ -25,7 +25,5 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
-    <ClCompile Include="..\Strip.cpp" />
-    <ClCompile Include="..\MovingPointStripPlugin.cpp" />
   </ItemGroup>
 </Project>

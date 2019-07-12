@@ -105,14 +105,8 @@
     <ClCompile Include="pixeltypes.cpp">
       <Filter>FastLED</Filter>
     </ClCompile>
-    <ClCompile Include="..\Strip.cpp">
-      <Filter>Emdr</Filter>
-    </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MovingPointStripPlugin.cpp">
-      <Filter>Emdr</Filter>
     </ClCompile>
     <ClCompile Include="..\RemoteController.cpp">
       <Filter>Emdr</Filter>

@@ -48,11 +48,16 @@ namespace EmdrEmulator
 
         private void Serial_WriteEventHandler(string text)
         {
-            Dispatcher.Invoke(() =>
+            try
             {
-                model.SerialMonitor += $"{text}";
-                serialMonitorScrollViewer.ScrollToBottom();
-            });
+
+                Dispatcher.Invoke(() =>
+                {
+                    model.SerialMonitor += $"{text}";
+                    serialMonitorScrollViewer.ScrollToBottom();
+                });
+            }
+            catch (TaskCanceledException) { }
         }
 
         private unsafe void FastLED_AddLedsEventHandler(int ledsCount)

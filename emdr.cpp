@@ -11,8 +11,8 @@
 #define MAX_CURRENT           100 // For safety
 
 #define LED_TYPE WS2811
-#define LED_PIN       7
-#define LED_PIN_RC    8
+#define LED_PIN       7 // pin for main strip
+#define LED_PIN_RC    8 // pin for remote control strip
 #define LED_ORDER   GRB
 //#define LED_COUNT	180 
 #define LED_COUNT	  3 

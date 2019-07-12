@@ -17,14 +17,16 @@ public:
 			new EventHandler<RemoteControllerStripPlugin, RemoteController::EventArgs>
 			(this, &RemoteControllerStripPlugin::onRemoteControllerButtonPressed);
 
-		// ustaw timer do migania diod� po wci�ni�ciu guzika na pilocie
+		// ustaw timer do migania diode po wcisnieciu guzika na pilocie
 		flashTimer.elapsed += new EventHandler<RemoteControllerStripPlugin, Timer::EventArgs>
 			(this, &RemoteControllerStripPlugin::onTimerFlashEvent);
-		flashTimer.interval = 1000;
 		flashTimer.autoReset = false;
 
-		buttonIndicator = (uint8_t)BUTTON_INDICATOR::UNSET;
+		// power on test - zaswiecamy wszystkie diody
+		buttonIndicator = (uint8_t)BUTTON_INDICATOR::ON;
 		buttonUnsupported = false;
+		flashTimer.interval = 2000;
+		flashTimer.Start();
 	}
 
 	virtual void Loop() override
@@ -61,9 +63,10 @@ private:
 
 	void onTimerFlashEvent(Timer::EventArgs& args)
 	{
-    (void) args;
+		(void) args;
 		// czas zgasic diode sygnalizujaca wcisniecie guzika na pilocie
 		flashTimer.Stop();
+		flashTimer.interval = 1000;
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
 	}
 
