@@ -20,6 +20,14 @@ size_t HardwareSerial::println(const char *str)
 	return strlen(str + 1);
 }
 
+size_t HardwareSerial::print(int value, int format)
+{
+	char str[256] = "";
+	snprintf(str, sizeof(str), "%d", value);
+	EmdrWrapper::Serial::OnWrite(str);
+	return strlen(str);
+}
+
 size_t HardwareSerial::println(int value, int format)
 {
 	char str[256] = "";

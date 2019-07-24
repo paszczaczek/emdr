@@ -1,6 +1,7 @@
 #define FASTLED_INTERNAL
 #include <Arduino.h>
 #include <FastLED.h>
+#include <IRremote.h>
 #include "Strip.h"
 #include "MovingPointStripPlugin.h"
 #include "RemoteController.h"
@@ -17,23 +18,27 @@
 //#define LED_COUNT	180 
 #define LED_COUNT	  3 
 
-Strip emdrStrip;
-RemoteController remoteController;
+#define RC_PIN 2        // pin dor remote controller
 
-// the setup function runs once when you press reset or power the board
+IRrecv irrecv(RC_PIN);
+Strip strip;
+RemoteController remoteController(irrecv);
+
 void setup()
 {
 	Serial.begin(115200);
-	Serial.write("setup\n");
+	Serial.println("setup");
 	
 	FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_CURRENT);
-	emdrStrip.SetController<LED_TYPE, LED_PIN, LED_ORDER>(LED_COUNT);
-	emdrStrip.AddPlugin(new MovingPointStripPlugin);
-	emdrStrip.AddPlugin(new RemoteControllerStripPlugin<LED_TYPE, LED_PIN_RC, LED_ORDER>);
+	strip.SetController<LED_TYPE, LED_PIN, LED_ORDER>(LED_COUNT);
+	strip.AddPlugin(new MovingPointStripPlugin);
+	strip.AddPlugin(new RemoteControllerStripPlugin<LED_TYPE, LED_PIN_RC, LED_ORDER>);
+
+	Serial.println("enableIRIn");
+	irrecv.enableIRIn();
 }
 
-// the loop function runs over and over again until power down or reset
-void loop()
-{
-	emdrStrip.Loop();
+void loop() {	
+	remoteController.Loop();
+	strip.Loop();
 }

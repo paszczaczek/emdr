@@ -147,6 +147,7 @@
     <ClInclude Include="controller.h" />
     <ClInclude Include="EmdrWrapper.h" />
     <ClInclude Include="FastLED.h" />
+    <ClInclude Include="IRremote.h" />
     <ClInclude Include="pixeltypes.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="HardwareSerial.h" />

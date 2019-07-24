@@ -27,11 +27,11 @@ namespace EmdrEmulator
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            if (int.TryParse(button.Content.ToString(), out int code))
-                EmdrWrapper.RemoteController.CodeReceived(code);
+            string tag = (string)((Button)sender).Tag;
+            if (int.TryParse(tag, out int button))
+                EmdrWrapper.RemoteController.ButtonReceived(button);
             else
-                EmdrWrapper.RemoteController.CodeReceived(-1);
+                EmdrWrapper.RemoteController.ButtonReceived(-1);
         }
     }
 }

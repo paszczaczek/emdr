@@ -2,17 +2,28 @@
 #include <Arduino.h>
 #include <vector>
 #include <map>
+#include <IRremote.h>
 #include "Event.h"
+
+extern IRrecv irrecv;
 
 class RemoteController
 {
 public:
-	enum Button {
-		UNSUPPORTED,
+	enum Button
+	{
+		UNSUPPORTED = -1,
+		CHANEL_PLUS,
+		CHANEL_MINUS,
 		DIGIT_1,
 		DIGIT_2,
 		DIGIT_3
 	};
+
+	RemoteController(IRrecv &irr) : irrecv(irr)
+	{
+		irrecv.enableIRIn();
+	}
 
 	class EventArgs
 	{
@@ -26,23 +37,35 @@ public:
 		Button button;
 	};
 
-	void ProcessCode(int code)
+	void ProcessCode(unsigned long code)
 	{
 		Button button = UNSUPPORTED;
-		auto it = codeMapper.find(code);
+		Serial.print(code, HEX);
+
+		auto it = codeMapper.find(results.value);
 		if (it != codeMapper.end())
 			button = it->second;
-		else {
-			char msg[32] = "";
-			snprintf(msg, sizeof(msg), "unsup. RC code: %d\n", code);
-			Serial.print(msg);
-		}
+		Serial.print("-> buttonPressed.Emit(");
+		Serial.print(button);
+		Serial.println(")");
 		buttonPressed.Emit(EventArgs(button));
+	}
+
+	void Loop()
+	{
+		if (irrecv.decode(&results)) {
+			ProcessCode(results.value);
+			irrecv.resume(); // Continue receiving
+		}
 	}
 
 	Event<EventArgs> buttonPressed;
 
 private:
-	static const std::map<int, Button> codeMapper;
+	typedef const std::map<unsigned long, Button> CodeMapper;
+	IRrecv &irrecv;
+	decode_results results;
+	static CodeMapper AVerMediaCodeMapper;
+	static CodeMapper _3939CodeMapper;
+	static CodeMapper &codeMapper;
 };
-

@@ -22,6 +22,9 @@
     <Filter Include="Emdr">
       <UniqueIdentifier>{f383b8cd-f3a2-4a6d-bdd1-ba509068932f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IRremote">
+      <UniqueIdentifier>{6e385dfe-b268-4105-991a-1e2368d3cb0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -84,6 +87,9 @@
     </ClInclude>
     <ClInclude Include="..\RemoteControllerStripPlugin.h">
       <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="IRremote.h">
+      <Filter>IRremote</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@ private:
 	int ledCurrent = 0;
 	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;;
 
-	void MovingPointStripPlugin::onMovingEvent(Timer::EventArgs& args)
+	void onMovingEvent(Timer::EventArgs& args)
 	{
 		auto ledNext = ledCurrent;
 
@@ -44,7 +44,7 @@ private:
 		strip->controller->leds()[ledCurrent] = CRGB::Black;
 		strip->controller->leds()[ledNext] = CRGB::Orange;
 		strip->updated = true;
-		Serial.println("MovingPointStripPlugin::onMovingEvent");
+		//Serial.println("MovingPointStripPlugin::onMovingEvent");
 
 		ledCurrent = ledNext;
 	}

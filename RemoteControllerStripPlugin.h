@@ -19,7 +19,7 @@ public:
 
 		// ustaw timer do migania diode po wcisnieciu guzika na pilocie
 		flashTimer.elapsed += new EventHandler<RemoteControllerStripPlugin, Timer::EventArgs>
-			(this, &RemoteControllerStripPlugin::onTimerFlashEvent);
+			(this, &RemoteControllerStripPlugin::onFlashTimerEvent);
 		flashTimer.autoReset = false;
 
 		// power on test - zaswiecamy wszystkie diody
@@ -56,17 +56,19 @@ private:
 	void onRemoteControllerButtonPressed(RemoteController::EventArgs &args)
 	{
 		// wcisnieto guzik na pilocie
+		//Serial.print("onRemoteControllerButtonPressed: ");
+		//Serial.println(args.button);
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::ON;
 		buttonUnsupported = args.button == RemoteController::Button::UNSUPPORTED;
+		flashTimer.interval = 90;
 		flashTimer.Start();
 	}
 
-	void onTimerFlashEvent(Timer::EventArgs& args)
+	void onFlashTimerEvent(Timer::EventArgs& args)
 	{
 		(void) args;
 		// czas zgasic diode sygnalizujaca wcisniecie guzika na pilocie
 		flashTimer.Stop();
-		flashTimer.interval = 1000;
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
 	}
 
@@ -97,7 +99,9 @@ private:
 		{
 			// tak
 			biColorCurrent = biColor;
-			controller->showLeds(2);
+			// na razie zablokuje, do czasu gdy wyjasni sie czy potrzebny bedzie osobny strip dla remotecontrollera
+			// controller->showLeds(2);
+			strip->updated = true;
 		}
 	}
 };

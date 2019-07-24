@@ -38,9 +38,10 @@ namespace EmdrWrapper {
 	public ref class RemoteController
 	{
 	public:
-		static void CodeReceived(int code)
+		static void ButtonReceived(int button)
 		{
-			remoteController.ProcessCode(code);
+			remoteController.buttonPressed.Emit(
+				::RemoteController::EventArgs((::RemoteController::Button)button));
 		}
 	};
 
