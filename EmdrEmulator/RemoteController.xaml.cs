@@ -31,7 +31,7 @@ namespace EmdrEmulator
             if (int.TryParse(tag, out int button))
                 EmdrWrapper.RemoteController.ButtonReceived(button);
             else
-                EmdrWrapper.RemoteController.ButtonReceived(-1);
+                EmdrWrapper.RemoteController.ButtonReceived(0);
         }
     }
 }

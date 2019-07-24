@@ -34,6 +34,11 @@ public:
 		if (startedAt == (unsigned long)-1)
 			return;
 		auto now = millis();
+		if (interval == 0)
+		{
+			Serial.println("Timer::Loop /0 !");
+			Stop();
+		}
 		unsigned int elapsedIntervals = (now - elapsedAt) / interval;
 		if (elapsedIntervals != 0)
 		{

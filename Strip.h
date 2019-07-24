@@ -3,10 +3,14 @@
 #include <FastLED.h>
 #include <ArduinoSTL.h>
 #include "StripPlugin.h"
+#include "RemoteController.h"
 
 class Strip
 {
 public:
+	Strip(RemoteController &remoteController) : remoteController(remoteController)
+	{ }
+
 	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
 	void SetController(int ledsCount)
 	{
@@ -19,6 +23,7 @@ public:
 	void AddPlugin(StripPlugin *plugin)
 	{
 		plugin->strip = this;
+		plugin->OnSetStrip(this);
 		plugins.push_back(plugin);
 	}
 
@@ -46,6 +51,7 @@ public:
 
 	bool updated = false;
 	CLEDController *controller = nullptr;
+	RemoteController &remoteController;
 
 private:
 	CRGB *leds = nullptr;

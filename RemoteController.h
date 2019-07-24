@@ -5,22 +5,24 @@
 #include <IRremote.h>
 #include "Event.h"
 
-extern IRrecv irrecv;
+//extern IRrecv irrecv;
 
 class RemoteController
 {
 public:
 	enum Button
 	{
-		UNSUPPORTED = -1,
+		UNSUPPORTED = 0,
 		CHANEL_PLUS,
 		CHANEL_MINUS,
+		PAUSE,
+		PLAY,
 		DIGIT_1,
 		DIGIT_2,
 		DIGIT_3
 	};
 
-	RemoteController(IRrecv &irr) : irrecv(irr)
+	RemoteController(IRrecv irrecv) : irrecv(irrecv)
 	{
 		irrecv.enableIRIn();
 	}
@@ -42,7 +44,7 @@ public:
 		Button button = UNSUPPORTED;
 		Serial.print(code, HEX);
 
-		auto it = codeMapper.find(results.value);
+		auto it = codeMapper.find(code);
 		if (it != codeMapper.end())
 			button = it->second;
 		Serial.print("-> buttonPressed.Emit(");
@@ -53,6 +55,7 @@ public:
 
 	void Loop()
 	{
+		decode_results results;
 		if (irrecv.decode(&results)) {
 			ProcessCode(results.value);
 			irrecv.resume(); // Continue receiving
@@ -62,9 +65,8 @@ public:
 	Event<EventArgs> buttonPressed;
 
 private:
-	typedef const std::map<unsigned long, Button> CodeMapper;
 	IRrecv &irrecv;
-	decode_results results;
+	typedef const std::map<unsigned long, Button> CodeMapper;
 	static CodeMapper AVerMediaCodeMapper;
 	static CodeMapper _3939CodeMapper;
 	static CodeMapper &codeMapper;

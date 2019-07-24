@@ -29,16 +29,18 @@ public:
 		flashTimer.Start();
 	}
 
-	virtual void Loop() override
+	virtual void OnSetStrip(Strip *strip) override
 	{
 		// utw�rz kontroler do aktualizacji ledsCount pierwszych diod obsugiwanych przez plugin pilota
 		// !!!
 		// https://github.com/FastLED/FastLED/issues/280
 		// Daniel Garcia: you can't have multiple controllers on the same pin
-		if (!controller)
-			controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>
+		controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>
 			(strip->controller->leds(), ledsCount);
+	}
 
+	virtual void Loop() override
+	{
 		flashTimer.Loop();
 		updateLeds();
 	}
@@ -48,7 +50,7 @@ private:
 	const uint8_t ledsCount = 1;
 	Timer flashTimer;
 
-	enum class BUTTON_INDICATOR :uint8_t { UNSET = 0, ON = 1, OFF = 2};
+	enum class BUTTON_INDICATOR :uint8_t { UNSET = 0, ON = 1, OFF = 2 };
 
 	uint8_t buttonIndicator : 2;
 	uint8_t buttonUnsupported : 1;
@@ -66,7 +68,7 @@ private:
 
 	void onFlashTimerEvent(Timer::EventArgs& args)
 	{
-		(void) args;
+		(void)args;
 		// czas zgasic diode sygnalizujaca wcisniecie guzika na pilocie
 		flashTimer.Stop();
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
@@ -77,9 +79,9 @@ private:
 		// wyznacz kolor jaki ma miec dioda sygnalizujaca wcisniecie guzika na pilocie
 		CRGB biColor = CRGB::Black;
 		switch (buttonIndicator) {
-		case (uint8_t)BUTTON_INDICATOR::ON: 
+		case (uint8_t)BUTTON_INDICATOR::ON:
 			// wcisnieto guzik na pilocie - dioda ma sie swiecic
-			biColor = buttonUnsupported ? CRGB::Blue : CRGB::Red; 
+			biColor = buttonUnsupported ? CRGB::Blue : CRGB::Red;
 			break;
 		case (uint8_t)BUTTON_INDICATOR::OFF:
 			// wcisnieto guzik na pilocie ale czas swiecenia diody minal - wylaczyc diode

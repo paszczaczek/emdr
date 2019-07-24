@@ -12,6 +12,10 @@ RemoteController::CodeMapper RemoteController::_3939CodeMapper =
 	{ 0x960, RemoteController::Button::CHANEL_PLUS },
 	{ 0x161, RemoteController::Button::CHANEL_MINUS },
 	{ 0x961, RemoteController::Button::CHANEL_MINUS },
+	{ 0x176, RemoteController::Button::PAUSE },
+	{ 0x976, RemoteController::Button::PAUSE },
+	{ 0x175, RemoteController::Button::PLAY },
+	{ 0x975, RemoteController::Button::PLAY }
 };
 
 

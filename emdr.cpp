@@ -21,8 +21,8 @@
 #define RC_PIN 2        // pin dor remote controller
 
 IRrecv irrecv(RC_PIN);
-Strip strip;
 RemoteController remoteController(irrecv);
+Strip strip(remoteController);
 
 void setup()
 {
