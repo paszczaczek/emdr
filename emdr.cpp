@@ -6,6 +6,7 @@
 #include "MovingPointStripPlugin.h"
 #include "RemoteController.h"
 #include "RemoteControllerStripPlugin.h"
+#include "PowerStripPlugin.h"
 
 #define MAX_CURRENT_FROM_EXT 1000 // Total maximum current draw when powered via external power supply
 #define MAX_CURRENT_FROM_USB  500 // Total maximum current draw from the Arduino when powered from a USB port
@@ -33,6 +34,7 @@ void setup()
 	strip.SetController<LED_TYPE, LED_PIN, LED_ORDER>(LED_COUNT);
 	strip.AddPlugin(new MovingPointStripPlugin);
 	strip.AddPlugin(new RemoteControllerStripPlugin<LED_TYPE, LED_PIN_RC, LED_ORDER>);
+	strip.AddPlugin(new PowerStipPlugin);
 
 	Serial.println("enableIRIn");
 	irrecv.enableIRIn();

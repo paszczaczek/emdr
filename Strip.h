@@ -27,6 +27,12 @@ public:
 		plugins.push_back(plugin);
 	}
 
+	void StartAllPlugins()
+	{
+		for (auto plugin : plugins)
+			plugin->OnStart();
+	}
+
 	void Loop()
 	{
 		for (auto plugin : plugins)

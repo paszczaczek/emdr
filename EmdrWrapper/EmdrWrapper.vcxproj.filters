@@ -91,6 +91,9 @@
     <ClInclude Include="IRremote.h">
       <Filter>IRremote</Filter>
     </ClInclude>
+    <ClInclude Include="..\PowerStripPlugin.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

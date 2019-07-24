@@ -11,7 +11,6 @@ public:
 		movingTimer.elapsed += new EventHandler<MovingPointStripPlugin, Timer::EventArgs>
 			(this, &MovingPointStripPlugin::onMovingTimerElapsed);
 		movingTimer.interval = 1000;
-		movingTimer.Start();
 	}
 
 	~MovingPointStripPlugin()
@@ -31,6 +30,24 @@ public:
 	virtual void Loop() override
 	{
 		movingTimer.Loop();
+	}
+
+	virtual void OnStart() override 
+	{
+		Plugin::OnStart();
+		movingTimer.Start();
+	}
+
+	virtual void OnPause() override
+	{
+		Plugin::OnPause();
+		movingTimer.Stop();
+	}
+
+	virtual void OnResume() override
+	{
+		Plugin::OnResume();
+		movingTimer.Start();
 	}
 
 private:
@@ -59,7 +76,7 @@ private:
 		strip->controller->leds()[ledCurrent] = CRGB::Black;
 		strip->controller->leds()[ledNext] = CRGB::Orange;
 		strip->updated = true;
-		//Serial.println("MovingPointStripPlugin::onMovingTimerElapsed");
+		//Serial.println("MovingPointStripPlugin::onTimerElapsed");
 
 		ledCurrent = ledNext;
 	}

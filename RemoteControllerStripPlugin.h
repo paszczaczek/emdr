@@ -22,11 +22,9 @@ public:
 			(this, &RemoteControllerStripPlugin::onFlashTimerEvent);
 		flashTimer.autoReset = false;
 
-		// power on test - zaswiecamy wszystkie diody
-		buttonIndicator = (uint8_t)BUTTON_INDICATOR::ON;
+		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
 		buttonUnsupported = false;
-		flashTimer.interval = 2000;
-		flashTimer.Start();
+		flashTimer.interval = 90;
 	}
 
 	virtual void OnSetStrip(Strip *strip) override
@@ -42,7 +40,14 @@ public:
 	virtual void Loop() override
 	{
 		flashTimer.Loop();
-		updateLeds();
+		if (state == Plugin::Started)
+			updateLeds();
+	}
+
+	virtual void OnStart() override
+	{
+		Plugin::OnStart();
+		flashTimer.Start();
 	}
 
 private:
@@ -62,7 +67,6 @@ private:
 		//Serial.println(args.button);
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::ON;
 		buttonUnsupported = args.button == RemoteController::Button::UNSUPPORTED;
-		flashTimer.interval = 90;
 		flashTimer.Start();
 	}
 

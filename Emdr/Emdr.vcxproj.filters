@@ -22,6 +22,7 @@
     <ClInclude Include="..\RemoteController.h" />
     <ClInclude Include="..\Event.h" />
     <ClInclude Include="..\RemoteControllerStripPlugin.h" />
+    <ClInclude Include="..\PowerStripPlugin.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
