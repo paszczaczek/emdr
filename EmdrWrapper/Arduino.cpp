@@ -24,5 +24,5 @@ unsigned long millis(void)
 	return ms;
 }
 
-void pinMode(uint8_t, uint8_t)
-{}
+void pinMode(uint8_t, uint8_t) {}
+const char *F(const char *str) { return str; }

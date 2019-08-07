@@ -8,15 +8,18 @@
 class MovingPointStripPlugin : public StripPlugin
 {
   public:
-    MovingPointStripPlugin()      
+    MovingPointStripPlugin() : movingTimer(2)
     {
       /*
         movingTimer.elapsed += new EventHandler<MovingPointStripPlugin, Timer::EventArgs>
                              (this, &MovingPointStripPlugin::onMovingTimerElapsed);
         movingTimer.interval = 1000;      
       */
-      elapsedEventHandler.Set(this, &MovingPointStripPlugin::onMovingTimerElapsed);
+      elapsedEventHandler.Set(this, &MovingPointStripPlugin::onMovingTimerElapsed);      
       movingTimer.elapsed += elapsedEventHandler;
+
+      elapsedEventHandler2.Set(this, &MovingPointStripPlugin::onTest);
+      movingTimer.elapsed += elapsedEventHandler2;
       
       movingTimer.interval = 1000;
       /*
@@ -61,11 +64,16 @@ class MovingPointStripPlugin : public StripPlugin
     int ledCurrent = 0;
     enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;
     EventHandler<MovingPointStripPlugin, Timer::EventArgs> elapsedEventHandler;
+    EventHandler<MovingPointStripPlugin, Timer::EventArgs> elapsedEventHandler2;
     EventHandler<MovingPointStripPlugin, RemoteController::EventArgs> buttonPressedEventHandler;
+
+    void onTest(Timer::EventArgs& ) {
+      Serial.println(F("    T*onMovingTimerElapsed"));
+    }
 
     void onMovingTimerElapsed(Timer::EventArgs& args)
     {
-      Serial.println(F("2*onMovingTimerElapsed"));
+      Serial.println(F("    E*onMovingTimerElapsed"));
       return;
       auto ledNext = ledCurrent;
 

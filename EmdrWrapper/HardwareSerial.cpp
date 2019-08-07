@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "HardwareSerial.h"
 #include "EmdrWrapper.h"
 
@@ -19,6 +20,13 @@ size_t HardwareSerial::println(const char *str)
 	EmdrWrapper::Serial::OnWrite("\n");
 	return strlen(str + 1);
 }
+
+size_t HardwareSerial::println()
+{
+	EmdrWrapper::Serial::OnWrite("\n");
+	return 1;
+}
+
 
 size_t HardwareSerial::print(int value, int format)
 {

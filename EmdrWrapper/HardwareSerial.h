@@ -15,5 +15,6 @@ public:
 	size_t println(const char *str);
 	size_t print(int value, int format = DEC);
 	size_t println(int value, int format = DEC);
+	size_t println();
 };
 extern HardwareSerial Serial;

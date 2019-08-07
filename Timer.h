@@ -15,6 +15,8 @@ class Timer
         unsigned int elapsedIntervals;
     };
 
+    Timer(byte handlersCapacity = 1) : elapsed(handlersCapacity) { }
+
     unsigned long interval = 0;
     bool autoReset = true;
     Event<EventArgs> elapsed;
@@ -44,10 +46,10 @@ class Timer
       if (elapsedIntervals != 0)
       {
         elapsedAt += elapsedIntervals * interval;
-        PRINTLN(F("Timer begin"));        
+        //Serial.println("Timer begin");        
         args.elapsedIntervals = elapsedIntervals;        
         elapsed.Emit(args);                  
-        PRINTLN(F("Timer end"));
+        //Serial.println("Timer end");
         if (!autoReset)
           Stop();
       }

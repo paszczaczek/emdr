@@ -34,10 +34,10 @@ public:
 private:
 	void Execute(TEventArgs& eventArgs) override
 	{
-    Serial.println("    EventHandler begin");
+    //Serial.println("    EventHandler begin");
     //PRINT_FREEMEM("   Execute begin");
 		(target->*function)(eventArgs);
-    Serial.println("    EventHandler end");
+    //Serial.println("    EventHandler end");
 	}
 
 	TTarget* target;
