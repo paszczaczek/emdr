@@ -1,66 +1,54 @@
 #pragma once
 #define FASTLED_INTERNAL
 #include <FastLED.h>
-#include <ArduinoSTL.h>
 #include "StripPlugin.h"
-#include "RemoteController.h"
+//#include "RemoteController.h"
 
 class Strip
 {
-public:
-	Strip(RemoteController &remoteController) : remoteController(remoteController)
-	{ }
+  public:
+    // Strip(CRGB *leds, uint8_t ledsCount, RemoteController &remoteController, StripPlugin **plugins) :
+    Strip(CRGB *leds, byte ledsCount, StripPlugin **plugins, byte pluginsCount) :
+      leds(leds),
+      ledsCount(ledsCount),
+      plugins(plugins),
+      pluginsCount(pluginsCount)
+    { }
 
-	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
-	void SetController(int ledsCount)
-	{
-		pinMode(DATA_PIN, OUTPUT);
-		leds = new CRGB[ledsCount];
-		controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>(leds, ledsCount);
-		controller->clearLedData();
-	}
+    template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
+    void SetController()
+    {
+      pinMode(DATA_PIN, OUTPUT);
+      controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>(leds, ledsCount);
+      FastLED.clear();
+    }
 
-	void AddPlugin(StripPlugin *plugin)
-	{
-		plugin->strip = this;
-		plugin->OnSetStrip(this);
-		plugins.push_back(plugin);
-	}
+    void StartAllPlugins()
+    {      
+      for (byte i = 0; i < pluginsCount; i++)
+        plugins[i]->OnStart();
+    }
 
-	void StartAllPlugins()
-	{
-		for (auto plugin : plugins)
-			plugin->OnStart();
-	}
+    void Loop()
+    {
+      for (byte i = 0; i < pluginsCount; i++)
+        plugins[i]->Loop();
 
-	void Loop()
-	{
-		for (auto plugin : plugins)
-			plugin->Loop();
+      if (updated)
+      {
+        // controller->showLeds() nie uwzglednia FastLED.setMaxPowerInVoltsAndMilliamps() !
+        //controller->showLeds(2);
+        FastLED.show(2);
+        updated = false;
+      }
+   }
 
-		if (updated)
-		{
-			// controller->showLeds() nie uwzglednia FastLED.setMaxPowerInVoltsAndMilliamps() !
-			//controller->showLeds(2);
-			FastLED.show(2);
-			updated = false;
-		}
-	}
+    bool updated = false;
+    CLEDController *controller = nullptr;
 
-	~Strip()
-	{
-		for (auto plugin : plugins)
-			delete plugin;
-
-		delete[] leds;
-	}
-
-	bool updated = false;
-	CLEDController *controller = nullptr;
-	RemoteController &remoteController;
-
-private:
-	CRGB *leds = nullptr;
-	int ledCurrent = 0;
-	std::vector<StripPlugin*> plugins;
+  private:
+    CRGB *leds;
+    byte ledsCount;
+    StripPlugin **plugins;
+    byte pluginsCount;
 };

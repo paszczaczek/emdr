@@ -13,6 +13,7 @@ public:
 	RemoteControllerStripPlugin()
 	{
 		// subskrybuj eventy od pilota
+    /*
 		remoteController.buttonPressed +=
 			new EventHandler<RemoteControllerStripPlugin, RemoteController::EventArgs>
 			(this, &RemoteControllerStripPlugin::onRemoteControllerButtonPressed);
@@ -25,6 +26,7 @@ public:
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
 		buttonUnsupported = false;
 		flashTimer.interval = 90;
+   */
 	}
 
 	virtual void OnSetStrip(Strip *strip) override

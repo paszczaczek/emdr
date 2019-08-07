@@ -1,73 +1,69 @@
 #pragma once
-#include <Arduino.h>
-#include <vector>
-#include <map>
+#include <stdint.h>
+//#include <Arduino.h>
+#include "Debug.h"
 #include <IRremote.h>
 #include "Event.h"
 
-//extern IRrecv irrecv;
-
 class RemoteController
 {
-public:
-	enum Button
-	{
-		UNSUPPORTED = 0,
-		CHANEL_PLUS,
-		CHANEL_MINUS,
-		PAUSE,
-		PLAY,
-		DIGIT_1,
-		DIGIT_2,
-		DIGIT_3
-	};
+  public:
+    RemoteController(IRrecv *irrecv, decode_results *results) :
+      irrecv(irrecv),
+      results(results) {
+    }
+  
+    enum Button : uint8_t
+    {
+      UNSUPPORTED = 0,
+      CHANEL_PLUS,
+      CHANEL_MINUS,
+      PAUSE,
+      PLAY,
+      DIGIT_1,
+      DIGIT_2,
+      DIGIT_3
+    };
 
-	RemoteController(IRrecv irrecv) : irrecv(irrecv)
-	{
-		irrecv.enableIRIn();
-	}
+    class EventArgs
+    {
+      public:
+      //  EventArgs(Button button) {
+      //    this->button = button;
+      //  }
+        Button button;
+    };
 
-	class EventArgs
-	{
-	public:
+    void ProcessCode(unsigned long code) {
+      Button button = UNSUPPORTED;
+      for (int i = 0; ; i++) {
+        if (codeMapper[i].code == 0)
+          break;
+        if (codeMapper[i].code == code)
+          button = codeMapper[i].button;
+      }
+      PRINT(("IR: ")); PRINT(code, HEX); PRINT((" -> ")); PRINT(button); PRINTLN("");
+      args.button = button;
+      //buttonPressed.Emit(EventArgs(button));
+      buttonPressed.Emit(args);
+    }
 
-		EventArgs(Button button)
-		{
-			this->button = button;
-		}
+    void Loop() {
+      if (irrecv->decode(results)) {        
+        ProcessCode(results->value);
+        irrecv->resume();
+      }
+    }
 
-		Button button;
-	};
+    Event<EventArgs> buttonPressed;
 
-	void ProcessCode(unsigned long code)
-	{
-		Button button = UNSUPPORTED;
-		Serial.print(code, HEX);
-
-		auto it = codeMapper.find(code);
-		if (it != codeMapper.end())
-			button = it->second;
-		Serial.print("-> buttonPressed.Emit(");
-		Serial.print(button);
-		Serial.println(")");
-		buttonPressed.Emit(EventArgs(button));
-	}
-
-	void Loop()
-	{
-		decode_results results;
-		if (irrecv.decode(&results)) {
-			ProcessCode(results.value);
-			irrecv.resume(); // Continue receiving
-		}
-	}
-
-	Event<EventArgs> buttonPressed;
-
-private:
-	IRrecv &irrecv;
-	typedef const std::map<unsigned long, Button> CodeMapper;
-	static CodeMapper AVerMediaCodeMapper;
-	static CodeMapper _3939CodeMapper;
-	static CodeMapper &codeMapper;
+  private:
+    IRrecv *irrecv;
+    decode_results *results;
+    EventArgs args;
+    typedef const struct {
+      unsigned long code;
+      Button button;
+    } CodeMapper[];
+    static CodeMapper codeMapper;
 };

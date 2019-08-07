@@ -10,7 +10,7 @@ public:
 	virtual void OnStop()   { state = Stopped; }
 	virtual void OnPause()  { state = Paused; }
 	virtual void OnResume() { state = Started; }
-	enum State :int8_t { Started, Stopped, Paused } state = Stopped;
+	enum State { Started, Stopped, Paused } state = Stopped;
 
 	virtual ~Plugin() {};
 };

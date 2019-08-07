@@ -1,44 +1,61 @@
 #pragma once
-#include <ArduinoSTL.h>
 #include "EventHandler.h"
-
+//
 template <class TEventArgs>
 class Event
 {
-public:
-	~Event()
-	{
-		for (auto eh : _eventHandlers)
-			delete eh;
-	}
+  public:
+    Event(byte handlersCapacity = 1) :
+      _handler(nullptr),
+      _moreHandlersCapacity(handlersCapacity - 1),
+      _moreHandlersCount(0)
+    {
+      if (_moreHandlersCapacity <= 1)
+      {
+        _moreHandlers = nullptr;
+      } else {
+        size_t size = _moreHandlersCapacity * sizeof(EventHandlerBase<TEventArgs> *);
+        _moreHandlers = (EventHandlerBase<TEventArgs> **)malloc(size);
+        memset(_moreHandlers, 0, size);
+      }
+    }
 
-	Event& operator += (EventHandlerBase<TEventArgs> *eventHandler)
-	{
-		_eventHandlers.push_back(eventHandler);
 
-		return *this;
-	}
-	
-	Event& operator -= (EventHandlerBase<TEventArgs> *eventHandler)
-	{
-		auto it = std::find(_eventHandlers.begin(), _eventHandlers.end(), eventHandler);
-		if (it != _eventHandlers.end())
-		{
-			delete *it;
-			_eventHandlers.erase(it);
-		}
+    Event& operator += (EventHandlerBase<TEventArgs> &eventHandler)
+    {
+      if (!_handler)
+        _handler = &eventHandler;
+      else
+      {
+        if (_moreHandlersCount < _moreHandlersCapacity)
+          _moreHandlers[_moreHandlersCount] = &eventHandler;
+        else
+        {
+          Serial.println(F("_moreHandlersCapacity to small"));
+          return *this;
+        }
+      }
+      _moreHandlersCount++;
 
-		return *this;
-	}
+      return *this;
+    }
 
-	void Emit(TEventArgs&& eventArgs)
-	{
-		//for (auto it = _eventHandlers.begin(); it < _eventHandlers.end(); it++)
-		//	(*it)->Execute(eventArgs);
-		for (auto eh : _eventHandlers)
-			eh->Execute(eventArgs);
-	}
 
-private:
-	std::vector<EventHandlerBase<TEventArgs>*> _eventHandlers;
+    void Emit(TEventArgs&/*&*/ eventArgs)
+    {
+      if (_handler)
+      {
+        Serial.println("  Event begin");
+        _handler->Execute(eventArgs);        
+        Serial.println("  Event end");
+        //for (byte n = 0; n < _moreHandlersCount; n++)
+        //  _moreHandlers[n]->Execute(eventArgs);
+      }
+    }
+
+  private:
+    EventHandlerBase<TEventArgs> *_handler;
+    EventHandlerBase<TEventArgs> **_moreHandlers;
+    byte _moreHandlersCapacity;
+    byte _moreHandlersCount;
 };
