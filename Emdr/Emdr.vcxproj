@@ -114,9 +114,9 @@
   <ItemGroup>
     <ClInclude Include="..\Emdr.h" />
     <ClInclude Include="..\Event.h" />
+    <ClInclude Include="..\MemoryFree.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
     <ClInclude Include="..\Plugin.h" />
-    <ClInclude Include="..\PowerStripPlugin.h" />
     <ClInclude Include="..\RemoteController.h" />
     <ClInclude Include="..\RemoteControllerStripPlugin.h" />
     <ClInclude Include="..\Strip.h" />
@@ -126,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
+    <ClCompile Include="..\MemoryFree.cpp" />
     <ClCompile Include="..\RemoteController.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -14,5 +14,6 @@ void CFastLED::show(uint8_t scale)
 	EmdrWrapper::FastLED::OnShow(leds()->raw, size());
 }
 
+void CFastLED::clear(bool writeData) {}
 
 CFastLED FastLED;

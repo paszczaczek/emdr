@@ -149,6 +149,7 @@
     <ClInclude Include="EmdrWrapper.h" />
     <ClInclude Include="FastLED.h" />
     <ClInclude Include="IRremote.h" />
+    <ClInclude Include="MemoryFree.h" />
     <ClInclude Include="pixeltypes.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="HardwareSerial.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="FastLED.cpp" />
     <ClCompile Include="HardwareSerial.cpp" />
+    <ClCompile Include="MemoryFree.cpp" />
     <ClCompile Include="pixeltypes.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

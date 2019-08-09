@@ -218,7 +218,7 @@ public:
 	}
 	/*
 	/// @name Adding SPI based controllers
-    //@{
+	//@{
 	/// Add an SPI based  CLEDController instance to the world.
 	/// There are two ways to call this method (as well as the other addLeds)
 	/// variations.  The first is with 2 arguments, in which case the arguments are  a pointer to
@@ -525,11 +525,10 @@ public:
 
 	/// Update all our controllers with the current led colors
 	void show(); // { show(m_Scale); }
-	/*
 	/// clear the leds, wiping the local array of data, optionally black out the leds as well
 	/// @param writeData whether or not to write out to the leds as well
 	void clear(bool writeData = false);
-
+	/*
 	/// clear out the local data array
 	void clearData();
 
@@ -595,11 +594,11 @@ public:
 	}
 	
 	/// Get the number of leds in the first controller
-    /// @returns the number of LEDs in the first controller
+	/// @returns the number of LEDs in the first controller
 	int size() { return (*this)[0].size(); }
 
 	/// Get a pointer to led data for the first controller
-    /// @returns pointer to the CRGB buffer for the first controller
+	/// @returns pointer to the CRGB buffer for the first controller
 	CRGB *leds() { return (*this)[0].leds(); }
 };
 

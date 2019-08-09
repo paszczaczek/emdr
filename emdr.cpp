@@ -4,7 +4,7 @@
 #include "Timer.h"
 #include "EventHandler.h"
 //#include <IRremote.h>
-//#include "MemoryFree.h"
+#include "MemoryFree.h"
 //#include "Debug.h"
 //#include "Strip.h"
 #include "MovingPointStripPlugin.h"
@@ -14,73 +14,49 @@
 
 #define MAX_CURRENT_FROM_EXT 1000 // Total maximum current draw when powered via external power supply
 #define MAX_CURRENT_FROM_USB  500 // Total maximum current draw from the Arduino when powered from a USB port
-#define MAX_CURRENT           100 // For safety
 
-//#define LED_TYPE WS2811
-#define LED_TYPE WS2812B
-#define LED_PIN       7 // pin for main strip
-#define LED_PIN_RC    8 // pin for remote control strip
-#define LED_ORDER   GRB
-#define LED_COUNT   180
 
-#define RC_PIN 2        // pin dor remote controller
+#define STRIP_LEDS_TYPE  WS2812B // led controller type
+#define STRIP_LEDS_PIN         7 // pin for main strip
+#define STRIP_LEDS_PIN_RC      8 // pin for remote control strip
+#define STRIP_LEDS_ORDER     GRB
+#define STRIP_LEDS_COUNT     180
+#define STRIP_LEDS_BRIGHTNESS  2
+#define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
-//IRrecv irrecv(RC_PIN);
-//decode_results irrecvResults;
-//RemoteController remoteController(&irrecv, &irrecvResults);
 
+#define RC_PIN 2 // pin for remote controller
+
+// remote controller
+IRrecv irrecv(RC_PIN);
+decode_results irrecvResults;
+RemoteController remoteController(&irrecv, &irrecvResults);
+
+// strip plugins
 MovingPointStripPlugin movingPointStripPlugin;
-
-/*
-StripPlugin* stripPlugins[] = {
+const byte stripPluginsCount = 1;
+StripPlugin* stripPlugins[stripPluginsCount] = {
   &movingPointStripPlugin
 };
-CRGB leds[LED_COUNT];
-Strip strip(leds, LED_COUNT, stripPlugins, 1);
-*/
 
-
-class Test {
-public:
-  void Callback(Timer::EventArgs& args) {
-    Serial.print("      Callback: ");
-    Serial.print(args.elapsedIntervals);
-    Serial.println();
-  }
-};
-
-Timer timer;
-EventHandler<Test, Timer::EventArgs> handler;
-Test test;
-
+// strip
+CRGB stripLeds[STRIP_LEDS_COUNT];
+Strip strip(
+    stripLeds, STRIP_LEDS_COUNT, 
+    stripPlugins, stripPluginsCount, 
+    STRIP_LEDS_MAX_CURRENT, STRIP_LEDS_BRIGHTNESS);
 
 void setup()
 {
   Serial.begin(115200);
-  Serial.println("setup");
+  PRINT_FREEMEM(F("setup"));  
 
-  /*
-  handler.Set(&test, &Test::Callback);
-  timer.elapsed += handler;
-  timer.interval = 1000;
-  timer.Start();
-  */
-  
-  //PRINT_FREEMEM(F("setup"));
-  //irrecv.enableIRIn();
-  /*
-    strip.SetController<LED_TYPE, LED_PIN, LED_ORDER>();
-    FastLED.setMaxPowerInVoltsAndMilliamps(5, MAX_CURRENT);
-    strip.StartAllPlugins();
-  */
-  movingPointStripPlugin.OnStart();
-  Serial.println("setup end");
+  irrecv.enableIRIn();  
+  strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>(STRIP_LEDS_MAX_CURRENT);
+  strip.StartAllPlugins();
 }
 
 void loop() {
-  /*
-  timer.Loop();
-  */
-  //remoteController.Loop();
-  movingPointStripPlugin.Loop();
+  remoteController.Loop();
+  strip.Loop();
 }

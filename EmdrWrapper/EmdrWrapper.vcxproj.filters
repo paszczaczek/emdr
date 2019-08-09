@@ -25,6 +25,9 @@
     <Filter Include="IRremote">
       <UniqueIdentifier>{6e385dfe-b268-4105-991a-1e2368d3cb0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MemoryFree">
+      <UniqueIdentifier>{07f00db4-8690-4257-8513-3718126fa831}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -94,6 +97,9 @@
     <ClInclude Include="..\PowerStripPlugin.h">
       <Filter>Emdr</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryFree.h">
+      <Filter>MemoryFree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -119,6 +125,9 @@
     </ClCompile>
     <ClCompile Include="..\RemoteController.cpp">
       <Filter>Emdr</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryFree.cpp">
+      <Filter>MemoryFree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

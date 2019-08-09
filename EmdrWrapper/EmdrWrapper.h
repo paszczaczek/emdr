@@ -40,10 +40,9 @@ namespace EmdrWrapper {
 	public:
 		static void ButtonReceived(int button)
 		{
-			/* TODO
-			remoteController.buttonPressed.Emit(
-				::RemoteController::EventArgs((::RemoteController::Button)button));
-				*/
+			::RemoteController::EventArgs args;
+			args.button = (::RemoteController::Button)button;
+			remoteController.buttonPressed.Emit(args);
 		}
 	};
 
