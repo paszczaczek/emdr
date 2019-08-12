@@ -112,6 +112,8 @@
     <None Include="..\emdr.ino" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Debug.h" />
+    <ClInclude Include="..\DiagnosticStripPlugin.h" />
     <ClInclude Include="..\Emdr.h" />
     <ClInclude Include="..\Event.h" />
     <ClInclude Include="..\MemoryFree.h" />

@@ -131,12 +131,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Debug.h" />
     <ClInclude Include="..\Emdr.h" />
     <ClInclude Include="..\Event.h" />
     <ClInclude Include="..\EventHandler.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
     <ClInclude Include="..\Plugin.h" />
-    <ClInclude Include="..\PowerStripPlugin.h" />
+    <ClInclude Include="..\DiagnosticStripPlugin.h" />
     <ClInclude Include="..\RemoteController.h" />
     <ClInclude Include="..\RemoteControllerStripPlugin.h" />
     <ClInclude Include="..\Strip.h" />

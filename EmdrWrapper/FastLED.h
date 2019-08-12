@@ -531,15 +531,15 @@ public:
 	/*
 	/// clear out the local data array
 	void clearData();
+	*/
 
 	/// Set all leds on all controllers to the given color/scale
 	/// @param color what color to set the leds to
 	/// @param scale what brightness scale to show at
-	void showColor(const struct CRGB & color, uint8_t scale);
+	void showColor(const struct CRGB & color, uint8_t scale) {}
 
 	/// Set all leds on all controllers to the given color
-	/// @param color what color to set the leds to
-	*/
+	/// @param color what color to set the leds to	
 	void showColor(const struct CRGB & color) { /*showColor(color, m_Scale);*/ }
 	/*
 

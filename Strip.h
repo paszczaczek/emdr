@@ -7,19 +7,18 @@
 class Strip
 {
 public:
-	// Strip(CRGB *leds, uint8_t ledsCount, RemoteController &remoteController, StripPlugin **plugins) :
-	Strip(CRGB *leds, byte ledsCount, StripPlugin **plugins, byte pluginsCount, byte maxCurrent, byte ledsBrightness) :
+	Strip(CRGB *leds, byte ledsCount, StripPlugin **plugins, byte pluginsCount, int maxCurrent, byte ledsBrightness) :
+    ledsBrightness(ledsBrightness),
 		leds(leds),
 		ledsCount(ledsCount),
-		plugins(plugins),
-		pluginsCount(pluginsCount),
-		ledsBrightness(ledsBrightness)
-	{ 
+		plugins(plugins),		
+    pluginsCount(pluginsCount)
+	{
 		FastLED.setMaxPowerInVoltsAndMilliamps(5, maxCurrent);
 	}
 
 	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
-	void SetController(int maxCurrent)
+	void SetController()
 	{
 		pinMode(DATA_PIN, OUTPUT);
 		controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>(leds, ledsCount);
@@ -39,20 +38,24 @@ public:
 
 		if (updated)
 		{
-			// controller->showLeds() nie uwzglednia FastLED.setMaxPowerInVoltsAndMilliamps() !
-			//controller->showLeds(2);
 			FastLED.show(ledsBrightness);
 			updated = false;
 		}
 	}
 
+	void SetLeds(CRGB color)
+	{
+		for (int i = 0; i < controller->size(); i++)
+			controller->leds()[i] = color;
+	}
+
 	bool updated = false;
 	CLEDController *controller = nullptr;
+	byte ledsBrightness;
 
 private:
 	CRGB *leds;
 	byte ledsCount;
-	byte ledsBrightness;
 	StripPlugin **plugins;
 	byte pluginsCount;
 };

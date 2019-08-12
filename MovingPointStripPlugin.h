@@ -51,7 +51,7 @@ class MovingPointStripPlugin : public StripPlugin
 
 	void onMovingTimerElapsed(Timer::EventArgs& args)
 	{
-	  Serial.println(F("onMovingTimerElapsed"));
+	  //Serial.println(F("onMovingTimerElapsed"));
 	  
 	  auto ledNext = ledCurrent;
 

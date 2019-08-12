@@ -26,18 +26,18 @@ public:
   */
   EventHandler& Set(TTarget* target, Function callback)
   {
-    this->target = target;
-    this->function = callback;
-    return *this;
+	this->target = target;
+	this->function = callback;
+	return *this;
   }
 
 private:
 	void Execute(TEventArgs& eventArgs) override
 	{
-    //Serial.println("    EventHandler begin");
-    //PRINT_FREEMEM("   Execute begin");
+	//Serial.println("    EventHandler begin");
+	//PRINT_FREEMEM("   Execute begin");
 		(target->*function)(eventArgs);
-    //Serial.println("    EventHandler end");
+	//Serial.println("    EventHandler end");
 	}
 
 	TTarget* target;

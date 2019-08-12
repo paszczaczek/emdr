@@ -94,11 +94,14 @@
     <ClInclude Include="IRremote.h">
       <Filter>IRremote</Filter>
     </ClInclude>
-    <ClInclude Include="..\PowerStripPlugin.h">
-      <Filter>Emdr</Filter>
-    </ClInclude>
     <ClInclude Include="MemoryFree.h">
       <Filter>MemoryFree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Debug.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DiagnosticStripPlugin.h">
+      <Filter>Emdr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

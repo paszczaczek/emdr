@@ -9,8 +9,12 @@ class RemoteController
 {
 public:
 	RemoteController(IRrecv *irrecv, decode_results *results) :
+		buttonPressed(2), // jesli dodasz nowego subskrybenta, zwieksz wartosc
 		irrecv(irrecv),
-		results(results) {}
+		results(results)
+	{
+		//Serial.begin(115200);
+	}
 
 	enum Button : uint8_t
 	{
@@ -48,7 +52,7 @@ public:
 	}
 
 	void Loop() {
-		if (irrecv->decode(results)) {
+		if (irrecv->decode(results)) {      
 			ProcessCode(results->value);
 			irrecv->resume();
 		}

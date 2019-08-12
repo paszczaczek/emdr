@@ -29,8 +29,8 @@ class Event
       } else {        
         if (_moreHandlersCount < _moreHandlersCapacity)          
           _moreHandlers[_moreHandlersCount++] = &eventHandler;
-        //else
-        //  Serial.println(F("_moreHandlersCapacity to small"));
+        else
+          Serial.println(F("_moreHandlersCapacity to small"));
       }
 
       return *this;
