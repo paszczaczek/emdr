@@ -42,7 +42,8 @@ namespace EmdrWrapper {
 		{
 			::RemoteController::EventArgs args;
 			args.button = (::RemoteController::Button)button;
-			remoteController.buttonPressed.Emit(args);
+			remoteController.event.Emit(args);
+			//remoteController.ProcessCode(-1);
 		}
 	};
 

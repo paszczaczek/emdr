@@ -8,6 +8,6 @@ RemoteController::CodeMapper RemoteController::codeMapper = {
   { 0x176, RemoteController::Button::PAUSE },
   { 0x976, RemoteController::Button::PAUSE },
   { 0x175, RemoteController::Button::PLAY },
-  { 0x975, RemoteController::Button::PLAY },
-  { 0,     RemoteController::Button::UNSUPPORTED}
+  { 0x975, RemoteController::Button::PLAY }
 };
+byte RemoteController::codeMapperCount = 8;

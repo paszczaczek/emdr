@@ -2,7 +2,7 @@
 #define FASTLED_INTERNAL
 #include <FastLED.h>
 #include "StripPlugin.h"
-//#include "RemoteController.h"
+#include "RemoteController.h"
 
 class Strip
 {
@@ -15,6 +15,8 @@ public:
     pluginsCount(pluginsCount)
 	{
 		FastLED.setMaxPowerInVoltsAndMilliamps(5, maxCurrent);
+		remoteControllerEventHandler.Set(this, &Strip::OnRemoteControllerEvent);
+		remoteController.event += remoteControllerEventHandler;
 	}
 
 	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
@@ -31,16 +33,42 @@ public:
 			plugins[i]->OnStart();
 	}
 
+	void StopAllPlugins()
+	{
+		for (byte i = 0; i < pluginsCount; i++)
+			plugins[i]->OnStop();
+	}
+
 	void Loop()
 	{
 		for (byte i = 0; i < pluginsCount; i++)
-			plugins[i]->Loop();
+			if (plugins[i]->state != Plugin::State::Stopped)
+					plugins[i]->Loop();
 
 		if (updated)
 		{
 			FastLED.show(ledsBrightness);
 			updated = false;
 		}
+	}
+
+	void OnRemoteControllerEvent(RemoteController::EventArgs &args)
+	{
+		for (byte i = 0; i < pluginsCount; i++)
+			if (plugins[i]->state != Plugin::State::Stopped)
+				switch (args.button) 
+				{
+				case RemoteController::Button::PAUSE_REQUEST:
+					plugins[i]->OnPause();
+					break;
+				case RemoteController::Button::RESUME_REQUEST:
+					plugins[i]->OnResume();
+					break;
+				default:
+					plugins[i]->OnRemoteControllerEvent(args);
+					break;
+				}
+
 	}
 
 	void SetLeds(CRGB color)
@@ -58,6 +86,7 @@ private:
 	byte ledsCount;
 	StripPlugin **plugins;
 	byte pluginsCount;
+	EventHandler<Strip, RemoteController::EventArgs> remoteControllerEventHandler;
 };
 
 extern Strip strip;

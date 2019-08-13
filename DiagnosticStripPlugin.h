@@ -49,7 +49,7 @@ private:
 		switch (callNo)
 		{
 		case 0: // zaswiec wszystkie diody na bialo      
-			Serial.print(F("PowerOn ..."));
+			Serial.print(F("PowerOn..."));
 			strip.SetLeds(CRGB::White);
 			break;
 		default:
@@ -57,7 +57,7 @@ private:
 			strip.SetLeds(CRGB::Black);
 			timer.Stop();
 			function = Function::None;
-			Serial.print(F(" done"));
+			Serial.println(F("done"));
 			strip.StartAllPlugins();
 			break;
 		}

@@ -13,7 +13,7 @@ public:
 	RemoteControllerStripPlugin()
 	{
 		// subskrybuj eventy od pilota
-		remoteController.buttonPressed += remoteControllerButtonPressedEventHandler.Set(
+		remoteController.event += remoteControllerButtonPressedEventHandler.Set(
 			this, &RemoteControllerStripPlugin::onRemoteControllerButtonPressed);
 
 		// ustaw timer do migania diode po wcisnieciu guzika na pilocie
@@ -39,7 +39,7 @@ public:
 	virtual void Loop() override
 	{
 		flashTimer.Loop();
-		if (state == Plugin::State::Started)
+		if (state != Plugin::State::Stopped)
 			updateLeds();
 	}
 
@@ -67,7 +67,10 @@ private:
 		//Serial.print("onRemoteControllerButtonPressed: ");
 		//Serial.println(args.button);
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::ON;
-		buttonUnsupported = args.button == RemoteController::Button::UNSUPPORTED;
+		buttonUnsupported 
+		  = args.button == RemoteController::Button::UNSUPPORTED
+		  || args.button == RemoteController::Button::PAUSE_REQUEST
+		  || args.button == RemoteController::Button::RESUME_REQUEST;
 		flashTimer.Start();
 	}
 
