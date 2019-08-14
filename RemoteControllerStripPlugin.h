@@ -1,12 +1,15 @@
 #pragma once
+#define FASTLED_ALLOW_INTERRUPTS 0
+#define FASTLED_INTERNAL
+#include <FastLED.h>
 #include <inttypes.h>
+#include "Strip.h"
 #include "StripPlugin.h"
 #include "RemoteController.h"
 #include "Emdr.h"
 #include "EventHandler.h"
 #include "Timer.h"
 
-//template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
 class RemoteControllerStripPlugin : public StripPlugin
 {
 public:
@@ -21,9 +24,9 @@ public:
 			this, &RemoteControllerStripPlugin::onFlashTimerEvent);
 		flashTimer.autoReset = false;
 
-		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
-		buttonUnsupported = false;
-		flashTimer.interval = 90;
+		//buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
+		//buttonUnsupported = false;
+		flashTimer.interval = 250;// 90;
 	}
 
 	//virtual void OnSetStrip(Strip *strip) override
@@ -50,28 +53,50 @@ public:
 	}
 
 private:
-	CLEDController *controller = nullptr;
-	const uint8_t ledsCount = 1;
+	//CLEDController *controller = nullptr;
+	//const uint8_t ledsCount = 1;
 	Timer flashTimer;
 	EventHandler<RemoteControllerStripPlugin, RemoteController::EventArgs> remoteControllerButtonPressedEventHandler;
 	EventHandler<RemoteControllerStripPlugin, Timer::EventArgs> flashTimerElapsedEventHandler;
 	
-	enum class BUTTON_INDICATOR :uint8_t { UNSET = 0, ON = 1, OFF = 2 };
+	//enum class BUTTON_INDICATOR :uint8_t { UNSET = 0, ON = 1, Off = 2, InterruptsNeeded = 3 };
 
-	uint8_t buttonIndicator : 2;
-	uint8_t buttonUnsupported : 1;
+	enum struct LedState : byte { None, Off, Code, CodeUnsupported} ledState = LedState::None;
+	bool interruptsNedded = false;
+
+	//uint8_t buttonIndicator : 2;
+	//uint8_t buttonUnsupported : 1;
 
 	void onRemoteControllerButtonPressed(RemoteController::EventArgs &args)
 	{
 		// wcisnieto guzik na pilocie
+		switch (args.button)
+		{
+		case RemoteController::Button::Unknown:
+			ledState = LedState::CodeUnsupported;
+			flashTimer.Start();
+			break;
+		case RemoteController::Button::IntBlkDisallowed:
+			interruptsNedded = true;
+			break;
+		case RemoteController::Button::IntBlkAllowed:
+			interruptsNedded = false;
+			break;
+		default:
+			ledState = LedState::Code;
+			flashTimer.Start();
+			break;
+		}
 		//Serial.print("onRemoteControllerButtonPressed: ");
 		//Serial.println(args.button);
+		/*
 		buttonIndicator = (uint8_t)BUTTON_INDICATOR::ON;
 		buttonUnsupported 
-		  = args.button == RemoteController::Button::UNSUPPORTED
-		  || args.button == RemoteController::Button::PAUSE_REQUEST
-		  || args.button == RemoteController::Button::RESUME_REQUEST;
-		flashTimer.Start();
+		  = args.button == RemoteController::Button::Unknown
+		  || args.button == RemoteController::Button::IntBlkDisallowed
+		  || args.button == RemoteController::Button::IntBlkAllowed;
+		  */
+		//flashTimer.Start();
 	}
 
 	void onFlashTimerEvent(Timer::EventArgs& args)
@@ -79,26 +104,44 @@ private:
 		(void)args;
 		// czas zgasic diode sygnalizujaca wcisniecie guzika na pilocie
 		flashTimer.Stop();
-		buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
+		//buttonIndicator = (uint8_t)BUTTON_INDICATOR::OFF;
+		ledState = LedState::Off;
 	}
 
 	void updateLeds()
 	{
 		// wyznacz kolor jaki ma miec dioda sygnalizujaca wcisniecie guzika na pilocie
 		CRGB biColor = CRGB::Black;
-		switch (buttonIndicator) {
-		case (uint8_t)BUTTON_INDICATOR::ON:
-			// wcisnieto guzik na pilocie - dioda ma sie swiecic
-			biColor = buttonUnsupported ? CRGB::Blue : CRGB::Red;
-			break;
-		case (uint8_t)BUTTON_INDICATOR::OFF:
-			// wcisnieto guzik na pilocie ale czas swiecenia diody minal - wylaczyc diode
-			biColor = CRGB::Black;
-			buttonIndicator = (uint8_t)BUTTON_INDICATOR::UNSET;
-			break;
-		case (uint8_t)BUTTON_INDICATOR::UNSET:
+		//switch (buttonIndicator) {
+		//case (uint8_t)BUTTON_INDICATOR::ON:
+		//	// wcisnieto guzik na pilocie - dioda ma sie swiecic na czerwono
+		//	biColor = buttonUnsupported ? CRGB::Blue : CRGB::Red;
+		//	break;
+		//case (uint8_t)BUTTON_INDICATOR::OFF:
+		//	// wcisnieto guzik na pilocie ale czas swiecenia diody minal - wylaczyc diode
+		//	biColor = CRGB::Black;
+		//	buttonIndicator = (uint8_t)BUTTON_INDICATOR::UNSET;
+		//	break;
+		//case (uint8_t)BUTTON_INDICATOR::UNSET:
+		//	// zaden guzik na pilocie nie byl wciskany - nie ingerujemy w swiecenie diody
+		//	return;
+		//}
+		switch (ledState) {
+		case LedState::None:
 			// zaden guzik na pilocie nie byl wciskany - nie ingerujemy w swiecenie diody
 			return;
+		case LedState::Off:
+			// wcisnieto guzik na pilocie ale czas swiecenia diody minal - wylaczyc diode
+			biColor = interruptsNedded ? CRGB::Green : CRGB::Black;
+			break;
+		case LedState::Code:
+			// wcisnieto obslugiwany guzik na pilocie - zapalic diode na czerwono
+			biColor = CRGB::Red;
+			break;
+		case LedState::CodeUnsupported:
+			// wcisnieto nieobslugiwany guzik na pilocie - zapalic diode na niebiesko
+			biColor = CRGB::Blue;
+			break;
 		}
 
 		// czy kolor zmienil sie?

@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <IRremote.h>
 #include "Debug.h"
+#include "Timer.h"
 #include "Event.h"
 //#include "Strip.h"
 
@@ -11,16 +12,72 @@ public:
 	RemoteController(IRrecv *irrecv, decode_results *results) :
 		event(2), // jesli dodasz nowego subskrybenta, zwieksz wartosc
 		irrecv(irrecv),
-		results(results),
-		badCodeCount(0)
+		results(results)
 	{
+	}
+
+	void ProcessCode(unsigned long code) {
+		PRINT(F("IR: ")); PRINT(code, HEX); PRINT(F(" -> "));
+		// probujemy rozpoznac kod
+		for (int i = 0; i < RemoteController::codeMapperCount; i++)
+		{
+			if (codeMapper[i].code == code)
+			{
+				// kod rozpoznany
+				args.button = codeMapper[i].button;
+				PRINTLN((int)args.button);
+				event.Emit(args);
+				return;
+			}
+		}
+
+		// kod nierozpoznany
+		if (!intBlkDisallowed)
+		{
+			// kod nierozpoznay ale nie wiadomo czy dlatego ze:
+			// a. strip zablokowal przerwania przeklamujac odczyt kodu
+			// b. odczyt kodu jest poprawny ale go nie obslugujemy
+			// wysylamy zakaz uzywania przerwan, aby by to rozstrzygnac
+			args.button = Button::IntBlkDisallowed;
+			PRINT((int)args.button); PRINTLN(F("(IntBlkDisallowed)"));
+			//releaseInterruptsTimer.Start();
+			intBlkDisallowed = true;
+		}
+		else
+		{
+			// kod nierozpoznany i wyslalismy juz wczesniej zakaz uzywania przerwan 
+			// oznacza to ze kod odczytal sie poprawnie, ale nie obslugujemy 
+			// wysylamy komunikat o nieznanym kodzie
+			args.button = Button::Unknown;
+			PRINT((int)args.button); PRINTLN(F("(Unknown)"));
+		}
+
+		event.Emit(args);
+	}
+
+	void Loop() {
+		// jesli jest zakaz uzywania przerwan i dosc dlugo nie odebrano zadnego kodu,
+		if (intBlkDisallowed && millis() - lastCodeTime > 3000)
+		{
+			// to prawdopodobnie pilot nie bedzie w najblizszej chwili uzywany 
+			// uchylam zakaz uzywania przerwan
+			args.button = Button::IntBlkAllowed;
+			PRINT(F("IR: timeout -> ")); PRINT((int)args.button); PRINTLN(F("(IntBlkAllowed)"));
+			event.Emit(args);
+			intBlkDisallowed = false;
+		}
+		if (irrecv->decode(results)) {
+			ProcessCode(results->value);
+			lastCodeTime = millis();
+			irrecv->resume();
+		}
 	}
 
 	enum struct Button : byte
 	{
-		UNSUPPORTED = 0,
-		PAUSE_REQUEST,
-		RESUME_REQUEST,
+		Unknown = 0,
+		IntBlkDisallowed,
+		IntBlkAllowed,
 		CHANEL_PLUS,
 		CHANEL_MINUS,
 		PAUSE,
@@ -36,64 +93,23 @@ public:
 		Button button;
 	};
 
-	void ProcessCode(unsigned long code) {
-		Button button = Button::UNSUPPORTED;
-		bool codeFound = false;
-		for (int i = 0; i < RemoteController::codeMapperCount; i++)
-			if (codeMapper[i].code == code)
-			{
-				// znaleziono pasujacy kod
-				if (badCodeCount > 0)
-				{
-					badCodeCount = 0;
-					PRINTLN(F("IR: RESUME_REQUEST!"));
-					args.button = Button::RESUME_REQUEST;
-					event.Emit(args);
-				}
-				button = codeMapper[i].button;
-				codeFound = true;
-				break;
-			}
-
-		if (!codeFound)
-		{
-			if (++badCodeCount >= 10)
-			{
-				// Jesli ciagle kody sa niezrozumiale, to przyczyna moze byc czeste
-				// odswiezanie stripu, bo FastLED blokuje przerwania na czas programowania diod.
-				// Wysylamy wiec komunikat blokujacy pluginy, tak aby kod mogl zostac poprawnie
-				// odczytany.
-				PRINTLN(F("IR: PAUSE_REQUEST!"));
-				button = Button::PAUSE_REQUEST;
-				//badCodeCount = 0;
-			}
-		}
-
-		PRINT(F("IR: ")); PRINT(code, HEX); PRINT(F(" -> ")); PRINT((int)button); PRINT(" ("); PRINT(badCodeCount); PRINTLN(")");
-		args.button = button;
-		event.Emit(args);
-	}
-
-	void Loop() {
-		if (irrecv->decode(results)) {
-			ProcessCode(results->value);
-			irrecv->resume();
-		}
-	}
-
 	Event<EventArgs> event;
 
 private:
 	IRrecv *irrecv;
 	decode_results *results;
 	EventArgs args;
-	byte badCodeCount;
+	unsigned long lastCodeTime = 0;
+	bool intBlkDisallowed = false;
+
 	typedef const struct {
 		unsigned long code;
 		Button button;
 	} CodeMapper[];
 	static CodeMapper codeMapper;
 	static byte codeMapperCount;
+
+
 };
 
 extern RemoteController remoteController;

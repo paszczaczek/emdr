@@ -79,6 +79,14 @@ private:
 	{
 		switch (args.button)
 		{
+		case RemoteController::Button::IntBlkDisallowed:
+			//Serial.println(F("MovingPointStripPlugin: paused"));
+			movingTimer.Stop();
+			break;
+		case RemoteController::Button::IntBlkAllowed:
+			//Serial.println(F("MovingPointStripPlugin: resumed"));
+			movingTimer.Start();
+			break;
 		case RemoteController::Button::CHANEL_PLUS:
 			if (movingTimer.interval > 20)
 				movingTimer.interval /= 2;

@@ -23,7 +23,7 @@ public:
 	// zapala na chwile wszystkie diody po wlaczeniu zasilania w celach diagnostycznych
 	void PowerOn() {
 		state = State::Started;
-		timer.interval = 2000;
+		timer.interval = 1000;
 		timer.Start();
 		PowerOn(0);
 	}

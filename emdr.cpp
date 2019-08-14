@@ -1,3 +1,4 @@
+//#define FASTLED_ALLOW_INTERRUPTS 1
 #define FASTLED_INTERNAL
 #include <Arduino.h>
 #include <FastLED.h>
