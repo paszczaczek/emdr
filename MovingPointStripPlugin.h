@@ -12,10 +12,7 @@ public:
 	{
 		elapsedEventHandler.Set(this, &MovingPointStripPlugin::onMovingTimerElapsed);
 		movingTimer.elapsed += elapsedEventHandler;
-		movingTimer.interval = 5;//1000;
-
-		//buttonPressedEventHandler.Set(this, &MovingPointStripPlugin::OnRemoteControllerButtonPressed);
-		//remoteController.event += buttonPressedEventHandler;
+		movingTimer.interval = 1000;
 	}
 
 	virtual void Loop() override
@@ -26,6 +23,7 @@ public:
 	virtual void OnStart() override
 	{
 		Plugin::OnStart();
+		setSpeed(speed = 70);
 		movingTimer.Start();
 	}
 
@@ -46,16 +44,39 @@ public:
 private:
 	Timer movingTimer;
 	int ledCurrent = 0;
+	byte speed = 1; // predkosc poruszania sie punktu wyrazona w liczbie diod na sekunke
 	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;
 	EventHandler<MovingPointStripPlugin, Timer::EventArgs> elapsedEventHandler;
-	//EventHandler<MovingPointStripPlugin, RemoteController::EventArgs> buttonPressedEventHandler;
+
+	void setSpeed(byte speed)
+	{
+		// <--speed--->
+		//movingTimer.interval = (speed * 1000) / (strip.controller->size() - 1);
+		//PRINT(F("Peirod: ")); PRINT(speed); PRINTLN(F("s"));
+		movingTimer.interval = 1 / (float)speed * 1000;
+		PRINT(F("Speed: ")); PRINT(speed); PRINTLN(F("d/s"));
+	}
+
+	void changeSpeed(bool increase)
+	{
+		if (increase)
+		{
+			if (speed < 180)
+				speed++;
+		}
+		else
+		{
+			if (speed > 1)
+				speed--;
+		}
+		setSpeed(speed);
+	}
 
 	void onMovingTimerElapsed(Timer::EventArgs& args)
 	{
 		auto ledNext = ledCurrent;
 
 		if (movingDirection == MovingDirection::RIGTH)
-			//if (ledCurrent < strip->controller->size() - (int)args.elapsedIntervals)
 			if (ledCurrent < strip.controller->size() - (int)args.elapsedIntervals)
 				ledNext += args.elapsedIntervals;
 			else
@@ -80,19 +101,16 @@ private:
 		switch (args.button)
 		{
 		case RemoteController::Button::IntBlkDisallowed:
-			//Serial.println(F("MovingPointStripPlugin: paused"));
 			movingTimer.Stop();
 			break;
 		case RemoteController::Button::IntBlkAllowed:
-			//Serial.println(F("MovingPointStripPlugin: resumed"));
 			movingTimer.Start();
 			break;
 		case RemoteController::Button::CHANEL_PLUS:
-			if (movingTimer.interval > 20)
-				movingTimer.interval /= 2;
+			changeSpeed(true);
 			break;
 		case RemoteController::Button::CHANEL_MINUS:
-			movingTimer.interval *= 2;
+			changeSpeed(false);
 			break;
 		case RemoteController::Button::PLAY:
 			movingTimer.Start();

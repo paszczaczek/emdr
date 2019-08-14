@@ -57,7 +57,6 @@ void setup()
 	irrecv.enableIRIn();
 	strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>();
 	diagnosticStipPlugin.PowerOn();
-	//strip.StartAllPlugins();
 }
 
 void loop() {
