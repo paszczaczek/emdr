@@ -141,7 +141,7 @@ void ledsOff() {
   for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
     leds[ledNo] = CRGB::Blue;
   leds[0] = CRGB::Blue;
-  FastLED.delay(1000);
+  FastLED.delay(1000); 
 
   for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
     leds[ledNo] = CRGB::Black;
