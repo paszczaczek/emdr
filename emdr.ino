@@ -44,8 +44,6 @@ const EOrder LEDS_COLOR_ORDER = GRB;
 CRGB leds[LEDS_COUNT];
 
 void setup() {
-  // put your setup code here, to run once:
-  // fastled
   // delay(1000); // power-up safety delay
   Serial.begin(115200);
   FastLED.addLeds<WS2811, LEDS_DATA_PIN, LEDS_COLOR_ORDER>(leds, LEDS_COUNT);
@@ -97,7 +95,7 @@ void moving_point(unsigned long now) {
   }
 
   // zapal dolejna diode
-  leds[curr_led_no] = CRGB::Orange;
+  leds[curr_led_no] = CRGB::Red;
 
   FastLED.show();
   fired_at = now;
@@ -144,5 +142,8 @@ void ledsOff() {
     leds[ledNo] = CRGB::Blue;
   leds[0] = CRGB::Blue;
   FastLED.delay(1000);
-  leds[0] = CRGB::Black;
+
+  for (int ledNo = 0; ledNo < LEDS_COUNT; ledNo++)
+    leds[ledNo] = CRGB::Black;
+  FastLED.show();
 }
