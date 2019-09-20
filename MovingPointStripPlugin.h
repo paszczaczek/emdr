@@ -10,8 +10,12 @@ class MovingPointStripPlugin : public StripPlugin
 public:
 	MovingPointStripPlugin()
 	{
-		elapsedEventHandler.Set(this, &MovingPointStripPlugin::onMovingTimerElapsed);
+		//elapsedEventHandler.Set(this, &MovingPointStripPlugin::onMovingTimerElapsed);
 		movingTimer.interval = 10000;
+		//movingCounter.to = 10;
+		movingCounter.interval = 1000;
+		movingCounter.countTo = 5;
+		movingCounter.Start();
 	}
 
 	virtual void Loop() override
@@ -19,6 +23,9 @@ public:
 		unsigned int intevals = 0;
 		if (movingTimer.Elapsed(intevals))
 			MovingTimerElapsed(intevals);
+		unsigned int counter = 0;
+		if (movingCounter.Elapsed(counter))
+			;// Serial.println(counter);
 	}
 
 	void MovingTimerElapsed(unsigned int elapsedIntervals)
@@ -51,7 +58,8 @@ public:
 	virtual void OnStart() override
 	{
 		Plugin::OnStart();
-		setSpeed(speed = 70);
+		//setSpeed(speed = 70);
+		setSpeed(speed = 10);
 		movingTimer.Start();
 	}
 
@@ -70,11 +78,12 @@ public:
 	}
 
 private:
-	Timer2 movingTimer;
+	TimerRepeatable movingTimer;
+	CounterUpToDown movingCounter;
 	int ledCurrent = 0;
 	byte speed = 1; // predkosc poruszania sie punktu wyrazona w liczbie diod na sekunke
 	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;
-	EventHandler<MovingPointStripPlugin, Timer::EventArgs> elapsedEventHandler;
+	//EventHandler<MovingPointStripPlugin, Timer::EventArgs> elapsedEventHandler;
 
 	void setSpeed(byte speed)
 	{
