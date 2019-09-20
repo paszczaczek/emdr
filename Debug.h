@@ -13,7 +13,7 @@
     Serial.print(tag); \
     Serial.print(F(": ")); \
     Serial.print(freeMemory()); \
-    Serial.println(); \
+    Serial.println(F("b")); \
   }
 #else
   #define PRINT(...) 

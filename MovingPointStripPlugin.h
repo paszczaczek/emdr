@@ -8,16 +8,44 @@
 class MovingPointStripPlugin : public StripPlugin
 {
 public:
-	MovingPointStripPlugin() : movingTimer(2)
+	MovingPointStripPlugin()
 	{
 		elapsedEventHandler.Set(this, &MovingPointStripPlugin::onMovingTimerElapsed);
-		movingTimer.elapsed += elapsedEventHandler;
-		movingTimer.interval = 1000;
+		movingTimer.interval = 10000;
 	}
 
 	virtual void Loop() override
 	{
-		movingTimer.Loop();
+		unsigned int intevals = 0;
+		if (movingTimer.Elapsed(intevals))
+			MovingTimerElapsed(intevals);
+	}
+
+	void MovingTimerElapsed(unsigned int elapsedIntervals)
+	{
+		long ledNext = ledCurrent;
+
+		if (movingDirection == MovingDirection::RIGTH)
+			if (ledCurrent < strip.controller->size() - (int)elapsedIntervals)
+				ledNext += elapsedIntervals;
+			else
+				movingDirection = MovingDirection::LEFT;
+		else if (ledCurrent > (int)elapsedIntervals - 1)
+			ledNext -= elapsedIntervals;
+		else
+			movingDirection = MovingDirection::RIGTH;
+
+		if (ledNext < 0 || ledNext >= strip.controller->size())
+			Serial.println(F("*MovingPointStrip::MovingTimerElapsed: ledNext bad!"));
+
+		if (ledNext == ledCurrent)
+			return;
+
+		strip.controller->leds()[ledCurrent] = CRGB::Black;
+		strip.controller->leds()[ledNext] = CRGB::Orange;
+		strip.updated = true;
+
+		ledCurrent = ledNext;
 	}
 
 	virtual void OnStart() override
@@ -42,7 +70,7 @@ public:
 	}
 
 private:
-	Timer movingTimer;
+	Timer2 movingTimer;
 	int ledCurrent = 0;
 	byte speed = 1; // predkosc poruszania sie punktu wyrazona w liczbie diod na sekunke
 	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;
@@ -50,10 +78,8 @@ private:
 
 	void setSpeed(byte speed)
 	{
-		// <--speed--->
-		//movingTimer.interval = (speed * 1000) / (strip.controller->size() - 1);
-		//PRINT(F("Peirod: ")); PRINT(speed); PRINTLN(F("s"));
-		movingTimer.interval = 1 / (float)speed * 1000;
+		// speed
+		movingTimer.interval = (unsigned long)(1 / (float)speed * 1000);
 		PRINT(F("Speed: ")); PRINT(speed); PRINTLN(F("d/s"));
 	}
 
@@ -76,6 +102,8 @@ private:
 	{
 		auto ledNext = ledCurrent;
 
+		Serial.println(args.elapsedIntervals);
+		Serial.println(args.elapsedIntervalsFromStart);
 		if (movingDirection == MovingDirection::RIGTH)
 			if (ledCurrent < strip.controller->size() - (int)args.elapsedIntervals)
 				ledNext += args.elapsedIntervals;
@@ -96,7 +124,7 @@ private:
 		ledCurrent = ledNext;
 	}
 
-	void OnRemoteControllerEvent(RemoteController::EventArgs &args) override
+	void OnRemoteControllerEvent(RemoteController::EventArgs& args) override
 	{
 		switch (args.button)
 		{
