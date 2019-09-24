@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 #include "Strip.h"
 #include "StripPlugin.h"
 #include "Timer.h"
@@ -7,29 +8,81 @@
 
 class MovingPointStripPlugin : public StripPlugin
 {
+private:
+	CounterUpDownRepeadable movingCounter;
+	Timer restTimer;
+
 public:
 	MovingPointStripPlugin()
 	{
 		//elapsedEventHandler.Set(this, &MovingPointStripPlugin::onMovingTimerElapsed);
 		movingTimer.interval = 10000;
-		//movingCounter.to = 10;
-		movingCounter.interval = 1000;
-		movingCounter.countTo = 5;
+		
+		movingCounter.interval = 20;
 		movingCounter.Start();
+		restTimer.interval = 3000;
 	}
 
 	virtual void Loop() override
 	{
-		unsigned int intevals = 0;
+		/*unsigned int intevals = 0;
 		if (movingTimer.Elapsed(intevals))
-			MovingTimerElapsed(intevals);
+			MovingTimerElapsed(intevals);*/
+		if (movingCounter.countTo == 0)
+			movingCounter.countTo = strip.controller->size() - 1;
+
+		if (restTimer.Elapsed())
+			RestTimerElapsed();
+
 		unsigned int counter = 0;
-		if (movingCounter.Elapsed(counter))
-			;// Serial.println(counter);
+		CounterUpDownRepeadable::Info info;
+		unsigned int ommittedMinMaxConters;
+		if (movingCounter.Elapsed(counter, &info, &ommittedMinMaxConters))
+			MovingCounterElapsed(counter, info, ommittedMinMaxConters);
 	}
 
-	void MovingTimerElapsed(unsigned int elapsedIntervals)
+	void RestTimerElapsed()
 	{
+		restTimer.Stop();
+		movingCounter.Resume();
+		Serial.println("RESUME");
+	}
+
+	void MovingCounterElapsed(unsigned int ledNext, CounterUpDownRepeadable::Info info, unsigned int ommittedMinMaxConters)
+	{
+		switch (info)
+		{
+		case CounterUpDownRepeadable::Info::MinOccurred:
+		case CounterUpDownRepeadable::Info::MaxOccurred:
+			movingCounter.Pause();
+			restTimer.Start();
+			Serial.println("MIN/MAX");
+			break;
+		case CounterUpDownRepeadable::Info::MinOmmited:
+			movingCounter.Pause();
+			movingCounter.Decrease(ommittedMinMaxConters);
+			restTimer.Start();
+			Serial.println("MIN OMMITTED");
+			ledNext = 0;
+			break;
+		case CounterUpDownRepeadable::Info::MaxOmmited:
+			movingCounter.Pause();
+			movingCounter.Decrease(ommittedMinMaxConters);
+			restTimer.Start();
+			Serial.println("MAX OMMITTED");
+			ledNext = movingCounter.countTo;
+			break;
+		default:
+			break;
+		}
+
+		strip.controller->leds()[ledCurrent] = CRGB::Black;
+		strip.controller->leds()[ledNext] = CRGB::Orange;
+		strip.updated = true;
+
+		ledCurrent = ledNext;
+
+		/*
 		long ledNext = ledCurrent;
 
 		if (movingDirection == MovingDirection::RIGTH)
@@ -45,6 +98,7 @@ public:
 		if (ledNext < 0 || ledNext >= strip.controller->size())
 			Serial.println(F("*MovingPointStrip::MovingTimerElapsed: ledNext bad!"));
 
+
 		if (ledNext == ledCurrent)
 			return;
 
@@ -53,6 +107,7 @@ public:
 		strip.updated = true;
 
 		ledCurrent = ledNext;
+		*/
 	}
 
 	virtual void OnStart() override
@@ -79,8 +134,7 @@ public:
 
 private:
 	TimerRepeatable movingTimer;
-	CounterUpToDown movingCounter;
-	int ledCurrent = 0;
+	unsigned int ledCurrent = 0;
 	byte speed = 1; // predkosc poruszania sie punktu wyrazona w liczbie diod na sekunke
 	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;
 	//EventHandler<MovingPointStripPlugin, Timer::EventArgs> elapsedEventHandler;
@@ -107,7 +161,7 @@ private:
 		setSpeed(speed);
 	}
 
-	void onMovingTimerElapsed(Timer::EventArgs& args)
+	/*void onMovingTimerElapsed(TimerOLD::EventArgs& args)
 	{
 		auto ledNext = ledCurrent;
 
@@ -131,7 +185,7 @@ private:
 		strip.updated = true;
 
 		ledCurrent = ledNext;
-	}
+	}*/
 
 	void OnRemoteControllerEvent(RemoteController::EventArgs& args) override
 	{

@@ -1,8 +1,9 @@
 #pragma once
 #include <Arduino.h>
+#include <stdio.h>
 #include "Event.h"
 
-class Timer
+class TimerOLD
 {
 public:
 	class EventArgs
@@ -12,7 +13,7 @@ public:
 		unsigned int elapsedIntervalsFromStart;
 	};
 
-	Timer(byte handlersCapacity = 1) : elapsed(handlersCapacity) { }
+	TimerOLD(byte handlersCapacity = 1) : elapsed(handlersCapacity) { }
 
 	unsigned long interval = 0;
 	bool autoReset = true;
@@ -65,8 +66,8 @@ public:
 	unsigned long interval = 0;
 
 protected:
-	// czas uruchomienia timera w milisekundach od startu systemu
-	unsigned long startedAt = -1;
+	// czas uruchomienia timera w milisekundach
+	unsigned long startedAt = (unsigned long)-1;
 
 protected:
 	// konstruktor protected nie pozwala tworzyc instacji tej klasy
@@ -86,16 +87,16 @@ public:
 	}
 
 	// czy timer jest wystartowany
-	bool Started()
+	bool IsStarted()
 	{
 		return startedAt != (unsigned long)-1;
 	}
 
 	// czy nadszedl czas aktywacji timera
-	bool Elapsed(unsigned int& elapsedIntervals)
+	bool Elapsed(unsigned int* ommittedIntervals = NULL)
 	{
 		// czy timer zostal uruchomiony?
-		if (!Started())
+		if (!IsStarted())
 			return false;
 
 		// interval musi byc podany
@@ -108,7 +109,16 @@ public:
 
 		// ile minelo pelnych intervalow od momentu startu
 		auto now = millis();
-		elapsedIntervals = (now - startedAt) / interval;
+		unsigned int elapsedIntervals = (now - startedAt) / interval;
+
+		// liczba pominietych intervalow
+		if (ommittedIntervals)
+		{
+			if (elapsedIntervals > 0)
+				* ommittedIntervals = elapsedIntervals - 1;
+			else
+				*ommittedIntervals = 0;
+		}
 
 		// czy nadszel aktywacji
 		return elapsedIntervals > 0;
@@ -117,13 +127,13 @@ public:
 
 
 // Timer aktywowany jednokrotnie
-class Timer2 : public TimerBase
+class Timer : public TimerBase
 {
 public:
 	// czy nadszedl czas aktywacji timera
-	bool Elapsed(unsigned int& elapsedIntervals)
+	bool Elapsed(unsigned int* ommittedIntervals = NULL)
 	{
-		bool elapsed = TimerBase::Elapsed(elapsedIntervals);
+		bool elapsed = TimerBase::Elapsed(ommittedIntervals);
 		// jesli nadszedl czas aktywacji, to stopujemy timer
 		if (elapsed)
 			Stop();
@@ -137,49 +147,59 @@ class TimerRepeatable : public TimerBase
 {
 public:
 	// czy nadszedl czas aktywacji timera
-	bool Elapsed(unsigned int& elapsedIntervals)
+	bool Elapsed(unsigned int* outOmmittedIntervals)
 	{
-		bool elapsed = TimerBase::Elapsed(elapsedIntervals);
+		unsigned int ommittedIntervals;
+		bool elapsed = TimerBase::Elapsed(&ommittedIntervals);
 		// jesli nadszedl czas aktywacji, to aktywujemy nastepny cykl
 		if (elapsed)
-			startedAt += elapsedIntervals * interval;
+			startedAt += (1 + ommittedIntervals) * interval;
+		if (outOmmittedIntervals)
+			* outOmmittedIntervals = ommittedIntervals;
 		return elapsed;
 	}
 };
 
 
 // Licznik odliczajacy od 1 do nieskonczonosci
-class CounterUp : public TimerRepeatable
+class CounterInfinite : public TimerRepeatable
 {
-private:
+protected:
 	// ile minelo interwalow od czasu wystartowania licznika
-	unsigned int elaspsedIntervalsFromStart = 0;
+	unsigned int counter = (unsigned int)-1;
 
 public:
 	// wystartowanie licznika
 	void Start()
 	{
 		TimerRepeatable::Start();
-		elaspsedIntervalsFromStart = 0;
+		//elaspsedIntervals = 0;
+	}
+
+	// zatrzymanie licznika
+	void Stop()
+	{
+		TimerRepeatable::Stop();
+		counter = (unsigned int)-1;
 	}
 
 	// czy nadszedl czas aktywacji licznika
-	bool Elapsed(unsigned int& counter)
+	bool Elapsed(unsigned int& outCounter, unsigned int* outOmmittedCounters = NULL)
 	{
-		unsigned int elapsedIntervals = 0;
-		bool elapsed = TimerRepeatable::Elapsed(elapsedIntervals);
+		unsigned int ommitedCounters;
+		bool elapsed = TimerRepeatable::Elapsed(&ommitedCounters);
 		if (elapsed)
-		{
-			elaspsedIntervalsFromStart += elapsedIntervals;
-			counter = elaspsedIntervalsFromStart;
-		}
+			counter += 1 + ommitedCounters;
+		outCounter = counter;
+		if (outOmmittedCounters)
+			* outOmmittedCounters = ommitedCounters;
 		return elapsed;
 	}
 };
 
 
 // Licznik odliczajacy w gore od 1 do zadanej wartosci
-class CounterUpTo : public CounterUp
+class Counter : public CounterInfinite
 {
 public:
 	// wartosc do ktorej odliczac
@@ -190,86 +210,243 @@ public:
 	bool Elapsed(unsigned int& counter)
 	{
 		// counterTo musi byc podany
-		if (countTo == 0 && Started())
+		if (countTo == 0 && IsStarted())
 		{
-			Serial.println(F("* CounterUpTo::counterTo=0!"));
+			Serial.println(F("* Counter:counterTo=0!"));
 			Stop();
 			return false;
 		}
 
-		bool elapsed = CounterUp::Elapsed(counter);
+		bool elapsed = CounterInfinite::Elapsed(counter);
 		if (elapsed && counter >= countTo)
 			Stop();
 		return elapsed;
 	}
 };
 
-#include <stdio.h>
+
 // Licznik odliczajacy w gore od 1 do zadanej wartosci i w dol
-class CounterUpToDown : public CounterUp
+class CounterUpDownRepeadable : public CounterInfinite
 {
 public:
 	// wartosc do ktorej odliczac
 	unsigned int countTo = 0;
+	enum struct Info : byte { MinOccurred, MaxOccurred, MinOmmited, MaxOmmited, None };
 
 public:
-	// czy nadszedl czas aktywacji countera
-	bool Elapsed(unsigned int& counter)
+	void Pause()
 	{
-		// counterTo musi byc podany
-		if (countTo <= 1 && Started())
+		TimerRepeatable::Stop();
+	}
+
+	void Resume()
+	{
+		TimerRepeatable::Start();
+	}
+
+	// czy nadszedl czas aktywacji countera
+	bool Elapsed(unsigned int& counter, Info* info = NULL, unsigned int* ommittedMinMaxCounters = NULL)
+	{
+		// inicjalizacja parametrow wyjsciowych
+		counter = 0;
+		if (info)
+			* info = Info::None;
+		if (ommittedMinMaxCounters)
+			ommittedMinMaxCounters = 0;
+
+		// od razu po uruchomieniu licznika jest pierwsza aktywacja z counterem zerowycm
+		if (this->counter == (unsigned int)-1)
 		{
-			Serial.println(F("* CounterUpToDown::counterTo=0!"));
+			this->counter = 0;
+			return true;
+		}
+
+		// counterTo musi byc podany
+		if (countTo <= 1 && IsStarted())
+		{
+			Serial.println(F("* CounterUpDownRepeadable::counterTo=0!"));
 			Stop();
 			return false;
 		}
 
-		bool elapsed = CounterUp::Elapsed(counter);
+		// czy naszedla czas aktywacji licznika?
+		unsigned int ommittedCounters;
+		bool elapsed = CounterInfinite::Elapsed(counter, &ommittedCounters);
 		if (elapsed)
 		{
-			/*
-			countTo = 5
-			|1| 2 3 4 |5| 6 7 8 |9| 10 - counter
-			|0| 1 2 3 |4| 5 6 7 |8|  9 - counter - 1
-			|0| 1 2 3 |0| 1 2 3 |0|  1 - (counter - 1) % (countTo - 1)
-			|1| 2 3 4 |1| 1 2 3 |1|  5 - (counter - 1) % (countTo - 1) + 1
-			*/
-			char buf[255] = "";
-			bool boundry = (counter - 1) % (countTo - 1) == 0;
-			bool up = (counter - 1) / (countTo - 1) % 2 == 0;
-			int cnt = 0;
-			if (boundry)
-				if (up)
-					cnt = 1;
+			// tak, nadszedl czas aktywacji
+			counter = this->counter % countTo;
+			bool fallingSlope = this->counter / countTo % 2 == 1;
+			if (fallingSlope)
+				if (counter == 0)
+					counter = countTo;
 				else
-					cnt = countTo;
-			else
-				if (up)
-					cnt = (counter - 1) % (countTo - 1) + 1;
-				else
-					cnt = countTo - (counter - 1) % (countTo - 1);
-			sprintf(buf, "%d %d %s : %d", counter, boundry, up ? "UP" : "dn", cnt);
-			Serial.println(buf);
-			/*
-			bool countUp = (counter - 1) / (countTo -1 ) % 2 == 0;
-			counter = (counter - 1) % countTo + 1;
-			if (countUp)
-				;
-			else
-				counter = countTo - counter;
-				*/
-				/*
-				bool countUp = counter / countTo % 2 == 0 || counter % countUp == 0;
-				if (countUp)
+					counter = countTo - counter;
+
+			if (counter == 0)
+			{
+				if (info)
+					* info = Info::MinOccurred;
+			}
+			else if (counter == countTo) {
+				if (info)
+					* info = Info::MaxOccurred;
+			}
+			else if (fallingSlope)
+			{
+				if (ommittedCounters >= countTo - counter)
 				{
-					counter %= countTo + 1;
+					if (info)
+						* info = Info::MaxOmmited;
+					if (ommittedMinMaxCounters)
+						* ommittedMinMaxCounters = countTo - counter;
 				}
-				else
+			}
+			else // raisingSlope
+			{
+				if (ommittedCounters >= counter)
 				{
-					counter  = countTo - counter % countTo;
+					if (info)
+						* info = Info::MinOmmited;
+					if (ommittedMinMaxCounters)
+						* ommittedMinMaxCounters = counter;
 				}
-				*/
+			}
+
+			Debug(this->counter, counter, ommittedCounters, fallingSlope, info);
 		}
 		return elapsed;
+	}
+
+	void Decrease(int delta)
+	{
+		counter -= delta;
+	}
+
+private:
+	void Debug(unsigned int counter, unsigned int counterModulo, unsigned int ommittedCounters, bool fallingSlope, Info* info)
+	{
+		char buf[255] = "";
+		char slope = fallingSlope ? '\\' : '/';
+		if (counterModulo == 0)
+			slope = 'v';
+		else if (counterModulo == countTo)
+			slope = '^';
+		snprintf(buf, sizeof buf, "%ud: %c%d !%d (%d)",
+			counter, slope, counterModulo, ommittedCounters, info ? (int)* info : -1);
+		Serial.println(buf);
+	}
+};
+
+
+class CounterUpDownRepeadable2 : public CounterUpDownRepeadable
+{
+public:
+	// wartosc do ktorej odliczac
+	unsigned int countTo = 0;
+	enum struct Info : byte { MinOccurred, MaxOccurred, MinOmmited, MaxOmmited, None };
+
+public:
+	void Pause()
+	{
+		TimerRepeatable::Stop();
+	}
+
+	void Resume()
+	{
+		TimerRepeatable::Start();
+	}
+
+	// czy nadszedl czas aktywacji countera
+	bool Elapsed(unsigned int& counter, Info* info = NULL, unsigned int* ommittedMinMaxCounters = NULL)
+	{
+		// inicjalizacja parametrow wyjsciowych
+		counter = 0;
+		if (info)
+			* info = Info::None;
+		if (ommittedMinMaxCounters)
+			ommittedMinMaxCounters = 0;
+
+		// od razu po uruchomieniu licznika jest pierwsza aktywacja z counterem zerowycm
+		if (this->counter == (unsigned int)-1)
+		{
+			this->counter = 0;
+			return true;
+		}
+
+		// counterTo musi byc podany
+		if (countTo <= 1 && IsStarted())
+		{
+			Serial.println(F("* CounterUpDownRepeadable::counterTo=0!"));
+			Stop();
+			return false;
+		}
+
+		// czy naszedla czas aktywacji licznika?
+		unsigned int ommittedCounters;
+		bool elapsed = CounterInfinite::Elapsed(counter, &ommittedCounters);
+		if (elapsed)
+		{
+			// tak, nadszedl czas aktywacji
+			counter = this->counter % countTo;
+			bool fallingSlope = this->counter / countTo % 2 == 1;
+			if (fallingSlope)
+				if (counter == 0)
+					counter = countTo;
+				else
+					counter = countTo - counter;
+
+			if (counter == 0)
+			{
+				if (info)
+					* info = Info::MinOccurred;
+			}
+			else if (counter == countTo) {
+				if (info)
+					* info = Info::MaxOccurred;
+			}
+			else if (fallingSlope)
+			{
+				if (ommittedCounters >= countTo - counter)
+				{
+					if (info)
+						* info = Info::MaxOmmited;
+					if (ommittedMinMaxCounters)
+						* ommittedMinMaxCounters = countTo - counter;
+				}
+			}
+			else // raisingSlope
+			{
+				if (ommittedCounters >= counter)
+				{
+					if (info)
+						* info = Info::MinOmmited;
+					if (ommittedMinMaxCounters)
+						* ommittedMinMaxCounters = counter;
+				}
+			}
+
+			Debug(this->counter, counter, ommittedCounters, fallingSlope, info);
+		}
+		return elapsed;
+	}
+
+	void Decrease(int delta)
+	{
+		counter -= delta;
+	}
+
+private:
+	void Debug(unsigned int counter, unsigned int counterModulo, unsigned int ommittedCounters, bool fallingSlope, Info* info)
+	{
+		char buf[255] = "";
+		char slope = fallingSlope ? '\\' : '/';
+		if (counterModulo == 0)
+			slope = 'v';
+		else if (counterModulo == countTo)
+			slope = '^';
+		snprintf(buf, sizeof buf, "%ud: %c%d !%d (%d)",
+			counter, slope, counterModulo, ommittedCounters, info ? (int)* info : -1);
+		Serial.println(buf);
 	}
 };

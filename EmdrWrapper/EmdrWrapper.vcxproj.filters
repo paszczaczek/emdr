@@ -28,6 +28,9 @@
     <Filter Include="MemoryFree">
       <UniqueIdentifier>{07f00db4-8690-4257-8513-3718126fa831}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ClassDiagrams">
+      <UniqueIdentifier>{f63a8c7e-122a-44b5-a99b-4baff7879c09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -142,5 +145,10 @@
     <Image Include="app.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagrams\Timers.cd">
+      <Filter>ClassDiagrams</Filter>
+    </None>
   </ItemGroup>
 </Project>

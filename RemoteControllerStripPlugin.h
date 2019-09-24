@@ -41,9 +41,9 @@ public:
 	}
 
 private:
-	Timer flashTimer;
+	TimerOLD flashTimer;
 	EventHandler<RemoteControllerStripPlugin, RemoteController::EventArgs> remoteControllerButtonPressedEventHandler;
-	EventHandler<RemoteControllerStripPlugin, Timer::EventArgs> flashTimerElapsedEventHandler;
+	EventHandler<RemoteControllerStripPlugin, TimerOLD::EventArgs> flashTimerElapsedEventHandler;
 	
 	enum struct LedState : byte { None, Off, Code, CodeUnsupported} ledState = LedState::None;
 	bool interruptsNedded = false;
@@ -70,7 +70,7 @@ private:
 		}
 	}
 
-	void onFlashTimerEvent(Timer::EventArgs&)
+	void onFlashTimerEvent(TimerOLD::EventArgs&)
 	{
 		// czas zgasic diode sygnalizujaca wcisniecie guzika na pilocie
 		flashTimer.Stop();

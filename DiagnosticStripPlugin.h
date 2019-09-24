@@ -29,11 +29,11 @@ public:
 	}
 
 private:
-	Timer timer;
-	EventHandler<DiagnosticStipPlugin, Timer::EventArgs> timerElapsedEventHandler;
+	TimerOLD timer;
+	EventHandler<DiagnosticStipPlugin, TimerOLD::EventArgs> timerElapsedEventHandler;
 	enum class Function { PowerOn, None } function;
 
-	void onTimerElapsed(Timer::EventArgs& args)
+	void onTimerElapsed(TimerOLD::EventArgs& args)
 	{
 		byte callNo = args.elapsedIntervalsFromStart - args.elapsedIntervals + 1;
 		switch (function)

@@ -53,8 +53,9 @@ namespace EmdrEmulator
 
                 Dispatcher.Invoke(() =>
                 {
-                    model.SerialMonitor += $"{text}";
+                    model.SerialMonitor += text;
                     serialMonitorScrollViewer.ScrollToBottom();
+                    Debug.Write(text);
                 });
             }
             catch (TaskCanceledException) { }
