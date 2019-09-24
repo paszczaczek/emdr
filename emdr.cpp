@@ -20,7 +20,7 @@
 #define STRIP_LEDS_PIN         7 // pin for main strip
 #define STRIP_LEDS_PIN_RC      8 // pin for remote control strip
 #define STRIP_LEDS_ORDER     GRB
-#define STRIP_LEDS_COUNT     120 // 30 //120
+#define STRIP_LEDS_COUNT     30 //120
 #define STRIP_LEDS_BRIGHTNESS  2
 #define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
@@ -57,6 +57,7 @@ void setup()
 	irrecv.enableIRIn();
 	strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>();
 	diagnosticStipPlugin.PowerOn();
+	//movingPointStripPlugin.OnStart();
 }
 
 void loop() {

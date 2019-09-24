@@ -27,7 +27,7 @@
         </ItemsControl.ItemTemplate>
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
-                <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Top" FlowDirection="LeftToRight" Margin="1,2" />
+                <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Top" FlowDirection="LeftToRight" Margin="1,15,1,2" />
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ItemsControl.ItemContainerStyle>

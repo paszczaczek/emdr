@@ -173,7 +173,6 @@ public:
 	void Start()
 	{
 		TimerRepeatable::Start();
-		//elaspsedIntervals = 0;
 	}
 
 	// zatrzymanie licznika
@@ -225,15 +224,15 @@ public:
 };
 
 
-// Licznik odliczajacy w gore od 1 do zadanej wartosci i w dol
+// Licznik odliczajacy w gore i w dol od 0 do zadanej wartosci
 class CounterUpDownRepeadable : public CounterInfinite
 {
 public:
 	// wartosc do ktorej odliczac
 	unsigned int countTo = 0;
-	enum struct Info : byte { MinOccurred, MaxOccurred, MinOmmited, MaxOmmited, None };
 
 public:
+
 	void Pause()
 	{
 		TimerRepeatable::Stop();
@@ -245,14 +244,13 @@ public:
 	}
 
 	// czy nadszedl czas aktywacji countera
-	bool Elapsed(unsigned int& counter, Info* info = NULL, unsigned int* ommittedMinMaxCounters = NULL)
+	bool Elapsed(unsigned int& counter, unsigned int* period, unsigned int* outOmmittedCounters = NULL)
 	{
-		// inicjalizacja parametrow wyjsciowych
-		counter = 0;
-		if (info)
-			* info = Info::None;
-		if (ommittedMinMaxCounters)
-			ommittedMinMaxCounters = 0;
+		// inicjalizacja wartosci zwrotnych
+		if (period)
+			* period = 0;
+		if (outOmmittedCounters)
+			* outOmmittedCounters = 0;
 
 		// od razu po uruchomieniu licznika jest pierwsza aktywacja z counterem zerowycm
 		if (this->counter == (unsigned int)-1)
@@ -282,171 +280,64 @@ public:
 					counter = countTo;
 				else
 					counter = countTo - counter;
-
-			if (counter == 0)
-			{
-				if (info)
-					* info = Info::MinOccurred;
-			}
-			else if (counter == countTo) {
-				if (info)
-					* info = Info::MaxOccurred;
-			}
-			else if (fallingSlope)
-			{
-				if (ommittedCounters >= countTo - counter)
-				{
-					if (info)
-						* info = Info::MaxOmmited;
-					if (ommittedMinMaxCounters)
-						* ommittedMinMaxCounters = countTo - counter;
-				}
-			}
-			else // raisingSlope
-			{
-				if (ommittedCounters >= counter)
-				{
-					if (info)
-						* info = Info::MinOmmited;
-					if (ommittedMinMaxCounters)
-						* ommittedMinMaxCounters = counter;
-				}
-			}
-
-			Debug(this->counter, counter, ommittedCounters, fallingSlope, info);
 		}
+
+		// wartosci zwrotne
+		if (period)
+			* period = this->counter / countTo;
+		if (outOmmittedCounters)
+			* outOmmittedCounters = ommittedCounters;
+
 		return elapsed;
-	}
-
-	void Decrease(int delta)
-	{
-		counter -= delta;
-	}
-
-private:
-	void Debug(unsigned int counter, unsigned int counterModulo, unsigned int ommittedCounters, bool fallingSlope, Info* info)
-	{
-		char buf[255] = "";
-		char slope = fallingSlope ? '\\' : '/';
-		if (counterModulo == 0)
-			slope = 'v';
-		else if (counterModulo == countTo)
-			slope = '^';
-		snprintf(buf, sizeof buf, "%ud: %c%d !%d (%d)",
-			counter, slope, counterModulo, ommittedCounters, info ? (int)* info : -1);
-		Serial.println(buf);
 	}
 };
 
-
-class CounterUpDownRepeadable2 : public CounterUpDownRepeadable
+// Licznik odliczajacy w gore i w dol od 0 do zadanej wartosci z gwarancja trafienia w 0 i max
+class CounterUpDownRepeadableSensable : public CounterUpDownRepeadable
 {
 public:
-	// wartosc do ktorej odliczac
-	unsigned int countTo = 0;
-	enum struct Info : byte { MinOccurred, MaxOccurred, MinOmmited, MaxOmmited, None };
-
-public:
-	void Pause()
+	// czy nadszedl czas aktywacji licznika
+	bool Elapsed(unsigned int& counter, unsigned int* period = NULL)
 	{
-		TimerRepeatable::Stop();
-	}
-
-	void Resume()
-	{
-		TimerRepeatable::Start();
-	}
-
-	// czy nadszedl czas aktywacji countera
-	bool Elapsed(unsigned int& counter, Info* info = NULL, unsigned int* ommittedMinMaxCounters = NULL)
-	{
-		// inicjalizacja parametrow wyjsciowych
-		counter = 0;
-		if (info)
-			* info = Info::None;
-		if (ommittedMinMaxCounters)
-			ommittedMinMaxCounters = 0;
-
-		// od razu po uruchomieniu licznika jest pierwsza aktywacja z counterem zerowycm
-		if (this->counter == (unsigned int)-1)
-		{
-			this->counter = 0;
-			return true;
-		}
-
-		// counterTo musi byc podany
-		if (countTo <= 1 && IsStarted())
-		{
-			Serial.println(F("* CounterUpDownRepeadable::counterTo=0!"));
-			Stop();
-			return false;
-		}
-
 		// czy naszedla czas aktywacji licznika?
 		unsigned int ommittedCounters;
-		bool elapsed = CounterInfinite::Elapsed(counter, &ommittedCounters);
+		bool elapsed = CounterUpDownRepeadable::Elapsed(counter, period, &ommittedCounters);
 		if (elapsed)
 		{
-			// tak, nadszedl czas aktywacji
-			counter = this->counter % countTo;
 			bool fallingSlope = this->counter / countTo % 2 == 1;
-			if (fallingSlope)
-				if (counter == 0)
-					counter = countTo;
-				else
-					counter = countTo - counter;
-
-			if (counter == 0)
-			{
-				if (info)
-					* info = Info::MinOccurred;
-			}
-			else if (counter == countTo) {
-				if (info)
-					* info = Info::MaxOccurred;
-			}
-			else if (fallingSlope)
-			{
-				if (ommittedCounters >= countTo - counter)
+			if (counter != 0 && counter != countTo)
+				if (fallingSlope)
 				{
-					if (info)
-						* info = Info::MaxOmmited;
-					if (ommittedMinMaxCounters)
-						* ommittedMinMaxCounters = countTo - counter;
+					if (ommittedCounters >= countTo - counter)
+					{
+						this->counter -= countTo - counter;
+						counter = countTo;
+					}
 				}
-			}
-			else // raisingSlope
-			{
-				if (ommittedCounters >= counter)
+				else // raisingSlope
 				{
-					if (info)
-						* info = Info::MinOmmited;
-					if (ommittedMinMaxCounters)
-						* ommittedMinMaxCounters = counter;
+					if (ommittedCounters >= counter)
+					{
+						this->counter -= counter;
+						counter = 0;
+					}
 				}
-			}
-
-			Debug(this->counter, counter, ommittedCounters, fallingSlope, info);
+			//Debug(this->counter, counter, ommittedCounters, fallingSlope, info);
 		}
 		return elapsed;
 	}
 
-	void Decrease(int delta)
-	{
-		counter -= delta;
-	}
-
-private:
-	void Debug(unsigned int counter, unsigned int counterModulo, unsigned int ommittedCounters, bool fallingSlope, Info* info)
-	{
-		char buf[255] = "";
-		char slope = fallingSlope ? '\\' : '/';
-		if (counterModulo == 0)
-			slope = 'v';
-		else if (counterModulo == countTo)
-			slope = '^';
-		snprintf(buf, sizeof buf, "%ud: %c%d !%d (%d)",
-			counter, slope, counterModulo, ommittedCounters, info ? (int)* info : -1);
-		Serial.println(buf);
-	}
+	//private:
+	//	void Debug(unsigned int counter, unsigned int counterModulo, unsigned int ommittedCounters, bool fallingSlope, Info* info)
+	//	{
+	//		char buf[255] = "";
+	//		char slope = fallingSlope ? '\\' : '/';
+	//		if (counterModulo == 0)
+	//			slope = 'v';
+	//		else if (counterModulo == countTo)
+	//			slope = '^';
+	//		snprintf(buf, sizeof buf, "%ud: %c%d !%d (%d)",
+	//			counter, slope, counterModulo, ommittedCounters, info ? (int)* info : -1);
+	//		Serial.println(buf);
+	//	}
 };

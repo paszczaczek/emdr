@@ -9,25 +9,21 @@
 class MovingPointStripPlugin : public StripPlugin
 {
 private:
-	CounterUpDownRepeadable movingCounter;
+	CounterUpDownRepeadableSensable movingCounter;
 	Timer restTimer;
+	unsigned int ledCurrent = 0;
+	byte speed = 1; // predkosc poruszania sie punktu wyrazona w liczbie diod na sekunke
 
 public:
 	MovingPointStripPlugin()
 	{
-		//elapsedEventHandler.Set(this, &MovingPointStripPlugin::onMovingTimerElapsed);
-		movingTimer.interval = 10000;
-		
-		movingCounter.interval = 20;
-		movingCounter.Start();
-		restTimer.interval = 3000;
+		movingCounter.interval = 100;
+		restTimer.interval = 2000;
 	}
 
 	virtual void Loop() override
 	{
-		/*unsigned int intevals = 0;
-		if (movingTimer.Elapsed(intevals))
-			MovingTimerElapsed(intevals);*/
+		// ustawinie ilosci diod
 		if (movingCounter.countTo == 0)
 			movingCounter.countTo = strip.controller->size() - 1;
 
@@ -35,114 +31,50 @@ public:
 			RestTimerElapsed();
 
 		unsigned int counter = 0;
-		CounterUpDownRepeadable::Info info;
-		unsigned int ommittedMinMaxConters;
-		if (movingCounter.Elapsed(counter, &info, &ommittedMinMaxConters))
-			MovingCounterElapsed(counter, info, ommittedMinMaxConters);
+		unsigned int period = 0;
+		if (movingCounter.Elapsed(counter, &period))
+			MovingCounterElapsed(counter, &period);
 	}
 
+	// poruszanie swiecacym punktem
+	void MovingCounterElapsed(unsigned int counter, unsigned int* period)
+	{
+		// na krancach tasmy zrob pauze
+		if ((counter == 0 || counter == movingCounter.countTo) && (!period || *period != 0))
+		{
+			//Serial.println("PAUSE");
+			movingCounter.Pause();
+			restTimer.Start();
+		}
+
+		strip.controller->leds()[ledCurrent] = CRGB::Black;
+		strip.controller->leds()[counter] = CRGB::Orange;
+		strip.updated = true;
+
+		ledCurrent = counter;
+	}
+
+	// pauza na krancach tasmy
 	void RestTimerElapsed()
 	{
 		restTimer.Stop();
 		movingCounter.Resume();
-		Serial.println("RESUME");
-	}
-
-	void MovingCounterElapsed(unsigned int ledNext, CounterUpDownRepeadable::Info info, unsigned int ommittedMinMaxConters)
-	{
-		switch (info)
-		{
-		case CounterUpDownRepeadable::Info::MinOccurred:
-		case CounterUpDownRepeadable::Info::MaxOccurred:
-			movingCounter.Pause();
-			restTimer.Start();
-			Serial.println("MIN/MAX");
-			break;
-		case CounterUpDownRepeadable::Info::MinOmmited:
-			movingCounter.Pause();
-			movingCounter.Decrease(ommittedMinMaxConters);
-			restTimer.Start();
-			Serial.println("MIN OMMITTED");
-			ledNext = 0;
-			break;
-		case CounterUpDownRepeadable::Info::MaxOmmited:
-			movingCounter.Pause();
-			movingCounter.Decrease(ommittedMinMaxConters);
-			restTimer.Start();
-			Serial.println("MAX OMMITTED");
-			ledNext = movingCounter.countTo;
-			break;
-		default:
-			break;
-		}
-
-		strip.controller->leds()[ledCurrent] = CRGB::Black;
-		strip.controller->leds()[ledNext] = CRGB::Orange;
-		strip.updated = true;
-
-		ledCurrent = ledNext;
-
-		/*
-		long ledNext = ledCurrent;
-
-		if (movingDirection == MovingDirection::RIGTH)
-			if (ledCurrent < strip.controller->size() - (int)elapsedIntervals)
-				ledNext += elapsedIntervals;
-			else
-				movingDirection = MovingDirection::LEFT;
-		else if (ledCurrent > (int)elapsedIntervals - 1)
-			ledNext -= elapsedIntervals;
-		else
-			movingDirection = MovingDirection::RIGTH;
-
-		if (ledNext < 0 || ledNext >= strip.controller->size())
-			Serial.println(F("*MovingPointStrip::MovingTimerElapsed: ledNext bad!"));
-
-
-		if (ledNext == ledCurrent)
-			return;
-
-		strip.controller->leds()[ledCurrent] = CRGB::Black;
-		strip.controller->leds()[ledNext] = CRGB::Orange;
-		strip.updated = true;
-
-		ledCurrent = ledNext;
-		*/
+		//Serial.println("RESUME");
 	}
 
 	virtual void OnStart() override
 	{
 		Plugin::OnStart();
-		//setSpeed(speed = 70);
-		setSpeed(speed = 10);
-		movingTimer.Start();
-	}
-
-	virtual void OnPause() override
-	{
-		PRINTLN(F("MovingPointStripPlugin::OnPause"));
-		Plugin::OnPause();
-		movingTimer.Stop();
-	}
-
-	virtual void OnResume() override
-	{
-		PRINTLN(F("MovingPointStripPlugin::OnResume"));
-		Plugin::OnResume();
-		movingTimer.Start();
+		SetSpeed(speed = 20);
+		movingCounter.Start();
 	}
 
 private:
-	TimerRepeatable movingTimer;
-	unsigned int ledCurrent = 0;
-	byte speed = 1; // predkosc poruszania sie punktu wyrazona w liczbie diod na sekunke
-	enum MovingDirection { RIGTH, LEFT } movingDirection = RIGTH;
-	//EventHandler<MovingPointStripPlugin, Timer::EventArgs> elapsedEventHandler;
-
-	void setSpeed(byte speed)
+	
+	void SetSpeed(byte speed)
 	{
 		// speed
-		movingTimer.interval = (unsigned long)(1 / (float)speed * 1000);
+		movingCounter.interval = (unsigned long)(1 / (float)speed * 1000);
 		PRINT(F("Speed: ")); PRINT(speed); PRINTLN(F("d/s"));
 	}
 
@@ -158,44 +90,18 @@ private:
 			if (speed > 1)
 				speed--;
 		}
-		setSpeed(speed);
+		SetSpeed(speed);
 	}
-
-	/*void onMovingTimerElapsed(TimerOLD::EventArgs& args)
-	{
-		auto ledNext = ledCurrent;
-
-		Serial.println(args.elapsedIntervals);
-		Serial.println(args.elapsedIntervalsFromStart);
-		if (movingDirection == MovingDirection::RIGTH)
-			if (ledCurrent < strip.controller->size() - (int)args.elapsedIntervals)
-				ledNext += args.elapsedIntervals;
-			else
-				movingDirection = MovingDirection::LEFT;
-		else if (ledCurrent > (int)args.elapsedIntervals - 1)
-			ledNext -= args.elapsedIntervals;
-		else
-			movingDirection = MovingDirection::RIGTH;
-
-		if (ledNext == ledCurrent)
-			return;
-
-		strip.controller->leds()[ledCurrent] = CRGB::Black;
-		strip.controller->leds()[ledNext] = CRGB::Orange;
-		strip.updated = true;
-
-		ledCurrent = ledNext;
-	}*/
 
 	void OnRemoteControllerEvent(RemoteController::EventArgs& args) override
 	{
 		switch (args.button)
 		{
 		case RemoteController::Button::IntBlkDisallowed:
-			movingTimer.Stop();
+			//movingTimer.Stop();
 			break;
 		case RemoteController::Button::IntBlkAllowed:
-			movingTimer.Start();
+			//movingTimer.Start();
 			break;
 		case RemoteController::Button::CHANEL_PLUS:
 			changeSpeed(true);
@@ -204,10 +110,10 @@ private:
 			changeSpeed(false);
 			break;
 		case RemoteController::Button::PLAY:
-			movingTimer.Start();
+			//movingTimer.Start();
 			break;
 		case RemoteController::Button::PAUSE:
-			movingTimer.Stop();
+			//movingTimer.Stop();
 			break;
 		default:
 			break;
