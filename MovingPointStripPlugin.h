@@ -48,7 +48,7 @@ public:
 		// poruszanie swiecacym punktem
 		unsigned int movingCounterValue = 0;
 		unsigned int movingCounterPeriod = 0;
-		if (movingCounter.Elapsed(movingCounterValue, &movingCounterPeriod))
+		if (movingCounter.ItsTimeWithCatchingMinMax(movingCounterValue, &movingCounterPeriod))
 			MovingCounterElapsed(movingCounterValue, &movingCounterPeriod);
 
 		// mierzenie czasu zabiegu
@@ -69,8 +69,8 @@ public:
 			counter == movingCounter.countTo)
 		{
 			Serial.println("PAUSE");
-			//movingCounter.Pause();
-			//restTimer.Start();
+			movingCounter.Pause();
+			restTimer.Start();
 		}
 
 		strip.controller->leds()[ledCurrent] = CRGB::Black;
@@ -98,7 +98,7 @@ public:
 	{
 		restTimer.Stop();
 		movingCounter.Resume();
-		//Serial.println("RESUME");
+		Serial.println("RESUME");
 	}
 
 	// mierzenie czasu zabiegu
@@ -156,7 +156,7 @@ public:
 		Plugin::OnStart();
 		SetSpeed(speed = 20);
 		movingCounter.Start();
-		movingCounter.interval = 500;
+		movingCounter.interval = 5;
 		sessionCounter.interval = 10 * 1000;
 		sessionCounter.countTo = 5;
 		sessionCounter.Start();

@@ -299,7 +299,7 @@ public:
 //};
 
 
-// Licznik odliczajacy w gore i w dol od 0 do zadanej wartosci
+// Licznik odliczajacy w gore i w dol od 1 do zadanej wartosci
 class CounterUpDownPeriodic : public CounterInfinite
 {
 public:
@@ -307,9 +307,8 @@ public:
 	unsigned int countTo = 0;
 
 public:
-
-	// czy nadszedl czas aktywacji countera
-	bool Elapsed(unsigned int& outCounter, unsigned int* outPeriod, unsigned int* outOmmittedCounters = NULL)
+	// czy nadszedl czas cykniecia licznika
+	bool ItsTime(unsigned int& outCounter, unsigned int* outPeriod, unsigned int* outOmmittedCounters = NULL)
 	{
 		// inicjalizacja wartosci zwrotnych
 		outCounter = 0;
@@ -327,9 +326,10 @@ public:
 		}
 
 		// czy naszedla czas aktywacji licznika?
+		// counter == 0 pojawia sie zaraz po uruchomieniu licznika
 		unsigned int ommittedCounters;
 		bool elapsed = CounterInfinite::Elapsed(counter, &ommittedCounters);
-		if (elapsed)
+		if (elapsed && counter > 0)
 		{
 			// tak, nadszedl czas aktywacji
 			/*
@@ -344,83 +344,74 @@ public:
 				  0 0 0 1 1 1 2 2  (counter - 1) / (countTo - 1)
 						t t t      fallingSlope
 			*/
-			// counter == 0 pojawia sie zaraz po uruchomieniu licznika
-			if (counter > 0)
-			{
-				// counter to licznik odliczajacy od 1 do nieskonczonosci
-				// outCounter to licznik odliczajacy od 1 do countTo
-				// obliczenia modulo trzeba robic na liczbach od zera, a counter jest od 1
-				// dlatego przed operacja modulo trzeba od countera odjac 1 i do wyniku dodac 1
-				outCounter = (counter - 1) % (countTo - 1);
-				bool fallingSlope = (counter - 1) / (countTo - 1) % 2 == 1;
-				if (fallingSlope)
-					if (outCounter == 0)
-						outCounter = countTo;
-					else
-						outCounter = countTo - outCounter;
+			// counter to licznik odliczajacy od 1 do nieskonczonosci
+			// outCounter to licznik odliczajacy od 1 do countTo
+			// modulo trzeba robic na liczbach od zera, a counter jest od 1
+			// dlatego przed operacja modulo trzeba od countera odjac 1 i do wyniku dodac 1
+			outCounter = (counter - 1) % (countTo - 1);
+			bool fallingSlope = (counter - 1) / (countTo - 1) % 2 == 1;
+			if (fallingSlope)
+				if (outCounter == 0)
+					outCounter = countTo;
 				else
-					outCounter = outCounter + 1;
+					outCounter = countTo - outCounter;
+			else
+				outCounter = outCounter + 1;
 
-				// wartosci zwrotne
-				if (outPeriod)
-					* outPeriod = (counter - 1) / (2 * countTo - 2);
-				if (outOmmittedCounters)
-					* outOmmittedCounters = ommittedCounters;
-			}
+			// wartosci zwrotne
+			if (outPeriod)
+				* outPeriod = (counter - 1) / (2 * countTo - 2);
+			if (outOmmittedCounters)
+				* outOmmittedCounters = ommittedCounters;
 
 			//fprintf(stderr, "%d: %d (%d)\n", counter, outCounter, *outPeriod);
 		}
 
 		return elapsed;
 	}
-};
 
-// Licznik odliczajacy w gore i w dol od 0 do zadanej wartosci z gwarancja trafienia w 0 i max
-class CounterUpDownPeriodicDetectingMinMax : public CounterUpDownPeriodic
-{
-public:
-	// czy nadszedl czas aktywacji licznika
-	bool Elapsed(unsigned int& counter, unsigned int* period = NULL)
+	// czy nadszedl czas cykniecia licznika z gwarancja wylapanie ominietego przejscia przez 1 lub max
+	bool ItsTimeWithCatchingMinMax(unsigned int& outCounter, unsigned int* outPeriod = NULL)
 	{
-		// czy naszedla czas aktywacji licznika?
+		// sprawdzamy naszedl czas cykniecia licznika
 		unsigned int ommittedCounters;
-		bool elapsed = CounterUpDownPeriodic::Elapsed(counter, period, &ommittedCounters);
-		if (elapsed)
-		{
-			bool fallingSlope = this->counter / countTo % 2 == 1;
-			if (counter != 0 && counter != countTo)
-				if (fallingSlope)
-				{
-					if (ommittedCounters >= countTo - counter)
-					{
-						this->counter -= countTo - counter;
-						counter = countTo;
-					}
-				}
-				else // raisingSlope
-				{
-					if (ommittedCounters >= counter)
-					{
-						this->counter -= counter;
-						counter = 0;
-					}
-				}
-			//Debug(this->counter, counter, ommittedCounters, fallingSlope, info);
-		}
-		return elapsed;
-	}
+		bool itsTime = ItsTime(outCounter, outPeriod, &ommittedCounters);
 
-	//private:
-	//	void Debug(unsigned int counter, unsigned int counterModulo, unsigned int ommittedCounters, bool fallingSlope, Info* info)
-	//	{
-	//		char buf[255] = "";
-	//		char slope = fallingSlope ? '\\' : '/';
-	//		if (counterModulo == 0)
-	//			slope = 'v';
-	//		else if (counterModulo == countTo)
-	//			slope = '^';
-	//		snprintf(buf, sizeof buf, "%ud: %c%d !%d (%d)",
-	//			counter, slope, counterModulo, ommittedCounters, info ? (int)* info : -1);
-	//		Serial.println(buf);
-	//	}
+		// wywolanie bezposrednio po uruchomieniu timera olewamy
+		if (outCounter == 0)
+			return itsTime;
+
+		if (itsTime)
+		{
+			// nadszedl czas cykniecia licznika
+			// dla cykniecia 1 i max nie ma czego sprawdzac
+			if (outCounter == 1 || outCounter == countTo)
+				return itsTime;
+			
+			// sprawdzamy czy zostalo pominiete 1 lub max
+			bool fallingSlope = (counter - 1) / (countTo - 1) % 2 == 1;
+			if (fallingSlope)
+			{
+				if (ommittedCounters >= countTo - outCounter)
+				{
+					// zostalo pominiete max - cofamy licznik do max
+					Serial.println("catched ommited max");
+					this->counter -= countTo - outCounter;
+					outCounter = countTo;
+				}
+			}
+			else // raisingSlope
+			{
+				if (ommittedCounters >= outCounter - 1)
+				{
+					// zostalo pominiete 1 - cofamy licznik do 1
+					Serial.println("catched ommited 1");
+					this->counter -= outCounter - 1;
+					outCounter = 1;
+				}
+			}
+		}
+
+		return itsTime;
+	}
 };
