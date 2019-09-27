@@ -143,7 +143,7 @@ public:
 
 
 // Timer aktywowany wielokorotnie
-class TimerRepeatable : public TimerBase
+class TimerPeriodic : public TimerBase
 {
 public:
 	// czy nadszedl czas aktywacji timera
@@ -161,8 +161,8 @@ public:
 };
 
 
-// Licznik odliczajacy od 1 do nieskonczonosci
-class CounterInfinite : public TimerRepeatable
+// Licznik odliczajacy od 0 do nieskonczonosci
+class CounterInfinite : public TimerPeriodic
 {
 protected:
 	// ile minelo interwalow od czasu wystartowania licznika
@@ -172,60 +172,60 @@ public:
 	// wystartowanie licznika
 	void Start()
 	{
-		TimerRepeatable::Start();
+		TimerPeriodic::Start();
 	}
 
 	// zatrzymanie licznika
 	void Stop()
 	{
-		TimerRepeatable::Stop();
+		TimerPeriodic::Stop();
 		counter = (unsigned int)-1;
+	}
+
+	// zapauzowanie licznika
+	void Pause()
+	{
+		TimerPeriodic::Stop();
+	}
+
+	// wznowienie licznika
+	void Resume()
+	{
+		TimerPeriodic::Start();
 	}
 
 	// czy nadszedl czas aktywacji licznika
 	bool Elapsed(unsigned int& outCounter, unsigned int* outOmmittedCounters = NULL)
 	{
-		unsigned int ommitedCounters;
-		bool elapsed = TimerRepeatable::Elapsed(&ommitedCounters);
-		if (elapsed)
-			counter += 1 + ommitedCounters;
+		// inicjalizacja wartosci zwrotnych
 		outCounter = counter;
 		if (outOmmittedCounters)
-			* outOmmittedCounters = ommitedCounters;
-		return elapsed;
-	}
-};
+			* outOmmittedCounters = 0;
 
-
-// Licznik odliczajacy w gore od 1 do zadanej wartosci
-class Counter : public CounterInfinite
-{
-public:
-	// wartosc do ktorej odliczac
-	unsigned int countTo = 0;
-
-public:
-	// czy nadszedl czas aktywacji licznika
-	bool Elapsed(unsigned int& counter)
-	{
-		// counterTo musi byc podany
-		if (countTo == 0 && IsStarted())
+		// od razu po uruchomieniu licznika jest pierwsza aktywacja z counterem zerowycm
+		if (counter == (unsigned int)-1)
 		{
-			Serial.println(F("* Counter:counterTo=0!"));
-			Stop();
-			return false;
+			counter = outCounter = 0;
+			return true;
 		}
 
-		bool elapsed = CounterInfinite::Elapsed(counter);
-		if (elapsed && counter >= countTo)
-			Stop();
+		// czy nadszedl czas aktywacji licznika?
+		unsigned int ommitedCounters;
+		bool elapsed = TimerPeriodic::Elapsed(&ommitedCounters);
+		if (elapsed)
+		{
+			counter += 1 + ommitedCounters;
+			outCounter = counter;
+			if (outOmmittedCounters)
+				* outOmmittedCounters = ommitedCounters;
+		}
 		return elapsed;
 	}
 };
 
 
-// Licznik odliczajacy w gore i w dol od 0 do zadanej wartosci
-class CounterUpDownRepeadable : public CounterInfinite
+// Licznik odliczajacy okresowo od 0 do zadanej wartosci
+class CounterPeriodic : public CounterInfinite
 {
 public:
 	// wartosc do ktorej odliczac
@@ -233,36 +233,20 @@ public:
 
 public:
 
-	void Pause()
-	{
-		TimerRepeatable::Stop();
-	}
-
-	void Resume()
-	{
-		TimerRepeatable::Start();
-	}
-
 	// czy nadszedl czas aktywacji countera
-	bool Elapsed(unsigned int& counter, unsigned int* period, unsigned int* outOmmittedCounters = NULL)
+	bool Elapsed(unsigned int& counter, unsigned int* period = NULL, unsigned int* outOmmittedCounters = NULL)
 	{
 		// inicjalizacja wartosci zwrotnych
+		counter = this->counter;
 		if (period)
 			* period = 0;
 		if (outOmmittedCounters)
 			* outOmmittedCounters = 0;
 
-		// od razu po uruchomieniu licznika jest pierwsza aktywacja z counterem zerowycm
-		if (this->counter == (unsigned int)-1)
-		{
-			this->counter = 0;
-			return true;
-		}
-
 		// counterTo musi byc podany
 		if (countTo <= 1 && IsStarted())
 		{
-			Serial.println(F("* CounterUpDownRepeadable::counterTo=0!"));
+			Serial.println(F("* CounterPeriodic::counterTo=0!"));
 			Stop();
 			return false;
 		}
@@ -273,18 +257,13 @@ public:
 		if (elapsed)
 		{
 			// tak, nadszedl czas aktywacji
-			counter = this->counter % countTo;
-			bool fallingSlope = this->counter / countTo % 2 == 1;
-			if (fallingSlope)
-				if (counter == 0)
-					counter = countTo;
-				else
-					counter = countTo - counter;
+			// na podstawie licznika liczacego do nieskonczonosci wyznaczamy wartosc licznika okresowego
+			counter = this->counter % (countTo + 1);
 		}
 
 		// wartosci zwrotne
 		if (period)
-			* period = this->counter / countTo;
+			* period = this->counter / (countTo + 1);
 		if (outOmmittedCounters)
 			* outOmmittedCounters = ommittedCounters;
 
@@ -292,8 +271,112 @@ public:
 	}
 };
 
+
+// Licznik odliczajacy od 0 do zadanej wartosci
+//class Counter : public CounterInfinite
+//{
+//public:
+//	// wartosc do ktorej odliczac
+//	unsigned int countTo = 0;
+//
+//public:
+//	// czy nadszedl czas aktywacji licznika
+//	bool Elapsed(unsigned int& counter)
+//	{
+//		// counterTo musi byc podany
+//		if (countTo == 0 && IsStarted())
+//		{
+//			Serial.println(F("* Counter:counterTo=0!"));
+//			Stop();
+//			return false;
+//		}
+//
+//		bool elapsed = CounterInfinite::Elapsed(counter);
+//		if (elapsed && counter >= countTo)
+//			Stop();
+//		return elapsed;
+//	}
+//};
+
+
+// Licznik odliczajacy w gore i w dol od 0 do zadanej wartosci
+class CounterUpDownPeriodic : public CounterInfinite
+{
+public:
+	// wartosc do ktorej odliczac
+	unsigned int countTo = 0;
+
+public:
+
+	// czy nadszedl czas aktywacji countera
+	bool Elapsed(unsigned int& outCounter, unsigned int* outPeriod, unsigned int* outOmmittedCounters = NULL)
+	{
+		// inicjalizacja wartosci zwrotnych
+		outCounter = 0;
+		if (outPeriod)
+			* outPeriod = 0;
+		if (outOmmittedCounters)
+			* outOmmittedCounters = 0;
+
+		// counterTo musi byc podany
+		if (countTo <= 1 && IsStarted())
+		{
+			Serial.println(F("* CounterUpDownPeriodic::counterTo=0!"));
+			Stop();
+			return false;
+		}
+
+		// czy naszedla czas aktywacji licznika?
+		unsigned int ommittedCounters;
+		bool elapsed = CounterInfinite::Elapsed(counter, &ommittedCounters);
+		if (elapsed)
+		{
+			// tak, nadszedl czas aktywacji
+			/*
+				countTo = 4
+						x
+					  x   x
+					x       x   x
+				  x           x
+				0 1 2 3 4 5 6 7 8  counter
+			   -1 0 1 2 3 4 5 6 7  counter - 1
+				  0 1 2 0 1 2 0 1  (counter - 1) % (countTo - 1)
+				  0 0 0 1 1 1 2 2  (counter - 1) / (countTo - 1)
+						t t t      fallingSlope
+			*/
+			// counter == 0 pojawia sie zaraz po uruchomieniu licznika
+			if (counter > 0)
+			{
+				// counter to licznik odliczajacy od 1 do nieskonczonosci
+				// outCounter to licznik odliczajacy od 1 do countTo
+				// obliczenia modulo trzeba robic na liczbach od zera, a counter jest od 1
+				// dlatego przed operacja modulo trzeba od countera odjac 1 i do wyniku dodac 1
+				outCounter = (counter - 1) % (countTo - 1);
+				bool fallingSlope = (counter - 1) / (countTo - 1) % 2 == 1;
+				if (fallingSlope)
+					if (outCounter == 0)
+						outCounter = countTo;
+					else
+						outCounter = countTo - outCounter;
+				else
+					outCounter = outCounter + 1;
+
+				// wartosci zwrotne
+				if (outPeriod)
+					* outPeriod = (counter - 1) / (2 * countTo - 2);
+				if (outOmmittedCounters)
+					* outOmmittedCounters = ommittedCounters;
+			}
+
+			//fprintf(stderr, "%d: %d (%d)\n", counter, outCounter, *outPeriod);
+		}
+
+		return elapsed;
+	}
+};
+
 // Licznik odliczajacy w gore i w dol od 0 do zadanej wartosci z gwarancja trafienia w 0 i max
-class CounterUpDownRepeadableSensable : public CounterUpDownRepeadable
+class CounterUpDownPeriodicDetectingMinMax : public CounterUpDownPeriodic
 {
 public:
 	// czy nadszedl czas aktywacji licznika
@@ -301,7 +384,7 @@ public:
 	{
 		// czy naszedla czas aktywacji licznika?
 		unsigned int ommittedCounters;
-		bool elapsed = CounterUpDownRepeadable::Elapsed(counter, period, &ommittedCounters);
+		bool elapsed = CounterUpDownPeriodic::Elapsed(counter, period, &ommittedCounters);
 		if (elapsed)
 		{
 			bool fallingSlope = this->counter / countTo % 2 == 1;

@@ -405,7 +405,7 @@ struct CRGB {
 	{
 		return r || g || b;
 	}
-
+	*/
 	/// invert each channel
 	inline CRGB operator- ()
 	{
@@ -415,7 +415,7 @@ struct CRGB {
 		retval.b = 255 - b;
 		return retval;
 	}
-
+	/*
 #if (defined SmartMatrix_h || defined SmartMatrix3_h)
 	operator rgb24() const {
 		rgb24 ret;
