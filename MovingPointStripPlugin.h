@@ -9,19 +9,20 @@
 class MovingPointStripPlugin : public StripPlugin
 {
 private:
+	CounterPeriodic testCounter;
 	// licznik poruszajacy swiecacym punktem
 	//CounterUpDownPeriodicDetectingMinMax movingCounter;
-	CounterUpDownPeriodic movingCounter;
-	
+	CounterPeriodic movingCounter;
+
 	// timer zatrzymujacy swiecacy punkt na koncach tasmy
 	Timer restTimer;
-	
+
 	// licznik odmierzajacy czas zabiegu
-	CounterPeriodic sessionCounter;
-	
+	CounterPeriodicOLD sessionCounter;
+
 	// number aktualnie swiecacgo punktu
 	unsigned int ledCurrent = 0;
-	
+
 	// predkosc poruszania sie swiecacego punktu wyrazona w liczbie diod na sekunke
 	byte speed = 1;
 
@@ -33,6 +34,7 @@ public:
 	{
 		//movingCounter.interval = 100;
 		restTimer.interval = 2000;
+		//testCounter.interval = 1000;
 	}
 
 	virtual void Loop() override
@@ -46,10 +48,29 @@ public:
 			RestTimerElapsed();
 
 		// poruszanie swiecacym punktem
-		unsigned int movingCounterValue = 0;
-		unsigned int movingCounterPeriod = 0;
-		if (movingCounter.ItsTimeWithCatchingMinMax(movingCounterValue, &movingCounterPeriod))
-			MovingCounterElapsed(movingCounterValue, &movingCounterPeriod);
+		unsigned int counter = 0;
+		unsigned int period = 0;
+		//if (movingCounter.ItsTimeWithCatchingMinMax(movingCounterValue, &movingCounterPeriod))
+		//	MovingCounterElapsed(movingCounterValue, &movingCounterPeriod);
+
+		if (movingCounter.ItsTime(
+			CounterPeriodic::Mode::UpDown, 
+			CounterPeriodic::Options::CatchMinMax,
+			counter, 
+			&period))
+			MovingCounterElapsed(counter, &period);
+
+		if (testCounter.ItsTime(
+			CounterPeriodic::Mode::Up,
+			CounterPeriodic::Options::WithZero,
+			counter,
+			&period))
+		{
+			Serial.print("Test: ");
+			Serial.print(counter);
+			Serial.print(" / ");
+			Serial.println(period);
+		}
 
 		// mierzenie czasu zabiegu
 		/*unsigned int sessionCounterValue = 0;
@@ -61,14 +82,17 @@ public:
 	// poruszanie swiecacym punktem
 	void MovingCounterElapsed(unsigned int counter, unsigned int* period)
 	{
-		Serial.println(counter);
+		//Serial.print(counter);
+		//Serial.print(", ");
+		//Serial.println(*period);
+
 		if (counter == 0)
 			return;
 		// na krancach tasmy zrob pauze
-		if ((counter == 1 && *period > 0) ||
+		if ((counter == 1 && *period > 1) ||
 			counter == movingCounter.countTo)
 		{
-			Serial.println("PAUSE");
+			//Serial.println("PAUSE");
 			movingCounter.Pause();
 			restTimer.Start();
 		}
@@ -78,19 +102,6 @@ public:
 		strip.updated = true;
 
 		ledCurrent = counter - 1;
-		//// na krancach tasmy zrob pauze
-		//if ((counter == 0 || counter == movingCounter.countTo) && *period != 0)
-		//{
-		//	//Serial.println("PAUSE");
-		//	movingCounter.Pause();
-		//	restTimer.Start();
-		//}
-
-		//strip.controller->leds()[ledCurrent] = CRGB::Black;
-		//strip.controller->leds()[counter] = movingColor;
-		//strip.updated = true;
-
-		//ledCurrent = counter;
 	}
 
 	// pauza na krancach tasmy
@@ -98,7 +109,7 @@ public:
 	{
 		restTimer.Stop();
 		movingCounter.Resume();
-		Serial.println("RESUME");
+		//Serial.println("RESUME");
 	}
 
 	// mierzenie czasu zabiegu
@@ -116,7 +127,7 @@ public:
 		}
 
 		// czy minal czas sygnalizacji konca zabiegu?
-		if (counter == 0 && period > 0)
+		if (counter == 0 && period > 1)
 		{
 			// tak - przywracamy normalny kolor poruszajacego sie punktu
 			//Serial.print(counter);  Serial.println(F(": Session orange"));
@@ -125,9 +136,9 @@ public:
 			strip.updated = true;
 			return;
 		}
-		
+
 		//Serial.println(counter);
-		
+
 		/*
 		switch (counter)
 		{
@@ -155,11 +166,14 @@ public:
 	{
 		Plugin::OnStart();
 		SetSpeed(speed = 20);
-		movingCounter.Start();
+		//movingCounter.Start();
 		movingCounter.interval = 5;
 		sessionCounter.interval = 10 * 1000;
 		sessionCounter.countTo = 5;
-		sessionCounter.Start();
+		//sessionCounter.Start();
+		testCounter.interval = 1000;
+		testCounter.countTo = 4;
+		testCounter.Start();
 	}
 
 private:
