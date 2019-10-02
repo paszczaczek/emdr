@@ -44,7 +44,7 @@ public:
 			movingCounter.countTo = strip.controller->size();// -1;
 
 		// pauza na krancach tasmy
-		if (restTimer.Elapsed())
+		if (restTimer.ItsTime(Timer::Mode::SingleShot))
 			RestTimerElapsed();
 
 		// poruszanie swiecacym punktem
@@ -61,8 +61,8 @@ public:
 			MovingCounterElapsed(counter, &period);
 
 		if (testCounter.ItsTime(
-			CounterPeriodic::Mode::Up,
-			CounterPeriodic::Options::WithZero,
+			CounterPeriodic::Mode::UpDown,
+			CounterPeriodic::Options::WithZero | CounterPeriodic::Options::CatchMinMax,
 			counter,
 			&period))
 		{

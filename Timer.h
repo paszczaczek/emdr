@@ -5,22 +5,21 @@
 
 
 // Klasa bazowa dla Timerow i Counterow, wylicza czasy aktywacji
-class TimerBase
+class Timer
 {
 public:
 	// po ilu milisekundach aktywowac timer
 	unsigned long interval = 0;
 
+	// warianty timera
+	enum struct Mode : byte { SingleShot, MultiShot };
+
 protected:
 	// czas uruchomienia timera w milisekundach
 	unsigned long startedAt = (unsigned long)-1;
 
-protected:
-	// konstruktor protected nie pozwala tworzyc instacji tej klasy
-	TimerBase() {}
-
 public:
-	// wystartowanie timera
+	// uruchomienie timera
 	void Start()
 	{
 		startedAt = millis();
@@ -32,15 +31,19 @@ public:
 		startedAt = (unsigned long)-1;
 	}
 
-	// czy timer jest wystartowany
+	// czy timer jest uruchomiony
 	bool IsStarted()
 	{
 		return startedAt != (unsigned long)-1;
 	}
 
-	// czy nadszedl czas aktywacji timera
-	bool Elapsed(unsigned int* ommittedIntervals = NULL)
+	// czy nadszedl czas wystrzelenia timera
+	bool ItsTime(Mode mode, unsigned int* outOmmittedIntervals = NULL)
 	{
+		// inicjalizacja wartosci zwrotnych
+		if (outOmmittedIntervals)
+			*outOmmittedIntervals = 0;
+
 		// czy timer zostal uruchomiony?
 		if (!IsStarted())
 			return false;
@@ -49,73 +52,90 @@ public:
 		if (interval == 0)
 		{
 			Serial.println(F("* Timer::interval=0!"));
-			startedAt = -1;
+			Stop();
 			return false;
 		}
 
 		// ile minelo pelnych intervalow od momentu startu
-		auto now = millis();
-		unsigned int elapsedIntervals = (now - startedAt) / interval;
+		unsigned int elapsedIntervals = (millis() - startedAt) / interval;
 
-		// liczba pominietych intervalow
-		if (ommittedIntervals)
+		// ile interwalow zostalo pominietych
+		unsigned int ommittedIntervals 
+			= elapsedIntervals > 1
+			? elapsedIntervals - 1 
+			: 0;
+
+		// zwrocenie liczby pominietych intervalow
+		if (outOmmittedIntervals)
+			*outOmmittedIntervals = ommittedIntervals;
+
+		// czy nadszel czas wystrzelenia timera
+		if (elapsedIntervals == 0)
+			return false;
+
+		// tak, nadszedl czas wystrzelenia timera
+		switch (mode)
 		{
-			if (elapsedIntervals > 0)
-				*ommittedIntervals = elapsedIntervals - 1;
-			else
-				*ommittedIntervals = 0;
+		case Timer::Mode::SingleShot:
+			// to timer jednorazowy - stopujemy go
+			Stop();
+			break;
+		case Timer::Mode::MultiShot:
+			// to timer wielorazowy - uruchamiamy ponownie
+			// korygujac moment startu ze wzgledu na pominiete interwaly
+			startedAt += (1 + ommittedIntervals) * interval;
+			break;
 		}
 
-		// czy nadszel aktywacji
-		return elapsedIntervals > 0;
+		return true;
 	}
 };
 
 
-// Timer aktywowany jednokrotnie
-class Timer : public TimerBase
-{
-public:
-	// czy nadszedl czas aktywacji timera
-	bool Elapsed(unsigned int* ommittedIntervals = NULL)
-	{
-		bool elapsed = TimerBase::Elapsed(ommittedIntervals);
-		// jesli nadszedl czas aktywacji, to stopujemy timer
-		if (elapsed)
-			Stop();
-		return elapsed;
-	}
-};
+//// Timer aktywowany jednokrotnie
+//class Timer : public TimerBase
+//{
+//public:
+//	// czy nadszedl czas aktywacji timera
+//	bool Elapsed(unsigned int* ommittedIntervals = NULL)
+//	{
+//		bool elapsed = TimerBase::Elapsed(ommittedIntervals);
+//		// jesli nadszedl czas aktywacji, to stopujemy timer
+//		if (elapsed)
+//			Stop();
+//		return elapsed;
+//	}
+//};
 
 
 // Timer aktywowany wielokorotnie
-class TimerPeriodic : public TimerBase
-{
-public:
-	// czy nadszedl czas aktywacji timera
-	bool Elapsed(unsigned int* outOmmittedIntervals)
-	{
-		unsigned int ommittedIntervals;
-		bool elapsed = TimerBase::Elapsed(&ommittedIntervals);
-		// jesli nadszedl czas aktywacji, to aktywujemy nastepny cykl
-		if (elapsed)
-			startedAt += (1 + ommittedIntervals) * interval;
-		if (outOmmittedIntervals)
-			*outOmmittedIntervals = ommittedIntervals;
-		return elapsed;
-	}
-};
+//class TimerPeriodic : public TimerBase
+//{
+//public:
+//	// czy nadszedl czas aktywacji timera
+//	bool Elapsed(unsigned int* outOmmittedIntervals)
+//	{
+//		unsigned int ommittedIntervals;
+//		bool elapsed = TimerBase::Elapsed(&ommittedIntervals);
+//		// jesli nadszedl czas aktywacji, to aktywujemy nastepny cykl
+//		if (elapsed)
+//			startedAt += (1 + ommittedIntervals) * interval;
+//		if (outOmmittedIntervals)
+//			*outOmmittedIntervals = ommittedIntervals;
+//		return elapsed;
+//	}
+//};
 
 
 // Licznik w roznych warianach
-class Counter : public TimerPeriodic
+class Counter : public Timer
 {
 public:
 	// warianty licznika
 	enum Mode : byte { Up, Down };
 
 	// opcje licznika
-	enum Options : byte { None, WithZero };
+	enum Options : byte { None = 0, WithZero = 1 };
 
 protected:
 	// ile minelo interwalow od czasu wystartowania licznika
@@ -125,26 +145,26 @@ public:
 	// wystartowanie licznika
 	void Start()
 	{
-		TimerPeriodic::Start();
+		Timer::Start();
 	}
 
 	// zatrzymanie licznika
 	void Stop()
 	{
-		TimerPeriodic::Stop();
+		Timer::Stop();
 		counter = (unsigned int)-1;
 	}
 
 	// zapauzowanie licznika
 	void Pause()
 	{
-		TimerPeriodic::Stop();
+		Timer::Stop();
 	}
 
 	// wznowienie licznika
 	void Resume()
 	{
-		TimerPeriodic::Start();
+		Timer::Start();
 	}
 
 	// czy nadszedl czas aktywacji licznika
@@ -165,7 +185,9 @@ public:
 
 		// czy nadszedl czas aktywacji licznika?
 		unsigned int ommitedCounters;
-		bool elapsed = TimerPeriodic::Elapsed(&ommitedCounters);
+		bool elapsed = Timer::ItsTime(
+			Timer::Mode::MultiShot,
+			&ommitedCounters);
 		if (elapsed)
 		{
 			counter += 1 + ommitedCounters;
@@ -176,8 +198,6 @@ public:
 		return elapsed;
 	}
 };
-
-
 
 // Licznik okresowy w roznych wariantach
 class CounterPeriodic : public Counter
@@ -190,7 +210,7 @@ public:
 	enum Mode : byte { Up, Down, UpDown, DownUp };
 
 	// opcje licznika
-	enum Options : byte { None, WithZero, CatchMinMax };
+	enum Options : byte { None = 0, WithZero = 1, CatchMinMax = 2 };
 
 public:
 	bool ItsTime(Mode mode, Options options, unsigned int& outCounter, unsigned int* outPeriod, unsigned int* outOmmittedCounters = NULL)
@@ -222,7 +242,7 @@ public:
 		// czy naszedla czas aktywacji licznika?
 		unsigned int ommittedCounters;
 		bool itsTime = Counter::ItsTime(
-			options & CounterPeriodic::Options::WithZero ? Counter::Options::WithZero : Counter::Options::None,
+			static_cast<Counter::Options>(options),
 			counter,
 			&ommittedCounters);
 
@@ -231,13 +251,12 @@ public:
 			return itsTime;
 
 		// nadszedl czas aktywacji licznika, wyznaczamy wartosci licznika i okresu
-		const char* notImplementedYet = F("* Not implemented yet!");
 		switch (mode)
 		{
-		case CounterPeriodic::Up:     Serial.println(notImplementedYet); Stop();  return false;
-		case CounterPeriodic::Down:   Serial.println(notImplementedYet); Stop();  return false;
 		case CounterPeriodic::UpDown: CalculationForUpDownCounter(outCounter, outPeriod); break;
-		case CounterPeriodic::DownUp: Serial.println(notImplementedYet); Stop();  return false;
+		case CounterPeriodic::Up:
+		case CounterPeriodic::Down:
+		case CounterPeriodic::DownUp: Serial.println(F("* Not implemented yet!")); Stop();  return false;
 		}
 
 		// wylapanie ominietego 1 lub max
@@ -321,9 +340,19 @@ private:
 	}
 };
 
-// ----------------------------
-#pragma region OLD
+inline Counter::Options operator|(Counter::Options a, Counter::Options b)
+{
+	return static_cast<Counter::Options>(static_cast<byte>(a) | static_cast<byte>(b));
+}
 
+// enum CounterPeriodic::Options jako flags
+inline CounterPeriodic::Options operator|(CounterPeriodic::Options a, CounterPeriodic::Options b)
+{
+	return static_cast<CounterPeriodic::Options>(static_cast<byte>(a) | static_cast<byte>(b));
+}
+
+
+//----------------------------
 class TimerOLD
 {
 public:
@@ -424,5 +453,3 @@ public:
 		return elapsed;
 	}
 };
-
-#pragma endregion
