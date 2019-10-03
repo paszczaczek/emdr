@@ -17,8 +17,8 @@ private:
 	// timer zatrzymujacy swiecacy punkt na koncach tasmy
 	Timer restTimer;
 
-	// licznik odmierzajacy czas zabiegu
-	CounterPeriodicOLD sessionCounter;
+	// timer odmierzajacy czas zabiegu
+	Timer sessionTimer;
 
 	// number aktualnie swiecacgo punktu
 	unsigned int ledCurrent = 0;
@@ -50,15 +50,16 @@ public:
 		// poruszanie swiecacym punktem
 		unsigned int counter = 0;
 		unsigned int period = 0;
-		//if (movingCounter.ItsTimeWithCatchingMinMax(movingCounterValue, &movingCounterPeriod))
-		//	MovingCounterElapsed(movingCounterValue, &movingCounterPeriod);
-
 		if (movingCounter.ItsTime(
-			CounterPeriodic::Mode::UpDown, 
+			CounterPeriodic::Mode::UpDown,
 			CounterPeriodic::Options::CatchMinMax,
-			counter, 
+			counter,
 			&period))
-			MovingCounterElapsed(counter, &period);
+			MovingCounterItsTime(counter, &period);
+
+		// sygnalizacja miniecia czasu zabiegu
+		if (sessionTimer.ItsTime(Timer::Mode::MultiShot))
+			SessionTimerItsTime();
 
 		if (testCounter.ItsTime(
 			CounterPeriodic::Mode::UpDown,
@@ -80,7 +81,7 @@ public:
 	}
 
 	// poruszanie swiecacym punktem
-	void MovingCounterElapsed(unsigned int counter, unsigned int* period)
+	void MovingCounterItsTime(unsigned int counter, unsigned int* period)
 	{
 		//Serial.print(counter);
 		//Serial.print(", ");
@@ -113,27 +114,33 @@ public:
 	}
 
 	// mierzenie czasu zabiegu
-	void SessionCounterElapsed(unsigned int counter, unsigned int period)
+	void SessionTimerItsTime(/*unsigned int counter, unsigned int period*/)
 	{
 		// czy minal czas zabiegu?
-		if (counter == sessionCounter.countTo)
+		// if (counter == sessionTimer.countTo)
+		if (sessionTimer.interval == 10 * 1000)
 		{
+
 			// tak - sugnalizujemy to chwilowa zmiana koloru poruszajacego sie punktu
-			//Serial.print(counter);  Serial.print(F(": Session blue: ")); Serial.println(period + 1);
+			Serial.print(F("Session blue: ")); Serial.println(millis());
 			movingColor = -movingColor;
 			strip.controller->leds()[ledCurrent] = movingColor;
 			strip.updated = true;
+			sessionTimer.interval = 5 * 1000;
 			return;
 		}
-
-		// czy minal czas sygnalizacji konca zabiegu?
-		if (counter == 0 && period > 1)
+		else
 		{
-			// tak - przywracamy normalny kolor poruszajacego sie punktu
-			//Serial.print(counter);  Serial.println(F(": Session orange"));
+			// czy minal czas sygnalizacji konca zabiegu?
+			//if (counter == 0 && period > 1)
+			//{
+				// tak - przywracamy normalny kolor poruszajacego sie punktu
+				//Serial.print(counter);  Serial.println(F(": Session orange"));
+			Serial.print(F("Session orange: ")); Serial.println(millis());
 			movingColor = -movingColor;
 			strip.controller->leds()[ledCurrent] = movingColor;
 			strip.updated = true;
+			sessionTimer.interval = 10 * 1000;
 			return;
 		}
 
@@ -166,14 +173,17 @@ public:
 	{
 		Plugin::OnStart();
 		SetSpeed(speed = 20);
-		//movingCounter.Start();
+		movingCounter.Start();
 		movingCounter.interval = 5;
-		sessionCounter.interval = 10 * 1000;
-		sessionCounter.countTo = 5;
+		sessionTimer.interval = 10 * 1000;
+		//sessionTimer.countTo = 5;
 		//sessionCounter.Start();
+		sessionTimer.interval = 10 * 1000;
+		sessionTimer.Start();
+
 		testCounter.interval = 1000;
 		testCounter.countTo = 4;
-		testCounter.Start();
+		//testCounter.Start();
 	}
 
 private:

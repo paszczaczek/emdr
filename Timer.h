@@ -408,48 +408,48 @@ private:
 };
 
 // Licznik odliczajacy okresowo od 0 do zadanej wartosci
-class CounterPeriodicOLD : public Counter
-{
-public:
-	// wartosc do ktorej odliczac
-	unsigned int countTo = 0;
-
-public:
-
-	// czy nadszedl czas aktywacji countera
-	bool Elapsed(unsigned int& counter, unsigned int* period = NULL, unsigned int* outOmmittedCounters = NULL)
-	{
-		// inicjalizacja wartosci zwrotnych
-		counter = this->counter;
-		if (period)
-			*period = 0;
-		if (outOmmittedCounters)
-			*outOmmittedCounters = 0;
-
-		// counterTo musi byc podany
-		if (countTo <= 1 && IsStarted())
-		{
-			Serial.println(F("* CounterPeriodic::counterTo=0!"));
-			Stop();
-			return false;
-		}
-
-		// czy naszedla czas aktywacji licznika?
-		unsigned int ommittedCounters;
-		bool elapsed = Counter::ItsTime(Counter::Options::WithZero, counter, &ommittedCounters);
-		if (elapsed)
-		{
-			// tak, nadszedl czas aktywacji
-			// na podstawie licznika liczacego do nieskonczonosci wyznaczamy wartosc licznika okresowego
-			counter = this->counter % (countTo + 1);
-		}
-
-		// wartosci zwrotne
-		if (period)
-			*period = this->counter / (countTo + 1);
-		if (outOmmittedCounters)
-			*outOmmittedCounters = ommittedCounters;
-
-		return elapsed;
-	}
-};
+//class CounterPeriodicOLD : public Counter
+//{
+//public:
+//	// wartosc do ktorej odliczac
+//	unsigned int countTo = 0;
+//
+//public:
+//
+//	// czy nadszedl czas aktywacji countera
+//	bool Elapsed(unsigned int& counter, unsigned int* period = NULL, unsigned int* outOmmittedCounters = NULL)
+//	{
+//		// inicjalizacja wartosci zwrotnych
+//		counter = this->counter;
+//		if (period)
+//			*period = 0;
+//		if (outOmmittedCounters)
+//			*outOmmittedCounters = 0;
+//
+//		// counterTo musi byc podany
+//		if (countTo <= 1 && IsStarted())
+//		{
+//			Serial.println(F("* CounterPeriodic::counterTo=0!"));
+//			Stop();
+//			return false;
+//		}
+//
+//		// czy naszedla czas aktywacji licznika?
+//		unsigned int ommittedCounters;
+//		bool elapsed = Counter::ItsTime(Counter::Options::WithZero, counter, &ommittedCounters);
+//		if (elapsed)
+//		{
+//			// tak, nadszedl czas aktywacji
+//			// na podstawie licznika liczacego do nieskonczonosci wyznaczamy wartosc licznika okresowego
+//			counter = this->counter % (countTo + 1);
+//		}
+//
+//		// wartosci zwrotne
+//		if (period)
+//			*period = this->counter / (countTo + 1);
+//		if (outOmmittedCounters)
+//			*outOmmittedCounters = ommittedCounters;
+//
+//		return elapsed;
+//	}
+//};
