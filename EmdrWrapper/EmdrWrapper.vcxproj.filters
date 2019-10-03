@@ -91,9 +91,6 @@
     <ClInclude Include="..\RemoteController.h">
       <Filter>Emdr</Filter>
     </ClInclude>
-    <ClInclude Include="..\RemoteControllerStripPlugin.h">
-      <Filter>Emdr</Filter>
-    </ClInclude>
     <ClInclude Include="IRremote.h">
       <Filter>IRremote</Filter>
     </ClInclude>
@@ -104,6 +101,9 @@
       <Filter>Emdr</Filter>
     </ClInclude>
     <ClInclude Include="..\DiagnosticStripPlugin.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RemoteControllerStripPlugin.h">
       <Filter>Emdr</Filter>
     </ClInclude>
   </ItemGroup>

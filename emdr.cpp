@@ -10,8 +10,8 @@
 #include "Strip.h"
 #include "MovingPointStripPlugin.h"
 #include "RemoteController.h"
-#include "RemoteControllerStripPlugin.h"
-#include "DiagnosticStripPlugin.h"
+//#include "RemoteControllerStripPlugin.h"
+//#include "DiagnosticStripPlugin.h"
 
 #define MAX_CURRENT_FROM_EXT 1000 // Total maximum current draw when powered via external power supply
 #define MAX_CURRENT_FROM_USB  500 // Total maximum current draw from the Arduino when powered from a USB port
@@ -32,14 +32,14 @@ decode_results irrecvResults;
 RemoteController remoteController(&irrecv, &irrecvResults);
 
 // strip plugins
-DiagnosticStipPlugin diagnosticStipPlugin;
+//DiagnosticStipPlugin diagnosticStipPlugin;
 MovingPointStripPlugin movingPointStripPlugin;
-RemoteControllerStripPlugin remoteControllerstripPlugin;
-const byte stripPluginsCount = 3;
+//RemoteControllerStripPlugin remoteControllerstripPlugin;
+const byte stripPluginsCount = /*3*/1;
 StripPlugin* stripPlugins[stripPluginsCount] = {
-  &diagnosticStipPlugin,
-  &movingPointStripPlugin,
-  &remoteControllerstripPlugin
+  //&diagnosticStipPlugin,
+  &movingPointStripPlugin/*,
+  &remoteControllerstripPlugin*/
 };
 
 // strip
@@ -56,8 +56,8 @@ void setup()
 
 	irrecv.enableIRIn();
 	strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>();
-	diagnosticStipPlugin.PowerOn();
-	//movingPointStripPlugin.OnStart();
+	//diagnosticStipPlugin.PowerOn();
+	movingPointStripPlugin.OnStart();
 }
 
 void loop() {
