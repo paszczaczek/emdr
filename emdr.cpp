@@ -16,7 +16,7 @@
 #define MAX_CURRENT_FROM_EXT 1000 // Total maximum current draw when powered via external power supply
 #define MAX_CURRENT_FROM_USB  500 // Total maximum current draw from the Arduino when powered from a USB port
 
-#define STRIP_LEDS_TYPE  WS2812B // led controller type
+#define STRIP_LEDS_TYPE   WS2811 // led controller type (w pracy dziala rowniez na WS2812B)
 #define STRIP_LEDS_PIN         7 // pin for main strip
 #define STRIP_LEDS_PIN_RC      8 // pin for remote control strip
 #define STRIP_LEDS_ORDER     GRB
