@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "Event.h"
 
-
 // Klasa bazowa dla Timerow i Counterow, wylicza czasy aktywacji
 class Timer
 {
@@ -91,42 +90,6 @@ public:
 	}
 };
 
-
-//// Timer aktywowany jednokrotnie
-//class Timer : public TimerBase
-//{
-//public:
-//	// czy nadszedl czas aktywacji timera
-//	bool Elapsed(unsigned int* ommittedIntervals = NULL)
-//	{
-//		bool elapsed = TimerBase::Elapsed(ommittedIntervals);
-//		// jesli nadszedl czas aktywacji, to stopujemy timer
-//		if (elapsed)
-//			Stop();
-//		return elapsed;
-//	}
-//};
-
-
-// Timer aktywowany wielokorotnie
-//class TimerPeriodic : public TimerBase
-//{
-//public:
-//	// czy nadszedl czas aktywacji timera
-//	bool Elapsed(unsigned int* outOmmittedIntervals)
-//	{
-//		unsigned int ommittedIntervals;
-//		bool elapsed = TimerBase::Elapsed(&ommittedIntervals);
-//		// jesli nadszedl czas aktywacji, to aktywujemy nastepny cykl
-//		if (elapsed)
-//			startedAt += (1 + ommittedIntervals) * interval;
-//		if (outOmmittedIntervals)
-//			*outOmmittedIntervals = ommittedIntervals;
-//		return elapsed;
-//	}
-//};
-
-
 // Licznik w roznych warianach
 class Counter : public Timer
 {
@@ -142,12 +105,6 @@ protected:
 	unsigned int counter = (unsigned int)-1;
 
 public:
-	// wystartowanie licznika
-	void Start()
-	{
-		Timer::Start();
-	}
-
 	// zatrzymanie licznika
 	void Stop()
 	{
@@ -270,7 +227,7 @@ public:
 	}
 
 private:
-	// licznik liczacy w gore i w dol od 1 do zadanej wartosci
+	// obliczenia wartosci licznika i okresu dla licznika licz¹cego okresowo w gore i w dol od 1 do zadanej wartosci
 	void CalculationForUpDownCounter(unsigned int& outCounter, unsigned int* outPeriod)
 	{
 		/*
@@ -340,12 +297,13 @@ private:
 	}
 };
 
+// operator bitowy | dla enum Counter::Options
 inline Counter::Options operator|(Counter::Options a, Counter::Options b)
 {
 	return static_cast<Counter::Options>(static_cast<byte>(a) | static_cast<byte>(b));
 }
 
-// enum CounterPeriodic::Options jako flags
+// operator bitowy | dla enum CounterPeriodic::Options
 inline CounterPeriodic::Options operator|(CounterPeriodic::Options a, CounterPeriodic::Options b)
 {
 	return static_cast<CounterPeriodic::Options>(static_cast<byte>(a) | static_cast<byte>(b));

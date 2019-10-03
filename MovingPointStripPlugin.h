@@ -9,9 +9,7 @@
 class MovingPointStripPlugin : public StripPlugin
 {
 private:
-	CounterPeriodic testCounter;
 	// licznik poruszajacy swiecacym punktem
-	//CounterUpDownPeriodicDetectingMinMax movingCounter;
 	CounterPeriodic movingCounter;
 
 	// timer zatrzymujacy swiecacy punkt na koncach tasmy
@@ -20,11 +18,14 @@ private:
 	// timer odmierzajacy czas zabiegu
 	Timer sessionTimer;
 
-	// number aktualnie swiecacgo punktu
-	unsigned int ledCurrent = 0;
+	// nummer pierwszej swiecacej diody; numer ostatniej diody jest w movingCounter.countTo + ledFirst
+	byte ledFirst = 0;
 
-	// predkosc poruszania sie swiecacego punktu wyrazona w liczbie diod na sekunke
-	byte speed = 1;
+	// numer aktualnie swiecacgo punktu
+	byte ledCurrent = 0;
+
+	// predkosc poruszania sie swiecacego punktu wyrazona w liczbie diod na sekunde
+	byte movingSpeed = 1;
 
 	// kolor poruszajacego sie punktu
 	CRGB movingColor = CRGB(CRGB::Orange);
@@ -32,21 +33,13 @@ private:
 public:
 	MovingPointStripPlugin()
 	{
-		//movingCounter.interval = 100;
+		movingCounter.countTo = 30;
 		restTimer.interval = 2000;
-		//testCounter.interval = 1000;
 	}
 
+	// petla zdarzen
 	virtual void Loop() override
-	{
-		// ustawinie ilosci diod
-		if (movingCounter.countTo == 0)
-			movingCounter.countTo = strip.controller->size();// -1;
-
-		// pauza na krancach tasmy
-		if (restTimer.ItsTime(Timer::Mode::SingleShot))
-			RestTimerElapsed();
-
+	{	
 		// poruszanie swiecacym punktem
 		unsigned int counter = 0;
 		unsigned int period = 0;
@@ -56,73 +49,54 @@ public:
 			counter,
 			&period))
 			MovingCounterItsTime(counter, &period);
+		
+		// pauza na krancach tasmy
+		if (restTimer.ItsTime(Timer::Mode::SingleShot))
+			RestTimerItsTime();
 
 		// sygnalizacja miniecia czasu zabiegu
 		if (sessionTimer.ItsTime(Timer::Mode::MultiShot))
 			SessionTimerItsTime();
-
-		if (testCounter.ItsTime(
-			CounterPeriodic::Mode::UpDown,
-			CounterPeriodic::Options::WithZero | CounterPeriodic::Options::CatchMinMax,
-			counter,
-			&period))
-		{
-			Serial.print("Test: ");
-			Serial.print(counter);
-			Serial.print(" / ");
-			Serial.println(period);
-		}
-
-		// mierzenie czasu zabiegu
-		/*unsigned int sessionCounterValue = 0;
-		unsigned int sessionCounterPeriod = 0;
-		if (sessionCounter.Elapsed(sessionCounterValue, &sessionCounterPeriod))
-			SessionCounterElapsed(sessionCounterValue, sessionCounterPeriod);*/
 	}
 
 	// poruszanie swiecacym punktem
 	void MovingCounterItsTime(unsigned int counter, unsigned int* period)
 	{
-		//Serial.print(counter);
-		//Serial.print(", ");
-		//Serial.println(*period);
-
-		if (counter == 0)
-			return;
 		// na krancach tasmy zrob pauze
 		if ((counter == 1 && *period > 1) ||
 			counter == movingCounter.countTo)
 		{
-			//Serial.println("PAUSE");
+			//Serial.println(F("pause"));
 			movingCounter.Pause();
 			restTimer.Start();
 		}
 
+		// gasimy aktualnie swiecaca sie diode
 		strip.controller->leds()[ledCurrent] = CRGB::Black;
-		strip.controller->leds()[counter - 1] = movingColor;
-		strip.updated = true;
+		
+		// i zapalamy nastepna 
+		ledCurrent = counter - 1 + ledFirst;
+		strip.controller->leds()[ledCurrent] = movingColor;
 
-		ledCurrent = counter - 1;
+		strip.updated = true;
 	}
 
-	// pauza na krancach tasmy
-	void RestTimerElapsed()
+	// koniec pauzy na krancach tasmy
+	void RestTimerItsTime()
 	{
+		//Serial.println(F("resume"));
 		restTimer.Stop();
 		movingCounter.Resume();
-		//Serial.println("RESUME");
 	}
 
 	// mierzenie czasu zabiegu
-	void SessionTimerItsTime(/*unsigned int counter, unsigned int period*/)
+	void SessionTimerItsTime()
 	{
 		// czy minal czas zabiegu?
-		// if (counter == sessionTimer.countTo)
 		if (sessionTimer.interval == 10 * 1000)
 		{
-
-			// tak - sugnalizujemy to chwilowa zmiana koloru poruszajacego sie punktu
-			Serial.print(F("Session blue: ")); Serial.println(millis());
+			// minal czas zabiegu, sugnalizujemy to chwilowa zmiana koloru poruszajacego sie punktu
+			Serial.print(F("session end: ")); Serial.println(millis());
 			movingColor = -movingColor;
 			strip.controller->leds()[ledCurrent] = movingColor;
 			strip.updated = true;
@@ -131,83 +105,48 @@ public:
 		}
 		else
 		{
-			// czy minal czas sygnalizacji konca zabiegu?
-			//if (counter == 0 && period > 1)
-			//{
-				// tak - przywracamy normalny kolor poruszajacego sie punktu
-				//Serial.print(counter);  Serial.println(F(": Session orange"));
-			Serial.print(F("Session orange: ")); Serial.println(millis());
+			// minal czas sygnalizacji konca zabiegu, przywracamy normaly kolor
+			Serial.print(F("session next: ")); Serial.println(millis());
 			movingColor = -movingColor;
 			strip.controller->leds()[ledCurrent] = movingColor;
 			strip.updated = true;
 			sessionTimer.interval = 10 * 1000;
 			return;
 		}
-
-		//Serial.println(counter);
-
-		/*
-		switch (counter)
-		{
-		case 0:
-			// czas zabiegu jeszcze nie minal
-			break;
-		case 1:
-			// minal czas zabiegu - zaczynamy migac swiecacym punktem
-			Serial.print(F("Session finished: ")); Serial.println(period + 1);
-			sessionFinished = 1;
-			strip.controller->leds()[ledCurrent] = CRGB::Red;
-			strip.updated = true;
-			break;
-		case 2:
-			// konczymy miganie, bedzie kolejna runda zabiegu
-			sessionFinished = 0;
-			strip.controller->leds()[ledCurrent] = CRGB::Orange;
-			strip.updated = true;
-			break;
-		}
-		*/
 	}
 
 	virtual void OnStart() override
 	{
 		Plugin::OnStart();
-		SetSpeed(speed = 20);
-		movingCounter.Start();
+		SetMovingSpeed(movingSpeed = 20);
 		movingCounter.interval = 5;
-		sessionTimer.interval = 10 * 1000;
-		//sessionTimer.countTo = 5;
-		//sessionCounter.Start();
+		movingCounter.Start();
 		sessionTimer.interval = 10 * 1000;
 		sessionTimer.Start();
-
-		testCounter.interval = 1000;
-		testCounter.countTo = 4;
-		//testCounter.Start();
 	}
 
 private:
-
-	void SetSpeed(byte speed)
+	// ustawienie predkosci poruszajacego sie punktu w diodach na sekunde
+	void SetMovingSpeed(byte speed)
 	{
 		// speed
 		movingCounter.interval = (unsigned long)(1 / (float)speed * 1000);
 		PRINT(F("Speed: ")); PRINT(speed); PRINTLN(F("d/s"));
 	}
 
-	void changeSpeed(bool increase)
+	void ChangeMovingSpeed(bool increase)
 	{
 		if (increase)
 		{
-			if (speed < 180)
-				speed++;
+			if (movingSpeed < 180)
+				movingSpeed++;
 		}
 		else
 		{
-			if (speed > 1)
-				speed--;
+			if (movingSpeed > 1)
+				movingSpeed--;
 		}
-		SetSpeed(speed);
+		SetMovingSpeed(movingSpeed);
 	}
 
 	void OnRemoteControllerEvent(RemoteController::EventArgs& args) override
@@ -221,10 +160,10 @@ private:
 			//movingTimer.Start();
 			break;
 		case RemoteController::Button::CHANEL_PLUS:
-			changeSpeed(true);
+			ChangeMovingSpeed(true);
 			break;
 		case RemoteController::Button::CHANEL_MINUS:
-			changeSpeed(false);
+			ChangeMovingSpeed(false);
 			break;
 		case RemoteController::Button::PLAY:
 			//movingTimer.Start();
