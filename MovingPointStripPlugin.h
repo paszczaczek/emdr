@@ -25,21 +25,30 @@ private:
 	byte ledCurrent = 0;
 
 	// predkosc poruszania sie swiecacego punktu wyrazona w liczbie diod na sekunde
-	byte movingSpeed = 1;
+	byte movingSpeed = 200;
 
 	// kolor poruszajacego sie punktu
 	CRGB movingColor = CRGB(CRGB::Orange);
 
+	// czas zatrzymania swiecacego punktu na koncach tasmy mierzony w sekunach
+#define restDuration 2
+
+	// czas trwania zabiegu i czas informowanie o koncu zabiegu mierzone w sekundach
+#define sessionDuration    (unsigned long)60
+#define sessionEndDuration (unsigned long)10
+
 public:
 	MovingPointStripPlugin()
 	{
+		movingCounter.interval = 5;
 		movingCounter.countTo = 30;
-		restTimer.interval = 2000;
+		restTimer.interval = restDuration * 1000;
+		sessionTimer.interval = sessionDuration * 1000;
 	}
 
 	// petla zdarzen
 	virtual void Loop() override
-	{	
+	{
 		// poruszanie swiecacym punktem
 		unsigned int counter = 0;
 		unsigned int period = 0;
@@ -49,7 +58,7 @@ public:
 			counter,
 			&period))
 			MovingCounterItsTime(counter, &period);
-		
+
 		// pauza na krancach tasmy
 		if (restTimer.ItsTime(Timer::Mode::SingleShot))
 			RestTimerItsTime();
@@ -73,7 +82,7 @@ public:
 
 		// gasimy aktualnie swiecaca sie diode
 		strip.controller->leds()[ledCurrent] = CRGB::Black;
-		
+
 		// i zapalamy nastepna 
 		ledCurrent = counter - 1 + ledFirst;
 		strip.controller->leds()[ledCurrent] = movingColor;
@@ -92,25 +101,24 @@ public:
 	// mierzenie czasu zabiegu
 	void SessionTimerItsTime()
 	{
-		// czy minal czas zabiegu?
-		if (sessionTimer.interval == 10 * 1000)
+		if (sessionTimer.interval == sessionEndDuration * 1000)
+		{
+			// minal czas sygnalizacji konca zabiegu, przywracamy normaly kolor
+			//Serial.print(F("session cont: ")); Serial.println(millis());
+			movingColor = -movingColor;
+			strip.controller->leds()[ledCurrent] = movingColor;
+			strip.updated = true;
+			sessionTimer.interval = (sessionDuration - sessionEndDuration) * 1000;
+			return;
+		} 
+		else
 		{
 			// minal czas zabiegu, sugnalizujemy to chwilowa zmiana koloru poruszajacego sie punktu
 			Serial.print(F("session end: ")); Serial.println(millis());
 			movingColor = -movingColor;
 			strip.controller->leds()[ledCurrent] = movingColor;
 			strip.updated = true;
-			sessionTimer.interval = 5 * 1000;
-			return;
-		}
-		else
-		{
-			// minal czas sygnalizacji konca zabiegu, przywracamy normaly kolor
-			Serial.print(F("session next: ")); Serial.println(millis());
-			movingColor = -movingColor;
-			strip.controller->leds()[ledCurrent] = movingColor;
-			strip.updated = true;
-			sessionTimer.interval = 10 * 1000;
+			sessionTimer.interval = sessionEndDuration * 1000;
 			return;
 		}
 	}
@@ -118,11 +126,10 @@ public:
 	virtual void OnStart() override
 	{
 		Plugin::OnStart();
-		SetMovingSpeed(movingSpeed = 20);
-		movingCounter.interval = 5;
+		SetMovingSpeed(movingSpeed);
 		movingCounter.Start();
-		sessionTimer.interval = 10 * 1000;
 		sessionTimer.Start();
+		PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));
 	}
 
 private:
@@ -131,7 +138,7 @@ private:
 	{
 		// speed
 		movingCounter.interval = (unsigned long)(1 / (float)speed * 1000);
-		PRINT(F("Speed: ")); PRINT(speed); PRINTLN(F("d/s"));
+		PRINT(F("speed: ")); PRINT(speed); PRINTLN(F("d/s"));
 	}
 
 	void ChangeMovingSpeed(bool increase)
