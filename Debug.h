@@ -1,9 +1,9 @@
 #pragma once
 #include "MemoryFree.h"
 
-#define DEBUG_PRINT
+#define DEBUG_PRINT 1
 
-#ifdef DEBUG_PRINT
+#if DEBUG_PRINT == 1
   #define PRINT(...)          Serial.print(__VA_ARGS__)
   #define PRINTLN(...)        Serial.println(__VA_ARGS__)
   #define WRITE(...)          Serial.write(__VA_ARGS__)

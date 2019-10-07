@@ -7,7 +7,7 @@
 #define INPUT_PULLUP 0x2
 
 typedef unsigned char byte;
-const char *F(const char *str);
+extern const char *F(const char *str);
 
 extern unsigned long millis(void);
 extern void pinMode(uint8_t, uint8_t);
