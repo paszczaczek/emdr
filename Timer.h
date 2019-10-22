@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include <stdio.h>
-#include "Event.h"
+//#include "Event.h"
 
 // Klasa bazowa dla Timerow i Counterow, wylicza czasy aktywacji
 class Timer

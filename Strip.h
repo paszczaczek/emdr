@@ -17,7 +17,7 @@ public:
     {
         FastLED.setMaxPowerInVoltsAndMilliamps(5, maxCurrent);
         remoteControllerEventHandler.Set(this, &Strip::OnRemoteControllerEvent);
-        remoteController.event += remoteControllerEventHandler;
+        //remoteController.event += remoteControllerEventHandler;
     }
 
     template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "Emdr.h"
 
-#include "Event.h"
+//#include "Event.h"
 #include "RemoteController.h"
 
 using System::String;
@@ -42,8 +42,7 @@ namespace EmdrWrapper {
 		{
 			::RemoteController::EventArgs args;
 			args.button = (::RemoteController::Button)button;
-			remoteController.event.Emit(args);
-			//remoteController.ProcessCode(-1);
+			//remoteController.event.Emit(args);
 		}
 	};
 

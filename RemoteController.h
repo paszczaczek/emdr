@@ -10,7 +10,7 @@ class RemoteController
 {
 public:
 	RemoteController(IRrecv *irrecv, decode_results *results) :
-		event(2), // jesli dodasz nowego subskrybenta, zwieksz wartosc
+		//event(2), // jesli dodasz nowego subskrybenta, zwieksz wartosc
 		irrecv(irrecv),
 		results(results)
 	{
@@ -26,7 +26,8 @@ public:
 				// kod rozpoznany
 				args.button = codeMapper[i].button;
 				PRINTLN((int)args.button);
-				event.Emit(args);
+				//event.Emit(args);
+				Event::Send(Event::Type::SELECT_STRIP_DEVICE);
 				return;
 			}
 		}
@@ -52,7 +53,7 @@ public:
 			PRINT((int)args.button); PRINTLN(F("(Unknown)"));
 		}
 
-		event.Emit(args);
+		//event.Emit(args);
 	}
 
 	void Loop() {
@@ -63,7 +64,7 @@ public:
 			// uchylam zakaz uzywania przerwan
 			args.button = Button::IntBlkAllowed;
 			PRINT(F("IR: timeout -> ")); PRINT((int)args.button); PRINTLN(F("(IntBlkAllowed)"));
-			event.Emit(args);
+			//event.Emit(args);
 			intBlkDisallowed = false;
 		}
 		if (irrecv->decode(results)) {
@@ -93,7 +94,7 @@ public:
 		Button button;
 	};
 
-	Event<EventArgs> event;
+	//Event<EventArgs> event;
 
 private:
 	IRrecv *irrecv;

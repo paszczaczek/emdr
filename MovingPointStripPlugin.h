@@ -31,11 +31,11 @@ private:
 	CRGB movingColor = CRGB(CRGB::Orange);
 
 	// czas zatrzymania swiecacego punktu na koncach tasmy mierzony w sekunach
-#define restDuration 2
+	#define restDuration 2
 
 	// czas trwania zabiegu i czas informowanie o koncu zabiegu mierzone w sekundach
-#define sessionDuration    (unsigned long)60
-#define sessionEndDuration (unsigned long)10
+	#define sessionDuration    (unsigned long)60
+	#define sessionEndDuration (unsigned long)10
 
 public:
 	MovingPointStripPlugin()

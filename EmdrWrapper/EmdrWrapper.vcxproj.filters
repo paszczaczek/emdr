@@ -60,9 +60,6 @@
     <ClInclude Include="..\Emdr.h">
       <Filter>Emdr</Filter>
     </ClInclude>
-    <ClInclude Include="..\Event.h">
-      <Filter>Emdr</Filter>
-    </ClInclude>
     <ClInclude Include="..\EventHandler.h">
       <Filter>Emdr</Filter>
     </ClInclude>
@@ -104,6 +101,9 @@
       <Filter>Emdr</Filter>
     </ClInclude>
     <ClInclude Include="..\RemoteControllerStripPlugin.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Event.h">
       <Filter>Emdr</Filter>
     </ClInclude>
   </ItemGroup>

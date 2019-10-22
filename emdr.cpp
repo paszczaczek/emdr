@@ -10,6 +10,7 @@
 #include "Strip.h"
 #include "MovingPointStripPlugin.h"
 #include "RemoteController.h"
+#include "Event.h"
 //#include "RemoteControllerStripPlugin.h"
 //#include "DiagnosticStripPlugin.h"
 
