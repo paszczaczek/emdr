@@ -105,6 +105,13 @@ protected:
 	unsigned int counter = (unsigned int)-1;
 
 public:
+	// uruchomienie timera
+	void Start()
+	{
+		counter = (unsigned int)-1;
+		Timer::Start();
+	}
+
 	// zatrzymanie licznika
 	void Stop()
 	{

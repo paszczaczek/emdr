@@ -31,11 +31,11 @@ private:
 	CRGB movingColor = CRGB(CRGB::Orange);
 
 	// czas zatrzymania swiecacego punktu na koncach tasmy mierzony w sekunach
-	#define restDuration 2
+#define restDuration 2
 
-	// czas trwania zabiegu i czas informowanie o koncu zabiegu mierzone w sekundach
-	#define sessionDuration    (unsigned long)60
-	#define sessionEndDuration (unsigned long)10
+// czas trwania zabiegu i czas informowanie o koncu zabiegu mierzone w sekundach
+#define sessionDuration    (unsigned long)60
+#define sessionEndDuration (unsigned long)10
 
 public:
 	MovingPointStripPlugin()
@@ -110,7 +110,7 @@ public:
 			strip.updated = true;
 			sessionTimer.interval = (sessionDuration - sessionEndDuration) * 1000;
 			return;
-		} 
+		}
 		else
 		{
 			// minal czas zabiegu, sugnalizujemy to chwilowa zmiana koloru poruszajacego sie punktu
@@ -123,13 +123,59 @@ public:
 		}
 	}
 
-	virtual void OnStart() override
+	void Start() override
 	{
-		Plugin::OnStart();
-		SetMovingSpeed(movingSpeed);
-		movingCounter.Start();
-		sessionTimer.Start();
-		PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));
+		switch (state)
+		{
+		case State::Started:
+			break;
+		case State::Stopped:
+		case State::Paused:
+			Plugin::Start();
+			SetMovingSpeed(movingSpeed);
+			movingCounter.Start();
+			sessionTimer.Start();
+			PRINTLN(F("Start"));
+			//PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));
+		}
+	}
+
+	void Stop() override
+	{
+		switch (state)
+		{
+		case Plugin::State::Started:
+		case Plugin::State::Stopped:
+		case Plugin::State::Paused:
+			Plugin::Stop();
+			movingCounter.Stop();
+			restTimer.Stop();
+			sessionTimer.Stop();
+			PRINTLN(F("Stop"));
+		}
+	}
+
+	void Pause() override
+	{
+		switch (state)
+		{
+		case State::Started:
+			Plugin::Pause();
+			movingCounter.Pause();
+			restTimer.Stop();
+			sessionTimer.Stop();
+			PRINTLN(F("Pause"));
+			break;
+		case State::Stopped:
+			break;
+		case State::Paused:
+			Plugin::Resume();
+			movingCounter.Resume();
+			restTimer.Start();
+			sessionTimer.Start();
+			PRINTLN(F("Resume"));
+			break;
+		}
 	}
 
 private:
@@ -156,30 +202,35 @@ private:
 		SetMovingSpeed(movingSpeed);
 	}
 
-	void OnRemoteControllerEvent(RemoteController::EventArgs& args) override
+	bool Receive(Event::Name eventName) override
 	{
-		switch (args.button)
+		switch (eventName)
 		{
-		case RemoteController::Button::IntBlkDisallowed:
-			//movingTimer.Stop();
+		case Event::Name::UnknowCode:
 			break;
-		case RemoteController::Button::IntBlkAllowed:
-			//movingTimer.Start();
+		case Event::Name::BlockingInterruptsDisallowed:
+			movingCounter.Pause();
 			break;
-		case RemoteController::Button::CHANEL_PLUS:
+		case Event::Name::BlockingInterruptsAllowed:
+			movingCounter.Resume();
+			break;
+		case Event::Name::Start:
+			Start();
+			break;
+		case Event::Name::Stop:
+			Stop();
+			break;
+		case Event::Name::Pause:
+			Pause();
+			break;
+		case Event::Name::CHANEL_PLUS:
 			ChangeMovingSpeed(true);
 			break;
-		case RemoteController::Button::CHANEL_MINUS:
+		case Event::Name::CHANEL_MINUS:
 			ChangeMovingSpeed(false);
 			break;
-		case RemoteController::Button::PLAY:
-			//movingTimer.Start();
-			break;
-		case RemoteController::Button::PAUSE:
-			//movingTimer.Stop();
-			break;
-		default:
-			break;
 		}
+
+		return false;
 	}
 };

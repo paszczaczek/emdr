@@ -1,11 +1,11 @@
 #pragma once
-//#include "EventName.h"
 #include "Event.h"
 
 class Device
 {
 public:
-	virtual bool ReceiveEvent(Event::Name eventName) { return false; }
+	virtual void Loop() = 0;
+	virtual bool Receive(Event::Name eventName) = 0;
 };
 
 extern Device& stripDevice;

@@ -1,116 +1,95 @@
 #pragma once
-#include <stdint.h>
+//#include <stdint.h>
 #include <IRremote.h>
 #include "Debug.h"
 #include "Timer.h"
 #include "Event.h"
-//#include "Strip.h"
+
+extern IRrecv irrecv;
 
 class RemoteController
 {
+private:
+	// odczytany kod z pilota
+	decode_results results;
+
+	// czas odczytania ostatniego kodu z pilota
+	unsigned long lastCodeTime = 0;
+
+	// czy zakaz blokowania przerwan obiwiazuje
+	bool blockInterruptsDisallowed = false;
+
 public:
-	RemoteController(IRrecv *irrecv, decode_results *results) :
-		//event(2), // jesli dodasz nowego subskrybenta, zwieksz wartosc
-		irrecv(irrecv),
-		results(results)
-	{
+	void Loop() {
+		// jesli jest zakaz blokowania przerwan i dosc dlugo nie odebrano zadnego kodu,
+		if (blockInterruptsDisallowed && millis() - lastCodeTime > 3000)
+		{
+			// to prawdopodobnie pilot nie bedzie w najblizszej chwili uzywany 
+			// uchylam zakaz uzywania przerwan
+			PRINT(F("IR: timeout -> ")); PRINTLN((int)Event::Name::BlockingInterruptsAllowed);
+			blockInterruptsDisallowed = false;
+			Event::Send(Event::Name::BlockingInterruptsAllowed);
+		}
+		if (irrecv.decode(&results)) {
+			ProcessCode();
+			lastCodeTime = millis();
+			irrecv.resume();
+		}
 	}
 
-	void ProcessCode(unsigned long code) {
-		PRINT(F("IR: ")); PRINT(code, HEX); PRINT(F(" -> "));
+private:
+
+	// przetwarza kod odczytany z pilota
+	void ProcessCode() {
+		PRINT(F("IR: ")); PRINT(results.value, HEX); PRINT(F(" -> "));
+
 		// probujemy rozpoznac kod
-		for (int i = 0; i < RemoteController::codeMapperCount; i++)
+		Event::Name eventName = GetEventName();
+		if (eventName != Event::Name::UnknowCode)
 		{
-			if (codeMapper[i].code == code)
-			{
-				// kod rozpoznany
-				args.button = codeMapper[i].button;
-				PRINTLN((int)args.button);
-				//event.Emit(args);
-				Event::Send(Event::Name::SELECT_STRIP_DEVICE);
-				return;
-			}
+			// kod rozpoznany
+			PRINTLN((byte)eventName);
+			Event::Send(eventName);
+			return;
 		}
 
 		// kod nierozpoznany
-		if (!intBlkDisallowed)
+		if (!blockInterruptsDisallowed)
 		{
-			// kod nierozpoznay ale nie wiadomo czy dlatego ze:
+			// kod nierozpoznay i nie wiadomo czy dlatego ze:
 			// a. strip zablokowal przerwania przeklamujac odczyt kodu
 			// b. odczyt kodu jest poprawny ale go nie obslugujemy
-			// wysylamy zakaz uzywania przerwan, aby by to rozstrzygnac
-			args.button = Button::IntBlkDisallowed;
-			PRINT((int)args.button); PRINTLN(F("(IntBlkDisallowed)"));
+			// wysylamy zakaz blokowania przerwan, aby by to rozstrzygnac
+			PRINTLN((int)Event::Name::BlockingInterruptsDisallowed);
 			//releaseInterruptsTimer.Start();
-			intBlkDisallowed = true;
+			blockInterruptsDisallowed = true;
+			Event::Send(Event::Name::BlockingInterruptsDisallowed);
 		}
 		else
 		{
 			// kod nierozpoznany i wyslalismy juz wczesniej zakaz uzywania przerwan 
 			// oznacza to ze kod odczytal sie poprawnie, ale nie obslugujemy 
 			// wysylamy komunikat o nieznanym kodzie
-			args.button = Button::Unknown;
-			PRINT((int)args.button); PRINTLN(F("(Unknown)"));
+			PRINTLN((int)Event::Name::UnknowCode);
+			Event::Send(Event::Name::UnknowCode);
 		}
-
-		//event.Emit(args);
 	}
 
-	void Loop() {
-		// jesli jest zakaz uzywania przerwan i dosc dlugo nie odebrano zadnego kodu,
-		if (intBlkDisallowed && millis() - lastCodeTime > 3000)
+	// rozpoznaje kody z pilota
+	Event::Name GetEventName()
+	{
+		switch (results.value)
 		{
-			// to prawdopodobnie pilot nie bedzie w najblizszej chwili uzywany 
-			// uchylam zakaz uzywania przerwan
-			args.button = Button::IntBlkAllowed;
-			PRINT(F("IR: timeout -> ")); PRINT((int)args.button); PRINTLN(F("(IntBlkAllowed)"));
-			//event.Emit(args);
-			intBlkDisallowed = false;
-		}
-		if (irrecv->decode(results)) {
-			ProcessCode(results->value);
-			lastCodeTime = millis();
-			irrecv->resume();
+		case 0x175: case 0x975: return Event::Name::Start;
+		case 0x176: case 0x976: return Event::Name::Stop;
+		case 0x169: case 0x969: return Event::Name::Pause;
+
+		case 0x160: case 0x960: return Event::Name::CHANEL_PLUS;
+		case 0x161: case 0x961: return Event::Name::CHANEL_MINUS;
+
+		default: return Event::Name::UnknowCode;
 		}
 	}
-
-	enum struct Button : byte
-	{
-		Unknown = 0,
-		IntBlkDisallowed,
-		IntBlkAllowed,
-		CHANEL_PLUS,
-		CHANEL_MINUS,
-		PAUSE,
-		PLAY,
-		DIGIT_1,
-		DIGIT_2,
-		DIGIT_3
-	};
-
-	class EventArgs
-	{
-	public:
-		Button button;
-	};
-
-	//Event<EventArgs> event;
-
-private:
-	IRrecv *irrecv;
-	decode_results *results;
-	EventArgs args;
-	unsigned long lastCodeTime = 0;
-	bool intBlkDisallowed = false;
-
-	typedef const struct {
-		unsigned long code;
-		Button button;
-	} CodeMapper[];
-	static CodeMapper codeMapper;
-	static byte codeMapperCount;
-
-
 };
 
 extern RemoteController remoteController;

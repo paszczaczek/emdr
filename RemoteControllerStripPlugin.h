@@ -34,9 +34,9 @@ public:
 			updateLeds();
 	}
 
-	virtual void OnStart() override
+	virtual void Start() override
 	{
-		Plugin::OnStart();
+		Plugin::Start();
 		flashTimer.Start();
 	}
 

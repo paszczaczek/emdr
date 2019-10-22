@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "Emdr.h"
 
-//#include "Event.h"
+#include "Event.h"
 #include "RemoteController.h"
 
 using System::String;
@@ -38,10 +38,11 @@ namespace EmdrWrapper {
 	public ref class RemoteController
 	{
 	public:
-		static void ButtonReceived(int button)
+		static void ButtonReceived(int eventName)
 		{
-			::RemoteController::EventArgs args;
-			args.button = (::RemoteController::Button)button;
+			Event::Send((Event::Name)eventName);
+			//::RemoteController::EventArgs args;
+			//args.button = (::RemoteController::Button)button;
 			//remoteController.event.Emit(args);
 		}
 	};

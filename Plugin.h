@@ -10,10 +10,11 @@ public:
 	virtual ~Plugin() {};
 
 	virtual void Loop() = 0;
-	virtual void OnStart()  { state = State::Started; }
-	virtual void OnStop()   { state = State::Stopped; }
-	virtual void OnPause()  { state = State::Paused; }
-	virtual void OnResume() { state = State::Started; }
-	virtual void OnRemoteControllerEvent(RemoteController::EventArgs &) { }
+	virtual void Start()  { state = State::Started; }
+	virtual void Stop()   { state = State::Stopped; }
+	virtual void Pause()  { state = State::Paused; }
+	virtual void Resume() { state = State::Started; }
+
+	virtual bool Receive(Event::Name eventName) = 0;
 
 };

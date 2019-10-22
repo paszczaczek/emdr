@@ -3,5 +3,5 @@
 
 void Event::Send(Name name)
 {
-	stripDevice.ReceiveEvent(name);
+	stripDevice.Receive(name);
 }

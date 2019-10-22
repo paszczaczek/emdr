@@ -30,8 +30,7 @@
 
 // remote controller
 IRrecv irrecv(RC_PIN);
-decode_results irrecvResults;
-RemoteController remoteController(&irrecv, &irrecvResults);
+RemoteController remoteController;
 
 // strip plugins
 //DiagnosticStipPlugin diagnosticStipPlugin;
@@ -60,10 +59,10 @@ void setup()
 	irrecv.enableIRIn();
 	strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>();
 	//diagnosticStipPlugin.PowerOn();
-	movingPointStripPlugin.OnStart();
+	movingPointStripPlugin.Start();
 }
 
 void loop() {
 	remoteController.Loop();
-	strip.Loop();
+	stripDevice.Loop();
 }
