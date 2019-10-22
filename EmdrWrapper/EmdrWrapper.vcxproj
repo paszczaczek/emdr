@@ -133,6 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Debug.h" />
+    <ClInclude Include="..\Device.h" />
     <ClInclude Include="..\Emdr.h" />
     <ClInclude Include="..\Event.h" />
     <ClInclude Include="..\EventHandler.h" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
+    <ClCompile Include="..\Event.cpp" />
     <ClCompile Include="..\RemoteController.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />

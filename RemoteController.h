@@ -27,7 +27,7 @@ public:
 				args.button = codeMapper[i].button;
 				PRINTLN((int)args.button);
 				//event.Emit(args);
-				Event::Send(Event::Type::SELECT_STRIP_DEVICE);
+				Event::Send(Event::Name::SELECT_STRIP_DEVICE);
 				return;
 			}
 		}

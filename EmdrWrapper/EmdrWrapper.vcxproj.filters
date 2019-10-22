@@ -106,6 +106,9 @@
     <ClInclude Include="..\Event.h">
       <Filter>Emdr</Filter>
     </ClInclude>
+    <ClInclude Include="..\Device.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -134,6 +137,9 @@
     </ClCompile>
     <ClCompile Include="MemoryFree.cpp">
       <Filter>MemoryFree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Event.cpp">
+      <Filter>Emdr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

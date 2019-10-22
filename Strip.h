@@ -4,8 +4,9 @@
 #include <FastLED.h>
 #include "StripPlugin.h"
 #include "RemoteController.h"
+#include "Device.h"
 
-class Strip
+class Strip : public Device
 {
 public:
     Strip(CRGB *leds, byte ledsCount, StripPlugin **plugins, byte pluginsCount, int maxCurrent, byte ledsBrightness) :

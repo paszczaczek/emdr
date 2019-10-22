@@ -11,6 +11,7 @@
 #include "MovingPointStripPlugin.h"
 #include "RemoteController.h"
 #include "Event.h"
+#include "Device.h"
 //#include "RemoteControllerStripPlugin.h"
 //#include "DiagnosticStripPlugin.h"
 
@@ -49,6 +50,7 @@ Strip strip(
 	stripLeds, STRIP_LEDS_COUNT,
 	stripPlugins, stripPluginsCount,
 	STRIP_LEDS_MAX_CURRENT, STRIP_LEDS_BRIGHTNESS);
+Device& stripDevice = strip;
 
 void setup()
 {
