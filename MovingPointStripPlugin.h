@@ -31,11 +31,11 @@ private:
 	CRGB movingColor = CRGB(CRGB::Orange);
 
 	// czas zatrzymania swiecacego punktu na koncach tasmy mierzony w sekunach
-#define restDuration 2
+	static const byte restDuration = 2;
 
-// czas trwania zabiegu i czas informowanie o koncu zabiegu mierzone w sekundach
-#define sessionDuration    (unsigned long)60
-#define sessionEndDuration (unsigned long)10
+	// czas trwania zabiegu i czas informowanie o koncu zabiegu mierzone w sekundach
+	static const unsigned long sessionDuration = 60;
+	static const unsigned int sessionEndMarkerDuration = 10;
 
 public:
 	MovingPointStripPlugin()
@@ -101,14 +101,14 @@ public:
 	// mierzenie czasu zabiegu
 	void SessionTimerItsTime()
 	{
-		if (sessionTimer.interval == sessionEndDuration * 1000)
+		if (sessionTimer.interval == sessionEndMarkerDuration * 1000)
 		{
 			// minal czas sygnalizacji konca zabiegu, przywracamy normaly kolor
 			//Serial.print(F("session cont: ")); Serial.println(millis());
 			movingColor = -movingColor;
 			strip.controller->leds()[ledCurrent] = movingColor;
 			strip.updated = true;
-			sessionTimer.interval = (sessionDuration - sessionEndDuration) * 1000;
+			sessionTimer.interval = (sessionDuration - sessionEndMarkerDuration) * 1000;
 			return;
 		}
 		else
@@ -118,19 +118,16 @@ public:
 			movingColor = -movingColor;
 			strip.controller->leds()[ledCurrent] = movingColor;
 			strip.updated = true;
-			sessionTimer.interval = sessionEndDuration * 1000;
+			sessionTimer.interval = sessionEndMarkerDuration * 1000;
 			return;
 		}
 	}
 
+	// wystartowanie lub wznowienie plugina
 	void Start() override
 	{
-		switch (state)
+		if (state == State::Stopped)
 		{
-		case State::Started:
-			break;
-		case State::Stopped:
-		case State::Paused:
 			Plugin::Start();
 			SetMovingSpeed(movingSpeed);
 			movingCounter.Start();
@@ -138,15 +135,21 @@ public:
 			PRINTLN(F("Start"));
 			//PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));
 		}
+		else if (state == State::Paused)
+		{
+			Plugin::Start();
+			movingCounter.Resume();
+			restTimer.Start();
+			sessionTimer.Start();
+			PRINTLN(F("Resume"));
+		}
 	}
 
+	// zatrzymanie plagina
 	void Stop() override
 	{
-		switch (state)
+		if (state != State::Stopped)
 		{
-		case Plugin::State::Started:
-		case Plugin::State::Stopped:
-		case Plugin::State::Paused:
 			Plugin::Stop();
 			movingCounter.Stop();
 			restTimer.Stop();
@@ -155,26 +158,16 @@ public:
 		}
 	}
 
+	// zapauzowanie plagina
 	void Pause() override
 	{
-		switch (state)
+		if (state == State::Started)
 		{
-		case State::Started:
 			Plugin::Pause();
 			movingCounter.Pause();
 			restTimer.Stop();
 			sessionTimer.Stop();
 			PRINTLN(F("Pause"));
-			break;
-		case State::Stopped:
-			break;
-		case State::Paused:
-			Plugin::Resume();
-			movingCounter.Resume();
-			restTimer.Start();
-			sessionTimer.Start();
-			PRINTLN(F("Resume"));
-			break;
 		}
 	}
 
@@ -187,6 +180,7 @@ private:
 		PRINT(F("speed: ")); PRINT(speed); PRINTLN(F("d/s"));
 	}
 
+	// zwiêkszenie lub zmniejszenie predkosci poruszajacego sie punktu
 	void ChangeMovingSpeed(bool increase)
 	{
 		if (increase)
@@ -202,6 +196,7 @@ private:
 		SetMovingSpeed(movingSpeed);
 	}
 
+	// obsluga eventow
 	bool Receive(Event::Name eventName) override
 	{
 		switch (eventName)
