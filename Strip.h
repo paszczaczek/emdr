@@ -62,26 +62,6 @@ public:
 		return false;
 	}
 
-	//void OnRemoteControllerEvent(RemoteController::EventArgs &args)
-	//{
-	//    for (byte i = 0; i < pluginsCount; i++)
-	//        if (plugins[i]->state != Plugin::State::Stopped)
-	//            plugins[i]->OnRemoteControllerEvent(args);
-	//            /*switch (args.button)
-	//            {
-	//            case RemoteController::Button::InterruptsNeeded:
-	//                plugins[i]->OnPause();
-	//                break;
-	//            case RemoteController::Button::IntBlkAllowed:
-	//                plugins[i]->OnResume();
-	//                break;
-	//            default:
-	//                plugins[i]->OnRemoteControllerEvent(args);
-	//                break;
-	//            }*/
-
-	//}
-
 	void SetLeds(CRGB color)
 	{
 		for (int i = 0; i < controller->size(); i++)

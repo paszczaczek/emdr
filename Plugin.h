@@ -1,6 +1,5 @@
 #pragma once
-#include "Arduino.h"
-#include "RemoteController.h"
+#include "Event.h"
 
 class Plugin
 {
