@@ -25,7 +25,7 @@ private:
 	byte ledCurrent = 0;
 
 	// predkosc poruszania sie swiecacego punktu wyrazona w liczbie diod na sekunde
-	byte movingSpeed = 200;
+	byte movingSpeed = 10; // 200;
 
 	// kolor poruszajacego sie punktu
 	CRGB movingColor = CRGB(CRGB::Orange);
@@ -33,8 +33,10 @@ private:
 	// czas zatrzymania swiecacego punktu na koncach tasmy mierzony w sekunach
 	static const byte restDuration = 2;
 
-	// czas trwania zabiegu i czas informowanie o koncu zabiegu mierzone w sekundach
+	// czas trwania zabiegu
 	static const unsigned long sessionDuration = 60;
+
+	// czas informowanie o koncu zabiegu mierzone w sekundach
 	static const unsigned int sessionEndMarkerDuration = 10;
 
 public:

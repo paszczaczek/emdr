@@ -12,104 +12,139 @@
 
 class RemoteControllerStripPlugin : public StripPlugin
 {
+private:
+	Timer flashTimer;
+
 public:
 	RemoteControllerStripPlugin()
 	{
-		// subskrybuj eventy od pilota
-		remoteController.event += remoteControllerButtonPressedEventHandler.Set(
-			this, &RemoteControllerStripPlugin::onRemoteControllerButtonPressed);
-
-		// ustaw timer do migania diode po wcisnieciu guzika na pilocie
-		flashTimer.elapsed += flashTimerElapsedEventHandler.Set(
-			this, &RemoteControllerStripPlugin::onFlashTimerEvent);
-		flashTimer.autoReset = false;
-
-		flashTimer.interval = 250;// 90;
+		receivingLedState = ReceivingLedState::None;
+		blockingInterruptsLedState = BlockingInterruptsLedState::None;
+		flashTimer.interval = 90;
+		Start();
 	}
 
 	virtual void Loop() override
 	{
-		flashTimer.Loop();
-		if (state != Plugin::State::Stopped)
-			updateLeds();
-	}
-
-	virtual void Start() override
-	{
-		Plugin::Start();
-		flashTimer.Start();
-	}
-
-private:
-	TimerOLD flashTimer;
-	EventHandler<RemoteControllerStripPlugin, RemoteController::EventArgs> remoteControllerButtonPressedEventHandler;
-	EventHandler<RemoteControllerStripPlugin, TimerOLD::EventArgs> flashTimerElapsedEventHandler;
-	
-	enum struct LedState : byte { None, Off, Code, CodeUnsupported} ledState = LedState::None;
-	bool interruptsNedded = false;
-
-	void onRemoteControllerButtonPressed(RemoteController::EventArgs &args)
-	{
-		// wcisnieto guzik na pilocie
-		switch (args.button)
+		if (flashTimer.ItsTime(Timer::Mode::SingleShot))
 		{
-		case RemoteController::Button::Unknown:
-			ledState = LedState::CodeUnsupported;
-			flashTimer.Start();
-			break;
-		case RemoteController::Button::IntBlkDisallowed:
-			interruptsNedded = true;
-			break;
-		case RemoteController::Button::IntBlkAllowed:
-			interruptsNedded = false;
-			break;
-		default:
-			ledState = LedState::Code;
-			flashTimer.Start();
-			break;
+			FlashTimerItsTime();
+		}
+		else if (strip.updated)
+		{
+			UpdateReceivingLeds();
+			UpdateBlockingInterruptsLeds();
 		}
 	}
 
-	void onFlashTimerEvent(TimerOLD::EventArgs&)
+private:
+	enum struct ReceivingLedState : byte { None, TurnOn, TurnOnUnsupported, TurnOff };
+	enum struct BlockingInterruptsLedState : byte { None, TurnOn, TurnOff };
+
+	// stan diody sygnalizujacej wcisniecie guzika na pilocie
+	ReceivingLedState receivingLedState : 2;
+
+	// stan diody sygnalizujacej zakaz blokowania przerwan
+	BlockingInterruptsLedState blockingInterruptsLedState : 2;
+
+	void FlashTimerItsTime()
 	{
 		// czas zgasic diode sygnalizujaca wcisniecie guzika na pilocie
-		flashTimer.Stop();
-		ledState = LedState::Off;
+		receivingLedState = ReceivingLedState::TurnOff;
+		UpdateReceivingLeds();
+		//ledUpdateNeeded = true;
 	}
 
-	void updateLeds()
+	bool Receive(Event::Name eventName) override
 	{
-		// wyznacz kolor jaki ma miec dioda sygnalizujaca wcisniecie guzika na pilocie
-		CRGB biColor = CRGB::Black;
-		switch (ledState) {
-		case LedState::None:
+		// wcisnieto guzik na pilocie
+		switch (eventName)
+		{
+		case Event::Name::BlockingInterruptsDisallowed:
+			blockingInterruptsLedState = BlockingInterruptsLedState::TurnOn;
+			UpdateBlockingInterruptsLeds();
+			break;
+		case Event::Name::BlockingInterruptsAllowed:
+			blockingInterruptsLedState = BlockingInterruptsLedState::TurnOff;
+			UpdateBlockingInterruptsLeds();
+			break;
+		case Event::Name::UnknowCode:
+			receivingLedState = ReceivingLedState::TurnOnUnsupported;
+			flashTimer.Start();
+			UpdateReceivingLeds();
+			break;
+		default:
+			receivingLedState = ReceivingLedState::TurnOn;
+			flashTimer.Start();
+			UpdateReceivingLeds();
+			break;
+		}
+
+		return false;
+	}
+
+	// altualizacja koloru diody sygnalizujacej wcisniecie guzika na pilocie
+	void UpdateReceivingLeds()
+	{
+		CRGB ledColorNew = CRGB::Black;
+		switch (receivingLedState) {
+		case ReceivingLedState::None:
 			// zaden guzik na pilocie nie byl wciskany - nie ingerujemy w swiecenie diody
 			return;
-		case LedState::Off:
-			// wcisnieto guzik na pilocie ale czas swiecenia diody minal - wylaczyc diode
-			biColor = interruptsNedded ? CRGB::Green : CRGB::Black;
-			ledState = LedState::None;
-			break;
-		case LedState::Code:
+		case ReceivingLedState::TurnOn:
 			// wcisnieto obslugiwany guzik na pilocie - zapalic diode na czerwono
-			biColor = CRGB::Red;
+			ledColorNew = CRGB::Red;
 			break;
-		case LedState::CodeUnsupported:
+		case ReceivingLedState::TurnOnUnsupported:
 			// wcisnieto nieobslugiwany guzik na pilocie - zapalic diode na niebiesko
-			biColor = CRGB::Blue;
+			ledColorNew = CRGB::Violet;
+			break;
+		case ReceivingLedState::TurnOff:
+			// wczesniej wcisnieto guzik na pilocie - nadszedl czas zgaszenia go
+			receivingLedState = ReceivingLedState::None;
+			ledColorNew = CRGB::Black;
 			break;
 		}
 
 		// czy kolor zmienil sie?
-		CRGB &biColorCurrent = strip.controller->leds()[0];
-		if (biColor.r != biColorCurrent.r ||
-			biColor.g != biColorCurrent.g ||
-			biColor.b != biColorCurrent.b)
+		CRGB& ledColorCurrent = strip.controller->leds()[0];
+		if (ledColorNew.r != ledColorCurrent.r ||
+			ledColorNew.g != ledColorCurrent.g ||
+			ledColorNew.b != ledColorCurrent.b)
 		{
 			// tak
-			biColorCurrent = biColor;
-			// na razie zablokuje, do czasu gdy wyjasni sie czy potrzebny bedzie osobny strip dla remotecontrollera
-			// controller->showLeds(2);
+			ledColorCurrent = ledColorNew;
+			strip.updated = true;
+		}
+	}
+
+	// altualizacja koloru diody sygnalizujacej zakaz blokowania przerwan
+	void UpdateBlockingInterruptsLeds()
+	{
+		CRGB ledColorNew = CRGB::Black;
+		switch (blockingInterruptsLedState) {
+		case BlockingInterruptsLedState::None:
+			// zaden guzik na pilocie nie byl wciskany - nie ingerujemy w swiecenie diody
+			return;
+		case BlockingInterruptsLedState::TurnOn:
+			// wcisnieto obslugiwany guzik na pilocie - zapalic diode na czerwono
+			ledColorNew = CRGB::Green;
+			break;
+		case BlockingInterruptsLedState::TurnOff:
+			// wcisnieto nieobslugiwany guzik na pilocie - zapalic diode na niebiesko
+			blockingInterruptsLedState = BlockingInterruptsLedState::None;
+			ledColorNew = CRGB::Black;
+			break;
+		}
+
+		// czy kolor zmienil sie?
+		CRGB& ledColorCurrent = strip.controller->leds()[1];
+		if (ledColorNew.r != ledColorCurrent.r ||
+			ledColorNew.g != ledColorCurrent.g ||
+			ledColorNew.b != ledColorCurrent.b)
+		{
+			// tak
+			ledColorCurrent = ledColorNew;
 			strip.updated = true;
 		}
 	}

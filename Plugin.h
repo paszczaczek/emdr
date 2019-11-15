@@ -4,7 +4,7 @@
 class Plugin
 {
 public:
-	enum struct State :byte { Started, Stopped, Paused } state = State::Stopped;
+	enum struct State : byte { Started, Stopped, Paused } state = State::Stopped;
 
 	virtual ~Plugin() {};
 

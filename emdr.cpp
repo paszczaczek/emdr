@@ -12,7 +12,7 @@
 #include "RemoteController.h"
 #include "Event.h"
 #include "Device.h"
-//#include "RemoteControllerStripPlugin.h"
+#include "RemoteControllerStripPlugin.h"
 //#include "DiagnosticStripPlugin.h"
 
 #define MAX_CURRENT_FROM_EXT 1000 // Total maximum current draw when powered via external power supply
@@ -35,12 +35,12 @@ RemoteController remoteController;
 // strip plugins
 //DiagnosticStipPlugin diagnosticStipPlugin;
 MovingPointStripPlugin movingPointStripPlugin;
-//RemoteControllerStripPlugin remoteControllerstripPlugin;
-const byte stripPluginsCount = /*3*/1;
+RemoteControllerStripPlugin remoteControllerstripPlugin;
+const byte stripPluginsCount = /*3*/2;
 StripPlugin* stripPlugins[stripPluginsCount] = {
   //&diagnosticStipPlugin,
-  &movingPointStripPlugin/*,
-  &remoteControllerstripPlugin*/
+  &movingPointStripPlugin,
+  &remoteControllerstripPlugin
 };
 
 // strip
@@ -55,6 +55,7 @@ void setup()
 {
 	Serial.begin(115200);
 	PRINT_FREEMEM(F("setup"));
+	PRINTLN(sizeof(Timer));
 
 	irrecv.enableIRIn();
 	strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>();

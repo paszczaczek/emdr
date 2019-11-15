@@ -17,17 +17,17 @@ private:
 	unsigned long lastCodeTime = 0;
 
 	// czy zakaz blokowania przerwan obiwiazuje
-	bool blockInterruptsDisallowed = false;
+	bool isBlockingInterruptsDisallowed = false;
 
 public:
 	void Loop() {
 		// jesli jest zakaz blokowania przerwan i dosc dlugo nie odebrano zadnego kodu,
-		if (blockInterruptsDisallowed && millis() - lastCodeTime > 3000)
+		if (isBlockingInterruptsDisallowed && millis() - lastCodeTime > 3000)
 		{
 			// to prawdopodobnie pilot nie bedzie w najblizszej chwili uzywany 
 			// uchylam zakaz uzywania przerwan
 			PRINT(F("IR: timeout -> ")); PRINTLN((int)Event::Name::BlockingInterruptsAllowed);
-			blockInterruptsDisallowed = false;
+			isBlockingInterruptsDisallowed = false;
 			Event::Send(Event::Name::BlockingInterruptsAllowed);
 		}
 		if (irrecv.decode(&results)) {
@@ -54,15 +54,15 @@ private:
 		}
 
 		// kod nierozpoznany
-		if (!blockInterruptsDisallowed)
+		if (!isBlockingInterruptsDisallowed)
 		{
 			// kod nierozpoznay i nie wiadomo czy dlatego ze:
 			// a. strip zablokowal przerwania przeklamujac odczyt kodu
 			// b. odczyt kodu jest poprawny ale go nie obslugujemy
 			// wysylamy zakaz blokowania przerwan, aby by to rozstrzygnac
-			PRINTLN((int)Event::Name::BlockingInterruptsDisallowed);
-			//releaseInterruptsTimer.Start();
-			blockInterruptsDisallowed = true;
+			isBlockingInterruptsDisallowed = true;
+			PRINT(F("UNKNOWN -> BLOCK"));
+			Event::Send(Event::Name::UnknowCode);
 			Event::Send(Event::Name::BlockingInterruptsDisallowed);
 		}
 		else
@@ -70,7 +70,7 @@ private:
 			// kod nierozpoznany i wyslalismy juz wczesniej zakaz uzywania przerwan 
 			// oznacza to ze kod odczytal sie poprawnie, ale nie obslugujemy 
 			// wysylamy komunikat o nieznanym kodzie
-			PRINTLN((int)Event::Name::UnknowCode);
+			PRINTLN(F("UNKNOWN"));
 			Event::Send(Event::Name::UnknowCode);
 		}
 	}
