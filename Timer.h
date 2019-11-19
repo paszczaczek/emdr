@@ -4,6 +4,7 @@
 //#include "Event.h"
 
 // Klasa bazowa dla Timerow i Counterow, wylicza czasy aktywacji
+template <class TStorage = unsigned int>
 class Timer
 {
 public:
@@ -75,11 +76,11 @@ public:
 		// tak, nadszedl czas wystrzelenia timera
 		switch (mode)
 		{
-		case Timer::Mode::SingleShot:
+		case Timer<TStorage>::Mode::SingleShot:
 			// to timer jednorazowy - stopujemy go
 			Stop();
 			break;
-		case Timer::Mode::MultiShot:
+		case Timer<TStorage>::Mode::MultiShot:
 			// to timer wielorazowy - uruchamiamy ponownie
 			// korygujac moment startu ze wzgledu na pominiete interwaly
 			startedAt += (1 + ommittedIntervals) * interval;
@@ -91,7 +92,8 @@ public:
 };
 
 // Licznik w roznych warianach
-class Counter : public Timer
+template <class TStorage = unsigned int>
+class Counter : public Timer<TStorage>
 {
 public:
 	// warianty licznika
@@ -109,26 +111,26 @@ public:
 	void Start()
 	{
 		counter = (unsigned int)-1;
-		Timer::Start();
+		Timer<TStorage>::Start();
 	}
 
 	// zatrzymanie licznika
 	void Stop()
 	{
-		Timer::Stop();
+		Timer<TStorage>::Stop();
 		counter = (unsigned int)-1;
 	}
 
 	// zapauzowanie licznika
 	void Pause()
 	{
-		Timer::Stop();
+		Timer<TStorage>::Stop();
 	}
 
 	// wznowienie licznika
 	void Resume()
 	{
-		Timer::Start();
+		Timer<TStorage>::Start();
 	}
 
 	// czy nadszedl czas aktywacji licznika
@@ -149,8 +151,8 @@ public:
 
 		// czy nadszedl czas aktywacji licznika?
 		unsigned int ommitedCounters;
-		bool elapsed = Timer::ItsTime(
-			Timer::Mode::MultiShot,
+		bool elapsed = Timer<TStorage>::ItsTime(
+			Timer<TStorage>::Mode::MultiShot,
 			&ommitedCounters);
 		if (elapsed)
 		{
@@ -164,7 +166,8 @@ public:
 };
 
 // Licznik okresowy w roznych wariantach
-class CounterPeriodic : public Counter
+template <class TStorage = unsigned int>
+class CounterPeriodic : public Counter<TStorage>
 {
 public:
 	// wartosc do ktorej odliczac
@@ -187,7 +190,7 @@ public:
 			*outOmmittedCounters = 0;
 
 		// czy licznik jest wystartowany?
-		if (!IsStarted())
+		if (!this->IsStarted())
 		{
 			// nie
 			return false;
@@ -198,29 +201,34 @@ public:
 			if (countTo <= 1)
 			{
 				Serial.println(F("* CounterPeriodic::counterTo=0!"));
-				Stop();
+				this->Stop();
 				return false;
 			}
 		}
 
 		// czy naszedla czas aktywacji licznika?
 		unsigned int ommittedCounters;
-		bool itsTime = Counter::ItsTime(
-			static_cast<Counter::Options>(options),
-			counter,
+		bool itsTime = Counter<TStorage>::ItsTime(
+			static_cast<typename Counter<TStorage>::Options>(options),
+			this->counter,
 			&ommittedCounters);
 
 		// jesli nie to konczymy
-		if (!itsTime || counter == 0)
+		if (!itsTime || this->counter == 0)
 			return itsTime;
 
 		// nadszedl czas aktywacji licznika, wyznaczamy wartosci licznika i okresu
 		switch (mode)
 		{
-		case CounterPeriodic::UpDown: CalculationForUpDownCounter(outCounter, outPeriod); break;
+		case CounterPeriodic::UpDown: 
+			CalculationForUpDownCounter(outCounter, outPeriod); 
+			break;
 		case CounterPeriodic::Up:
 		case CounterPeriodic::Down:
-		case CounterPeriodic::DownUp: Serial.println(F("* Not implemented yet!")); Stop();  return false;
+		case CounterPeriodic::DownUp: 
+			Serial.println(F("* Not implemented yet!")); 
+			this->Stop();  
+			return false;
 		}
 
 		// wylapanie ominietego 1 lub max
@@ -234,7 +242,7 @@ public:
 	}
 
 private:
-	// obliczenia wartosci licznika i okresu dla licznika licz¹cego okresowo w gore i w dol od 1 do zadanej wartosci
+	// obliczenia wartosci licznika i okresu dla licznika liczacego okresowo w gore i w dol od 1 do zadanej wartosci
 	void CalculationForUpDownCounter(unsigned int& outCounter, unsigned int* outPeriod)
 	{
 		/*
@@ -255,8 +263,8 @@ private:
 					t t t      fallingSlope
 		*/
 		// wyznaczamy wartosc licznika
-		outCounter = (counter - 1) % (countTo - 1);
-		bool fallingSlope = (counter - 1) / (countTo - 1) % 2 == 1;
+		outCounter = (this->counter - 1) % (this->countTo - 1);
+		bool fallingSlope = (this->counter - 1) / (this->countTo - 1) % 2 == 1;
 		if (fallingSlope)
 			if (outCounter == 0)
 				outCounter = countTo;
@@ -267,7 +275,7 @@ private:
 
 		// wyznaczamy okres
 		if (outPeriod)
-			*outPeriod = (counter - 1) / (2 * countTo - 2) + 1;
+			*outPeriod = (this->counter - 1) / (2 * countTo - 2) + 1;
 	}
 
 	// wylapywanie pominietych wartosci min i max
@@ -278,16 +286,16 @@ private:
 			return;
 
 		// sprawdzamy czy zostalo pominiete 1 lub max
-		bool fallingSlope = (counter - 1) / (countTo - 1) % 2 == 1;
+		bool fallingSlope = (this->counter - 1) / (countTo - 1) % 2 == 1;
 		if (fallingSlope)
 		{
 			if (ommittedCounters >= countTo - outCounter)
 			{
 				// zostalo pominiete max - cofamy licznik do max
 				//Serial.println("catched ommited max");
-				counter -= countTo - outCounter;
+				this->counter -= countTo - outCounter;
 				outCounter = countTo;
-				// TODO: ew. cofniecie *outPeriod
+				(void)outPeriod; // TODO: ew. cofniecie *outPeriod
 			}
 		}
 		else // raisingSlope
@@ -296,22 +304,28 @@ private:
 			{
 				// zostalo pominiete 1 - cofamy licznik do 1
 				//Serial.println("catched ommited 1");
-				counter -= outCounter - 1;
+				this->counter -= outCounter - 1;
 				outCounter = 1;
-				// TODO: ew. cofniecie *outPeriod
+				(void)outPeriod; // TODO: ew. cofniecie *outPeriod
 			}
 		}
 	}
 };
 
 // operator bitowy | dla enum Counter::Options
-inline Counter::Options operator|(Counter::Options a, Counter::Options b)
+template <typename TStorage>
+inline typename Counter<TStorage>::Options operator|(
+	typename Counter<TStorage>::Options a, 
+	typename Counter<TStorage>::Options b)
 {
-	return static_cast<Counter::Options>(static_cast<byte>(a) | static_cast<byte>(b));
+	return static_cast<typename Counter<TStorage>::Options>(static_cast<byte>(a) | static_cast<byte>(b));
 }
 
 // operator bitowy | dla enum CounterPeriodic::Options
-inline CounterPeriodic::Options operator|(CounterPeriodic::Options a, CounterPeriodic::Options b)
+template <class TStorage>
+inline typename CounterPeriodic<TStorage>::Options operator|(
+	typename CounterPeriodic<TStorage>::Options a, 
+	typename CounterPeriodic<TStorage>::Options b)
 {
-	return static_cast<CounterPeriodic::Options>(static_cast<byte>(a) | static_cast<byte>(b));
+	return static_cast<typename CounterPeriodic<TStorage>::Options>(static_cast<byte>(a) | static_cast<byte>(b));
 }

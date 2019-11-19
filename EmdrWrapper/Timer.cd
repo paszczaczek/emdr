@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Counter&lt;TStorage&gt;">
+    <Position X="2.75" Y="0.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="Counter&lt;TStorage&gt;::Mode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\marcin\Documents\Arduino\emdr\Timer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="Counter&lt;TStorage&gt;::Options" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\marcin\Documents\Arduino\emdr\Timer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAACAAACAAAAAAAAAAAAAAAAEAIAAAAAgAAAA=</HashCode>
+      <FileName>C:\Users\marcin\Documents\Arduino\emdr\Timer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CounterPeriodic&lt;TStorage&gt;">
+    <Position X="5" Y="0.5" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="CounterPeriodic&lt;TStorage&gt;::Mode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\marcin\Documents\Arduino\emdr\Timer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="CounterPeriodic&lt;TStorage&gt;::Options" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\marcin\Documents\Arduino\emdr\Timer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAgAAAAAAAAAAAAAAACAAAAAAAAAQ=</HashCode>
+      <FileName>C:\Users\marcin\Documents\Arduino\emdr\Timer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

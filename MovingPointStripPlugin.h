@@ -10,13 +10,13 @@ class MovingPointStripPlugin : public StripPlugin
 {
 private:
 	// licznik poruszajacy swiecacym punktem
-	CounterPeriodic movingCounter;
+	CounterPeriodic<> movingCounter;
 
 	// timer zatrzymujacy swiecacy punkt na koncach tasmy
-	Timer restTimer;
+	Timer<> restTimer;
 
 	// timer odmierzajacy czas zabiegu
-	Timer sessionTimer;
+	Timer<> sessionTimer;
 
 	// nummer pierwszej swiecacej diody; numer ostatniej diody jest w movingCounter.countTo + ledFirst
 	byte ledFirst = 0;
@@ -55,18 +55,18 @@ public:
 		unsigned int counter = 0;
 		unsigned int period = 0;
 		if (movingCounter.ItsTime(
-			CounterPeriodic::Mode::UpDown,
-			CounterPeriodic::Options::CatchMinMax,
+			CounterPeriodic<>::Mode::UpDown,
+			CounterPeriodic<>::Options::CatchMinMax,
 			counter,
 			&period))
 			MovingCounterItsTime(counter, &period);
 
 		// pauza na krancach tasmy
-		if (restTimer.ItsTime(Timer::Mode::SingleShot))
+		if (restTimer.ItsTime(Timer<>::Mode::SingleShot))
 			RestTimerItsTime();
 
 		// sygnalizacja miniecia czasu zabiegu
-		if (sessionTimer.ItsTime(Timer::Mode::MultiShot))
+		if (sessionTimer.ItsTime(Timer<>::Mode::MultiShot))
 			SessionTimerItsTime();
 	}
 
@@ -182,7 +182,7 @@ private:
 		PRINT(F("speed: ")); PRINT(speed); PRINTLN(F("d/s"));
 	}
 
-	// zwiêkszenie lub zmniejszenie predkosci poruszajacego sie punktu
+	// zwiekszenie lub zmniejszenie predkosci poruszajacego sie punktu
 	void ChangeMovingSpeed(bool increase)
 	{
 		if (increase)
@@ -225,6 +225,8 @@ private:
 			break;
 		case Event::Name::CHANEL_MINUS:
 			ChangeMovingSpeed(false);
+			break;
+		default:
 			break;
 		}
 
