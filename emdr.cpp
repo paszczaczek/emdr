@@ -55,7 +55,7 @@ void setup()
 {
 	Serial.begin(115200);
 	PRINT_FREEMEM(F("setup"));
-	PRINTLN(sizeof(Timer));
+	PRINTLN(sizeof(Timer<>));
 
 	irrecv.enableIRIn();
 	strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>();

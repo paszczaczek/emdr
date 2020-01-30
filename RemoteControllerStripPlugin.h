@@ -13,7 +13,7 @@
 class RemoteControllerStripPlugin : public StripPlugin
 {
 private:
-	Timer flashTimer;
+	Timer<> flashTimer;
 
 public:
 	RemoteControllerStripPlugin()
@@ -26,7 +26,7 @@ public:
 
 	virtual void Loop() override
 	{
-		if (flashTimer.ItsTime(Timer::Mode::SingleShot))
+		if (flashTimer.ItsTime(Timer<>::Mode::SingleShot))
 		{
 			FlashTimerItsTime();
 		}
