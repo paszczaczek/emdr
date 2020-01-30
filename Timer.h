@@ -1,7 +1,167 @@
-#pragma once
+﻿#pragma once
 #include <Arduino.h>
 #include <stdio.h>
 //#include "Event.h"
+
+#define TIMER_DEBUG 1
+
+class Timer2
+{
+public:	
+	
+
+	// Czas trwania interwalu.
+	enum class Interval : byte {
+		ms1, ms2, ms4, ms8, ms16, ms32, ms64, ms128, ms256, ms512, ms1024,
+		s1 = ms1024, s2, s4, s8, s16, s32, s64,
+		m1 = s64, m2, m4, m8, m16, m32, m64,
+		h1 = m64, h2, h4, h8, h16, h32, h64, h128
+	};
+
+	// Pojemnosc licznika.
+	enum class Capacity : byte {
+		bit1 = 1, values2 = bit1,
+		bits2, values4 = bits2,
+		bits3, values8 = bits3,
+		bits4, values16 = bits4,
+		bits5, values32 = bits5,
+		bits6, values64 = bits6,
+		bits7, values128 = bits7,
+		bits8, values256 = bits8,
+		bits9, values512 = bits9,
+		bits10, values1024 = bits10,
+		bits11, values2k = bits11,
+		bits12, values4k = bits12,
+		bits13, values8k = bits13,
+		bits14, values16k = bits14,
+		bits15, values32k = bits15,
+		bits16, values65k = bits16,
+		bits17, values131k = bits17,
+		bits18, values262k = bits18,
+		bits19, values524k = bits19,
+		bits20, values1048k = bits20,
+		bits21, values2m = bits21,
+		bits22, values4m = bits22,
+		bits23, values8m = bits23,
+		bits24, values16m = bits24,
+		bits25, values33m = bits25,
+		bits26, values67m = bits26,
+		bits27, values134m = bits27,
+		bits28, values268m = bits28,
+		bits29, values536m = bits29,
+		bits30, values1073m = bits30,
+		bits31, values2g = bits31,
+		bits32, values4g = bits32
+	};
+
+	// Czy nadszel czas wystrzelenia licznika.
+	static bool ItsTime(
+		Interval interval,
+		Capacity capacity,
+		unsigned long* startedAt,
+		unsigned int countTo,
+		char label = '\0')
+	{
+		if (!IsStarted(countTo))
+			return false;
+
+		unsigned long nowMs = millis();
+		unsigned long startedAtMs = *startedAt << (byte)interval;
+		unsigned long elapsedMs = nowMs - startedAtMs;
+		unsigned long elapsedIntervals = Window(interval, capacity, elapsedMs);
+		if (elapsedIntervals >= countTo)
+		{
+			*startedAt = Now(interval, capacity);
+#if TIMER_DEBUG
+			static unsigned long prev = 0;
+			if (label)
+			{
+				const char tmp[2] = { label, 0 };
+				Serial.print(tmp);
+				Serial.print(F(" "));
+			}
+			Serial.print(millis());
+			Serial.print(F(" "));
+			Serial.print(elapsedIntervals);
+			Serial.print(F(" "));
+			Serial.println(nowMs - prev);
+			prev = nowMs;
+#endif
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	static unsigned long Now(Interval interval, Capacity capacity)
+	{
+		return Window(interval, capacity, millis());
+	}
+
+
+	static unsigned long Window(Interval interval, Capacity capacity, unsigned long ms)
+	{
+		// ........ ........ ..XXXXXX X......  - window i millis()
+		byte shiftLeft = (byte)interval;
+		byte windowWidth = (byte)capacity;
+
+		if (shiftLeft + windowWidth > 32)
+		{
+			Serial.println(F("*err Timer::Now"));
+			return 0;
+		}
+
+		byte shiftRight = 32 - shiftLeft - windowWidth;
+
+		unsigned long window = ms;
+		//Serial.print(shiftRight); Serial.print(F(" ")); Serial.print(window); Serial.print(F(" -> "));
+		window <<= shiftRight;
+		window >>= shiftRight;
+		window >>= shiftLeft;
+		//Serial.println(window);
+
+		return window;
+	}
+
+	// Czy nadszedl czas na wystrzelenie timera?
+	static bool ItsTime(
+		Interval resolution,
+		Capacity capacity,
+		unsigned long& startedAt)
+	{
+		return true;
+	}
+
+	// Uruchomienie timera.
+	static unsigned long Start(Interval resolution, Capacity capacity)
+	{
+		return Now(resolution, capacity);
+	}
+
+	// Zatrzymanie timera.
+	static unsigned long Stop()
+	{
+		return -1;
+	}
+
+	// Czy timer jest uruchomiony?
+	static bool IsStarted(unsigned long countTo)
+	{
+		return countTo != 0;
+	}
+	/*static bool IsStarted(unsigned long startedAt, Capacity capacity)
+	{
+		byte windowWidth = (byte)capacity;
+
+		unsigned long maxValue = 0;
+		for (byte n = 0; n < windowWidth; n++)
+			maxValue |= 1 << n;
+
+		return startedAt != maxValue;
+	}*/
+};
 
 // Klasa bazowa dla Timerow i Counterow, wylicza czasy aktywacji
 class Timer
@@ -59,9 +219,9 @@ public:
 		unsigned int elapsedIntervals = (millis() - startedAt) / interval;
 
 		// ile interwalow zostalo pominietych
-		unsigned int ommittedIntervals 
+		unsigned int ommittedIntervals
 			= elapsedIntervals > 1
-			? elapsedIntervals - 1 
+			? elapsedIntervals - 1
 			: 0;
 
 		// zwrocenie liczby pominietych intervalow
@@ -234,7 +394,7 @@ public:
 	}
 
 private:
-	// obliczenia wartosci licznika i okresu dla licznika licz�cego okresowo w gore i w dol od 1 do zadanej wartosci
+	// obliczenia wartosci licznika i okresu dla licznika liczącego okresowo w gore i w dol od 1 do zadanej wartosci
 	void CalculationForUpDownCounter(unsigned int& outCounter, unsigned int* outPeriod)
 	{
 		/*

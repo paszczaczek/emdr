@@ -9,29 +9,11 @@
 class MovingPointStripPlugin : public StripPlugin
 {
 private:
-	// licznik poruszajacy swiecacym punktem
-	CounterPeriodic movingCounter;
-
-	// timer zatrzymujacy swiecacy punkt na koncach tasmy
-	Timer restTimer;
-
-	// timer odmierzajacy czas zabiegu
-	Timer sessionTimer;
-
-	// nummer pierwszej swiecacej diody; numer ostatniej diody jest w movingCounter.countTo + ledFirst
-	byte ledFirst = 0;
-
-	// numer aktualnie swiecacgo punktu
-	byte ledCurrent = 0;
-
 	// predkosc poruszania sie swiecacego punktu wyrazona w liczbie diod na sekunde
 	byte movingSpeed = 10; // 200;
 
 	// kolor poruszajacego sie punktu
 	CRGB movingColor = CRGB(CRGB::Orange);
-
-	// czas zatrzymania swiecacego punktu na koncach tasmy mierzony w sekunach
-	static const byte restDuration = 2;
 
 	// czas trwania zabiegu
 	static const unsigned long sessionDuration = 60;
@@ -39,90 +21,110 @@ private:
 	// czas informowanie o koncu zabiegu mierzone w sekundach
 	static const unsigned int sessionEndMarkerDuration = 10;
 
+	static const Timer2::Interval movingTimerInterval = Timer2::Interval::ms32;
+	static const Timer2::Capacity movingTimerCapacity = Timer2::Capacity::bit1;
+
+	static const Timer2::Interval pauseTimerInterval = Timer2::Interval::ms512;
+	static const Timer2::Capacity pauseTimerCapacity = Timer2::Capacity::bits4;
+
+	unsigned int movingTimerStartedAt : static_cast<int>(movingTimerCapacity);
+	unsigned int movingLedNo : 8;
+	unsigned int movingLedDirection : 1;
+
+	unsigned int pauseTimerStartedAt : static_cast<int>(pauseTimerCapacity);
+	unsigned int pauseTimerCountTo : static_cast<int>(pauseTimerCapacity);
+	
+	// czas zatrzymania swiecacego punktu na koncach tasmy
+	unsigned int pauseDuration : static_cast<int>(pauseTimerCapacity);
+
 public:
 	MovingPointStripPlugin()
 	{
-		movingCounter.interval = 5;
-		movingCounter.countTo = 30;
-		restTimer.interval = restDuration * 1000;
-		sessionTimer.interval = sessionDuration * 1000;
+		//restTimer.interval = restDuration * 1000;
+		//sessionTimer.interval = sessionDuration * 1000;
+
+		movingTimerStartedAt = Timer2::Now(movingTimerInterval, movingTimerCapacity);
+		movingLedNo = 0;
+		movingLedDirection = 0;
+
+		pauseTimerStartedAt = Timer2::Now(pauseTimerInterval, pauseTimerCapacity);
+		pauseTimerCountTo = 0;
+		pauseDuration = 2;
 	}
 
 	// petla zdarzen
 	virtual void Loop() override
 	{
-		// poruszanie swiecacym punktem
-		unsigned int counter = 0;
-		unsigned int period = 0;
-		if (movingCounter.ItsTime(
-			CounterPeriodic::Mode::UpDown,
-			CounterPeriodic::Options::CatchMinMax,
-			counter,
-			&period))
-			MovingCounterItsTime(counter, &period);
+		unsigned long counterStartedAt;
+		
+		// przesuwanie swiecacego punktu
+		counterStartedAt = movingTimerStartedAt;
+		if (pauseTimerCountTo == 0 && Timer2::ItsTime(
+			movingTimerInterval, movingTimerCapacity,
+			&counterStartedAt, 1, 'm'))
+		{
+			movingTimerStartedAt = counterStartedAt;
+			MovePoint();
+		}
 
-		// pauza na krancach tasmy
-		if (restTimer.ItsTime(Timer::Mode::SingleShot))
-			RestTimerItsTime();
-
-		// sygnalizacja miniecia czasu zabiegu
-		if (sessionTimer.ItsTime(Timer::Mode::MultiShot))
-			SessionTimerItsTime();
+		// pauza na krancowych diodach
+		counterStartedAt = pauseTimerStartedAt;
+		if (Timer2::ItsTime(
+			pauseTimerInterval, pauseTimerCapacity,
+			&counterStartedAt, pauseTimerCountTo, 'p'))
+		{
+			pauseTimerStartedAt = counterStartedAt;
+			movingTimerStartedAt = counterStartedAt;
+			pauseTimerCountTo = 0;
+		}
 	}
 
-	// poruszanie swiecacym punktem
-	void MovingCounterItsTime(unsigned int counter, unsigned int* period)
+	void MovePoint()
 	{
-		// na krancach tasmy zrob pauze
-		if ((counter == 1 && *period > 1) ||
-			counter == movingCounter.countTo)
-		{
-			//Serial.println(F("pause"));
-			movingCounter.Pause();
-			restTimer.Start();
-		}
+		// czy trwa pauza na pierwszej i ostatniej diody
+		if (pauseTimerCountTo > 0)
+			return;
 
 		// gasimy aktualnie swiecaca sie diode
-		strip.controller->leds()[ledCurrent] = CRGB::Black;
+		strip.controller->leds()[movingLedNo] = CRGB::Black;
 
-		// i zapalamy nastepna 
-		ledCurrent = counter - 1 + ledFirst;
-		strip.controller->leds()[ledCurrent] = movingColor;
-
-		strip.updated = true;
-	}
-
-	// koniec pauzy na krancach tasmy
-	void RestTimerItsTime()
-	{
-		//Serial.println(F("resume"));
-		restTimer.Stop();
-		movingCounter.Resume();
-	}
-
-	// mierzenie czasu zabiegu
-	void SessionTimerItsTime()
-	{
-		if (sessionTimer.interval == sessionEndMarkerDuration * 1000)
-		{
-			// minal czas sygnalizacji konca zabiegu, przywracamy normaly kolor
-			//Serial.print(F("session cont: ")); Serial.println(millis());
-			movingColor = -movingColor;
-			strip.controller->leds()[ledCurrent] = movingColor;
-			strip.updated = true;
-			sessionTimer.interval = (sessionDuration - sessionEndMarkerDuration) * 1000;
-			return;
-		}
+		// ruch w kierunku ostaniej diody
+		if (movingLedDirection == 0)
+			if (movingLedNo < strip.controller->size() - 1)
+			{
+				// nastepna dioda
+				movingLedNo++;
+			}
+			else
+			{
+				// ostatnia dioda - zmiana kierunku
+				movingLedDirection = 1;
+				movingLedNo--;
+			}
+		// ruch w kierunku pierwszej diody
 		else
+			if (movingLedNo > 0)
+			{
+				// poprzednia dioda
+				movingLedNo--;
+			}
+			else
+			{
+				// pierwsza dioda - zmiana kierunku
+				movingLedDirection = 0;
+				movingLedNo++;
+			}
+
+		// pauze na pierwszej i ostatniej diodzie
+		if (movingLedNo == 0 && movingLedDirection == 1 ||
+			movingLedNo == strip.controller->size() - 1 && movingLedDirection == 0)
 		{
-			// minal czas zabiegu, sugnalizujemy to chwilowa zmiana koloru poruszajacego sie punktu
-			Serial.print(F("session end: ")); Serial.println(millis());
-			movingColor = -movingColor;
-			strip.controller->leds()[ledCurrent] = movingColor;
-			strip.updated = true;
-			sessionTimer.interval = sessionEndMarkerDuration * 1000;
-			return;
+			pauseTimerStartedAt = Timer2::Now(pauseTimerInterval, pauseTimerCapacity);
+			pauseTimerCountTo = pauseDuration;
 		}
+
+		strip.controller->leds()[movingLedNo] = movingColor;
+		strip.updated = true;
 	}
 
 	// wystartowanie lub wznowienie plugina
@@ -132,17 +134,17 @@ public:
 		{
 			Plugin::Start();
 			SetMovingSpeed(movingSpeed);
-			movingCounter.Start();
-			sessionTimer.Start();
+			//movingCounter.Start();
+			//sessionTimer.Start();
 			PRINTLN(F("Start"));
 			//PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));
 		}
 		else if (state == State::Paused)
 		{
 			Plugin::Start();
-			movingCounter.Resume();
-			restTimer.Start();
-			sessionTimer.Start();
+			//movingCounter.Resume();
+			//restTimer.Start();
+			//sessionTimer.Start();
 			PRINTLN(F("Resume"));
 		}
 	}
@@ -153,9 +155,9 @@ public:
 		if (state != State::Stopped)
 		{
 			Plugin::Stop();
-			movingCounter.Stop();
-			restTimer.Stop();
-			sessionTimer.Stop();
+			//movingCounter.Stop();
+			//restTimer.Stop();
+			//sessionTimer.Stop();
 			PRINTLN(F("Stop"));
 		}
 	}
@@ -166,9 +168,9 @@ public:
 		if (state == State::Started)
 		{
 			Plugin::Pause();
-			movingCounter.Pause();
-			restTimer.Stop();
-			sessionTimer.Stop();
+			//movingCounter.Pause();
+			//restTimer.Stop();
+			//sessionTimer.Stop();
 			PRINTLN(F("Pause"));
 		}
 	}
@@ -178,7 +180,7 @@ private:
 	void SetMovingSpeed(byte speed)
 	{
 		// speed
-		movingCounter.interval = (unsigned long)(1 / (float)speed * 1000);
+		//movingCounter.interval = (unsigned long)(1 / (float)speed * 1000);
 		PRINT(F("speed: ")); PRINT(speed); PRINTLN(F("d/s"));
 	}
 
@@ -206,10 +208,10 @@ private:
 		case Event::Name::UnknowCode:
 			break;
 		case Event::Name::BlockingInterruptsDisallowed:
-			movingCounter.Pause();
+			//movingCounter.Pause();
 			break;
 		case Event::Name::BlockingInterruptsAllowed:
-			movingCounter.Resume();
+			//movingCounter.Resume();
 			break;
 		case Event::Name::Start:
 			Start();
