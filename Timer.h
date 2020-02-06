@@ -7,8 +7,8 @@
 
 class Timer2
 {
-public:	
-	
+public:
+
 
 	// Czas trwania interwalu.
 	enum class Interval : byte {
@@ -59,10 +59,61 @@ public:
 		Interval interval,
 		Capacity capacity,
 		unsigned long* startedAt,
-		unsigned int countTo,
-		unsigned long* omittedIntervals,
+		unsigned long countTo,
+		unsigned long* ommitted,
 		char label = '\0')
 	{
+		/*
+		...x xx.. .... ....   window, interval=1024ms, capacity=3bity
+		0 1 2 3 4 5 6 7       dostepne wartosci "czasu"
+				  S-->N       przypadek 1: elapsed = 7 - 5 = 2
+		----->N   S----       przypadek 2: elapsed = (7 - 5) + 1 + (3 - 0) = 6
+		*/
+
+		if (!IsStarted(countTo))
+			return false;
+
+		unsigned long now = Now(interval, capacity);
+		unsigned long max = Window(interval, capacity, -1);
+		unsigned long elapsed;
+		// przypadek 1
+		if (now >= *startedAt)
+			elapsed = now - *startedAt;
+		// przypadek 2
+		else
+			elapsed = (max - *startedAt) + 1 + now;
+
+		if (elapsed >= countTo)
+		{
+			*ommitted = elapsed - countTo;
+#if DEBUG_TIMER_ITSTIME
+			if (label)
+			{
+				static unsigned long prevMs = 0;
+				unsigned long nowMs = millis();
+				unsigned long elapsedMs = nowMs - prevMs;
+				unsigned long shouldElapseMs = (1 << (byte)interval) * countTo;
+				char buf[256] = "";
+				snprintf(buf, sizeof(buf),
+					"%c ms:%ld->%ld/%ld s:%ld n:%ld/%ld e:%ld/%ld o:%ld",
+					label,
+					nowMs, elapsedMs, shouldElapseMs,
+					*startedAt,
+					now, max,
+					elapsed, countTo, *ommitted);
+				Serial.println(buf);
+				prevMs = nowMs;
+			}
+#endif
+			*startedAt = now;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
+#if 0
 		if (!IsStarted(countTo))
 			return false;
 
@@ -94,8 +145,9 @@ public:
 		else
 		{
 			return false;
-		}
 	}
+#endif
+}
 
 	static unsigned long Now(Interval interval, Capacity capacity)
 	{
