@@ -21,8 +21,10 @@ private:
 	// czas informowanie o koncu zabiegu mierzone w sekundach
 	static const unsigned int sessionEndMarkerDuration = 10;
 
-	static const Timer2::Interval movingTimerInterval = Timer2::Interval::ms32;
-	static const Timer2::Capacity movingTimerCapacity = Timer2::Capacity::bit1;
+	//static const Timer2::Interval movingTimerInterval = Timer2::Interval::ms32;
+	static const Timer2::Interval movingTimerInterval = Timer2::Interval::ms256;
+	//static const Timer2::Capacity movingTimerCapacity = Timer2::Capacity::bit1;
+	static const Timer2::Capacity movingTimerCapacity = Timer2::Capacity::bits5;
 
 	static const Timer2::Interval pauseTimerInterval = Timer2::Interval::ms512;
 	static const Timer2::Capacity pauseTimerCapacity = Timer2::Capacity::bits4;
@@ -56,75 +58,81 @@ public:
 	virtual void Loop() override
 	{
 		unsigned long counterStartedAt;
+		unsigned long elapsedIntervals;
 		
 		// przesuwanie swiecacego punktu
 		counterStartedAt = movingTimerStartedAt;
 		if (pauseTimerCountTo == 0 && Timer2::ItsTime(
 			movingTimerInterval, movingTimerCapacity,
-			&counterStartedAt, 1, 'm'))
+			//&counterStartedAt, 1, 'm'))
+			&counterStartedAt, 1, &elapsedIntervals, 'm'))
 		{
 			movingTimerStartedAt = counterStartedAt;
-			MovePoint();
+			MovePoint(elapsedIntervals);
 		}
 
 		// pauza na krancowych diodach
-		counterStartedAt = pauseTimerStartedAt;
-		if (Timer2::ItsTime(
-			pauseTimerInterval, pauseTimerCapacity,
-			&counterStartedAt, pauseTimerCountTo, 'p'))
-		{
-			pauseTimerStartedAt = counterStartedAt;
-			movingTimerStartedAt = counterStartedAt;
-			pauseTimerCountTo = 0;
-		}
+		//counterStartedAt = pauseTimerStartedAt;
+		//if (Timer2::ItsTime(
+		//	pauseTimerInterval, pauseTimerCapacity,
+		//	&counterStartedAt, pauseTimerCountTo, 'p'))
+		//{
+		//	pauseTimerStartedAt = counterStartedAt;
+		//	movingTimerStartedAt = counterStartedAt;
+		//	pauseTimerCountTo = 0;
+		//}
 	}
 
-	void MovePoint()
+	void MovePoint(unsigned long elapsedIntervals)
 	{
 		// czy trwa pauza na pierwszej i ostatniej diody
 		if (pauseTimerCountTo > 0)
 			return;
 
-		// gasimy aktualnie swiecaca sie diode
-		strip.controller->leds()[movingLedNo] = CRGB::Black;
-
-		// ruch w kierunku ostaniej diody
-		if (movingLedDirection == 0)
-			if (movingLedNo < strip.controller->size() - 1)
-			{
-				// nastepna dioda
-				movingLedNo++;
-			}
-			else
-			{
-				// ostatnia dioda - zmiana kierunku
-				movingLedDirection = 1;
-				movingLedNo--;
-			}
-		// ruch w kierunku pierwszej diody
-		else
-			if (movingLedNo > 0)
-			{
-				// poprzednia dioda
-				movingLedNo--;
-			}
-			else
-			{
-				// pierwsza dioda - zmiana kierunku
-				movingLedDirection = 0;
-				movingLedNo++;
-			}
-
-		// pauze na pierwszej i ostatniej diodzie
-		if (movingLedNo == 0 && movingLedDirection == 1 ||
-			movingLedNo == strip.controller->size() - 1 && movingLedDirection == 0)
+		while (elapsedIntervals-- > 0)
 		{
-			pauseTimerStartedAt = Timer2::Now(pauseTimerInterval, pauseTimerCapacity);
-			pauseTimerCountTo = pauseDuration;
-		}
+			// gasimy aktualnie swiecaca sie diode
+			strip.controller->leds()[movingLedNo] = CRGB::Black;
 
-		strip.controller->leds()[movingLedNo] = movingColor;
-		strip.updated = true;
+			// ruch w kierunku ostaniej diody
+			if (movingLedDirection == 0)
+				if (movingLedNo < (unsigned int)strip.controller->size() - 1)
+				{
+					// nastepna dioda
+					movingLedNo++;
+				}
+				else
+				{
+					// ostatnia dioda - zmiana kierunku
+					movingLedDirection = 1;
+					movingLedNo--;
+				}
+			// ruch w kierunku pierwszej diody
+			else
+				if (movingLedNo > 0)
+				{
+					// poprzednia dioda
+					movingLedNo--;
+				}
+				else
+				{
+					// pierwsza dioda - zmiana kierunku
+					movingLedDirection = 0;
+					movingLedNo++;
+				}
+
+			strip.controller->leds()[movingLedNo] = movingColor;
+			strip.updated = true;
+
+			// pauze na pierwszej i ostatniej diodzie
+			if (movingLedNo == 0 && movingLedDirection == 1 ||
+				movingLedNo == strip.controller->size() - 1 && movingLedDirection == 0)
+			{
+				//pauseTimerStartedAt = Timer2::Now(pauseTimerInterval, pauseTimerCapacity);
+				//pauseTimerCountTo = pauseDuration;
+				break;
+			}
+		}
 	}
 
 	// wystartowanie lub wznowienie plugina

@@ -3,7 +3,7 @@
 #include <stdio.h>
 //#include "Event.h"
 
-#define TIMER_DEBUG 1
+#define DEBUG_TIMER_ITSTIME 1
 
 class Timer2
 {
@@ -60,6 +60,7 @@ public:
 		Capacity capacity,
 		unsigned long* startedAt,
 		unsigned int countTo,
+		unsigned long* omittedIntervals,
 		char label = '\0')
 	{
 		if (!IsStarted(countTo))
@@ -68,11 +69,12 @@ public:
 		unsigned long nowMs = millis();
 		unsigned long startedAtMs = *startedAt << (byte)interval;
 		unsigned long elapsedMs = nowMs - startedAtMs;
-		unsigned long elapsedIntervals = Window(interval, capacity, elapsedMs);
-		if (elapsedIntervals >= countTo)
+		//unsigned long elapsedIntervals = Window(interval, capacity, elapsedMs);
+		*omittedIntervals = elapsedMs / (1 << (byte)interval);
+		if (*omittedIntervals >= countTo)
 		{
-			*startedAt = Now(interval, capacity);
-#if TIMER_DEBUG
+			*startedAt = Window(interval, capacity, nowMs);
+#if DEBUG_TIMER_ITSTIME
 			static unsigned long prev = 0;
 			if (label)
 			{
@@ -82,7 +84,7 @@ public:
 			}
 			Serial.print(millis());
 			Serial.print(F(" "));
-			Serial.print(elapsedIntervals);
+			Serial.print(*omittedIntervals);
 			Serial.print(F(" "));
 			Serial.println(nowMs - prev);
 			prev = nowMs;
