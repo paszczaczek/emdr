@@ -192,7 +192,7 @@ class CFastLED {
 	// int m_nControllers;
 	uint8_t  m_Scale; 				///< The current global brightness scale setting
 	uint16_t m_nFPS;					///< Tracking for current FPS value
-	uint32_t m_nMinMicros;		///< minimum µs between frames, used for capping frame rates.
+	uint32_t m_nMinMicros;		///< minimum ï¿½s between frames, used for capping frame rates.
 	uint32_t m_nPowerData;		///< max power use parameter
 	power_func m_pPowerFunc;	///< function for overriding brightness when using FastLED.show();
 

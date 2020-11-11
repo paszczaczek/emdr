@@ -141,6 +141,9 @@
     <ClCompile Include="..\Event.cpp">
       <Filter>Emdr</Filter>
     </ClCompile>
+    <ClCompile Include="..\MovingPointStripPlugin.cpp">
+      <Filter>Emdr</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">

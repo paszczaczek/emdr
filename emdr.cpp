@@ -15,18 +15,25 @@
 #include "RemoteControllerStripPlugin.h"
 //#include "DiagnosticStripPlugin.h"
 
+//#define DEVEL                   // developing configuration
+
 #define MAX_CURRENT_FROM_EXT 1000 // Total maximum current draw when powered via external power supply
 #define MAX_CURRENT_FROM_USB  500 // Total maximum current draw from the Arduino when powered from a USB port
 
 #define STRIP_LEDS_TYPE   WS2811 // led controller type (w pracy dziala rowniez na WS2812B)
 #define STRIP_LEDS_PIN         7 // pin for main strip
+#define STRIP_LEDS_ONBOARD_PIN 3 // pin for short strip on board for development
 #define STRIP_LEDS_PIN_RC      8 // pin for remote control strip
 #define STRIP_LEDS_ORDER     GRB
-#define STRIP_LEDS_COUNT     10 //180 //30 //120
+#define STRIP_LEDS_COUNT     120
 #define STRIP_LEDS_BRIGHTNESS  2
 #define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
 #define RC_PIN 2 // pin for remote controller
+
+#ifdef DEVEL
+#define STRIP_LEDS_PIN STRIP_LEDS_ONBOARD_PIN
+#endif
 
 // remote controller
 IRrecv irrecv(RC_PIN);
@@ -34,7 +41,11 @@ RemoteController remoteController;
 
 // strip plugins
 //DiagnosticStipPlugin diagnosticStipPlugin;
-MovingPointStripPlugin movingPointStripPlugin;
+#ifdef DEVEL
+MovingPointStripPlugin movingPointStripPlugin(10, 0, 5);
+#else
+MovingPointStripPlugin movingPointStripPlugin(2);
+#endif
 RemoteControllerStripPlugin remoteControllerstripPlugin;
 const byte stripPluginsCount = /*3*/2;
 StripPlugin* stripPlugins[stripPluginsCount] = {
@@ -55,7 +66,6 @@ void setup()
 {
 	Serial.begin(115200);
 	PRINT_FREEMEM(F("setup"));
-	PRINTLN(sizeof(Timer));
 
 	irrecv.enableIRIn();
 	strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>();
