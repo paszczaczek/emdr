@@ -1,5 +1,6 @@
 #include <sys/timeb.h>
 #include <inttypes.h>
+#include <windows.h>
 
 unsigned long millis(void)
 {
@@ -22,6 +23,11 @@ unsigned long millis(void)
 	}
 
 	return ms;
+}
+
+void delay(unsigned long ms)
+{
+	Sleep(ms);
 }
 
 void pinMode(uint8_t, uint8_t) {}

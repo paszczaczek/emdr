@@ -10,4 +10,5 @@ typedef unsigned char byte;
 extern const char *F(const char *str);
 
 extern unsigned long millis(void);
+extern void delay(unsigned long);
 extern void pinMode(uint8_t, uint8_t);
