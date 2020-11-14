@@ -3,6 +3,8 @@
 
 #define DEBUG_PRINT 1
 
+#define F(string_literal) string_literal
+
 #if DEBUG_PRINT == 1
   #define PRINT(...)          Serial.print(__VA_ARGS__)
   #define PRINTLN(...)        Serial.println(__VA_ARGS__)

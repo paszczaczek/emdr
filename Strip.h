@@ -28,13 +28,13 @@ public:
 		controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>(leds, ledsCount);
 		FastLED.clear(true);
 		
-    while (true) {
-  		SetLeds(CRGB::White);
-		  FastLED.show();
-      delay(1000);
-  		FastLED.clear(true);
-      delay(100);
-    }
+    //while (true) {
+  		//SetLeds(CRGB::White);
+		  //FastLED.show();
+    //  delay(1000);
+  		//FastLED.clear(true);
+    //  delay(100);
+    //}
 	}
 
 	void StartAllPlugins()

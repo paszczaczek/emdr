@@ -30,5 +30,17 @@ void delay(unsigned long ms)
 	Sleep(ms);
 }
 
-void pinMode(uint8_t, uint8_t) {}
-const char *F(const char *str) { return str; }
+int digitalRead(uint8_t pin)
+{
+	return 0x0;
+}
+
+
+void pinMode(uint8_t, uint8_t) 
+{
+}
+
+const char *F(const char *str) 
+{ 
+	return str; 
+}

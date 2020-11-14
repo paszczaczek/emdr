@@ -57,18 +57,25 @@ private:
 	// kolor poruszajacego sie punktu
 	CRGB movingColor = CRGB(CRGB::Orange);
 public:
-	MovingPointStripPlugin(byte movingTimerCountTo = 1, byte movingFirstLedNo = 0, byte movingLastLedNo = 0)
+	MovingPointStripPlugin()
 	{
 		movingTimerStartedAt = Timer2::Now(movingTimerInterval, movingTimerCapacity);
-		this->movingFirstLedNo = movingFirstLedNo;
-		this->movingLastLedNo = movingLastLedNo;
+		movingFirstLedNo = 0;
+		movingLastLedNo = 0;
 		movingLedNo = 0;
 		movingLedDirection = 0;
-		this->movingTimerCountTo = movingTimerCountTo;
+		movingTimerCountTo = 0;
 
 		pauseTimerStartedAt = Timer2::Now(pauseTimerResolution, pauseTimerCapacity);
 		pauseTimerCountTo = 0;
 		pauseDuration = 2;
+	}
+
+	void Setup(byte movingTimerCountTo = 1, byte movingFirstLedNo = 0, byte movingLastLedNo = 0)
+	{
+		this->movingTimerCountTo = movingTimerCountTo;
+		this->movingFirstLedNo = movingFirstLedNo;
+		this->movingLastLedNo = movingLastLedNo;
 	}
 
 	// petla zdarzen
