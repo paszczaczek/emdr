@@ -9,32 +9,41 @@
 class Strip : public Device
 {
 public:
-	Strip(CRGB* leds, byte ledsCount, StripPlugin** plugins, byte pluginsCount, int maxCurrent, byte ledsBrightness) :
-		ledsBrightness(ledsBrightness),
-		leds(leds),
-		ledsCount(ledsCount),
-		plugins(plugins),
-		pluginsCount(pluginsCount)
+	Strip(int maxCurrent, byte ledsBrightness) :
+		ledsBrightness(ledsBrightness)
 	{
 		FastLED.setMaxPowerInVoltsAndMilliamps(5, maxCurrent);
-		//remoteControllerEventHandler.Set(this, &Strip::OnRemoteControllerEvent);
-		//remoteController.event += remoteControllerEventHandler;
 	}
-
+	
+	// konfiguracja paska ledow
 	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
 	void SetController()
 	{
 		pinMode(DATA_PIN, OUTPUT);
 		controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>(leds, ledsCount);
 		FastLED.clear(true);
-		
-    //while (true) {
-  		//SetLeds(CRGB::White);
-		  //FastLED.show();
-    //  delay(1000);
-  		//FastLED.clear(true);
-    //  delay(100);
-    //}
+	}
+
+	// dodanie pluginu poruszajacego sie punktu
+	void AddMovingPointStripPlugin(StripPlugin* movingPointStripPlugin)
+	{
+		plugins[movingPointStripPluginIdx] = movingPointStripPlugin;
+	}
+
+	// zwrocenie pluginu poruszajacego sie punktu
+	StripPlugin* GetMovingPointStripPlugin() {
+		return plugins[movingPointStripPluginIdx];
+	}
+
+	// dodanie pluginu diagnostycznego
+	void AddDiagnosticStipPlugin(StripPlugin* diagnosticStipPlugin)
+	{
+		plugins[diagnosticStipPluginIdx] = diagnosticStipPlugin;
+	}
+
+	// zwrocenie pluginu diagnostycznego
+	StripPlugin* GetDiagnosticStipPlugin() {
+		return plugins[diagnosticStipPluginIdx];
 	}
 
 	void StartAllPlugins()
@@ -81,11 +90,12 @@ public:
 	byte ledsBrightness;
 
 private:
-	CRGB* leds;
-	byte ledsCount;
-	StripPlugin** plugins;
-	byte pluginsCount;
-	//EventHandler<Strip, RemoteController::EventArgs> remoteControllerEventHandler;
+	constexpr static int ledsCount = 179;
+	constexpr static int pluginsCount = 2;
+	constexpr static int diagnosticStipPluginIdx = 0;
+	constexpr static int movingPointStripPluginIdx = 1;
+	CRGB leds[ledsCount];
+	StripPlugin* plugins[pluginsCount];
 };
 
 extern Strip strip;

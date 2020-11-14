@@ -16,3 +16,5 @@ public:
 	virtual bool Receive(Event::Name eventName) = 0;
 
 };
+
+// sizeof(Plugin) = 3

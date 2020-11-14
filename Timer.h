@@ -122,7 +122,8 @@ public:
 
 		if (elapsed >= countTo)
 		{
-			*ommitted = elapsed - countTo;
+			if (ommitted)
+				*ommitted = elapsed - countTo;
 #if DEBUG_TIMER_ITSTIME
 			if (label)
 			{
@@ -137,7 +138,7 @@ public:
 					nowMs, elapsedMs, shouldElapseMs,
 					*startedAt,
 					now, max,
-					elapsed, countTo, *ommitted);
+					elapsed, countTo, ommitted ? *ommitted : -1);
 				Serial.println(buf);
 				prevMs = nowMs;
 			}

@@ -1,4 +1,3 @@
-//#define FASTLED_ALLOW_INTERRUPTS 1
 #define FASTLED_INTERNAL
 #include <Arduino.h>
 #include <FastLED.h>
@@ -13,22 +12,17 @@
 #include "Event.h"
 #include "Device.h"
 #include "RemoteControllerStripPlugin.h"
-//#include "DiagnosticStripPlugin.h"
+#include "DiagnosticStripPlugin.h"
 
 bool isDevelMode();
-
-//#define DEVEL                   // developing configuration
 
 #define MAX_CURRENT_FROM_EXT 1000 // Total maximum current draw when powered via external power supply
 #define MAX_CURRENT_FROM_USB  500 // Total maximum current draw from the Arduino when powered from a USB port
 
-#define STRIP_LEDS_TYPE   WS2812B // led controller type (w pracy dziala rowniez na WS2812B)
-#define STRIP_LEDS_PIN          7 // pin for main strip
-#define STRIP_LEDS_ONBOARD_PIN  3 // pin for short strip on board for development
-#define STRIP_LEDS_PIN_RC       8 // pin for remote control strip
-#define STRIP_LEDS_ORDER      GRB
-#define STRIP_LEDS_COUNT      179 // diods in celling strip
-#define STRIP_LEDS_BRIGHTNESS  2
+#define STRIP_LEDS_PROD_PIN   7 // pin for long celling strip for production
+#define STRIP_LEDS_DEVEL_PIN  3 // pin for short strip on board for development
+#define STRIP_LEDS_PIN_RC     8 // pin for remote control strip
+#define STRIP_LEDS_BRIGHTNESS 2 // jasnosc swiecenie diod
 #define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
 constexpr int ENV_PIN = 4;     // pin for detecting production/development environmetn;
@@ -40,22 +34,12 @@ IRrecv irrecv(RC_PIN);
 RemoteController remoteController;
 
 // strip plugins
-//DiagnosticStipPlugin diagnosticStipPlugin;
+DiagnosticStipPlugin diagnosticStipPlugin;
 MovingPointStripPlugin movingPointStripPlugin;
 RemoteControllerStripPlugin remoteControllerstripPlugin;
-const byte stripPluginsCount = /*3*/2;
-StripPlugin* stripPlugins[stripPluginsCount] = {
-	//&diagnosticStipPlugin,
-	&movingPointStripPlugin,
-	&remoteControllerstripPlugin
-};
 
 // strip
-CRGB stripLeds[STRIP_LEDS_COUNT];
-Strip strip(
-	stripLeds, STRIP_LEDS_COUNT,
-	stripPlugins, stripPluginsCount,
-	STRIP_LEDS_MAX_CURRENT, STRIP_LEDS_BRIGHTNESS);
+Strip strip(STRIP_LEDS_MAX_CURRENT, STRIP_LEDS_BRIGHTNESS);
 Device& stripDevice = strip;
 
 void setup()
@@ -63,24 +47,32 @@ void setup()
 	Serial.begin(115200);
 	PRINT_FREEMEM(("setup"));
 
+	// konfiguracja zalezy od srodowidka prod/devel
 	pinMode(ENV_PIN, INPUT_PULLUP);  
 	if (isDevelMode())
 	{
 		// w srodowisku devel tasma ma dlugosc 10 ledow, jest przyklejona do plyty glownej
 		// i jest podlaczona do innego pinu
 		movingPointStripPlugin.Setup(10, 0, 5);
-		strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_ONBOARD_PIN, STRIP_LEDS_ORDER>();
+		strip.SetController<WS2812B, STRIP_LEDS_DEVEL_PIN, GRB>();
 	}
 	else
 	{
 		movingPointStripPlugin.Setup(2);
-		strip.SetController<STRIP_LEDS_TYPE, STRIP_LEDS_PIN, STRIP_LEDS_ORDER>();
+		strip.SetController<WS2812B, STRIP_LEDS_PROD_PIN, GRB>();
 	}
 
+	// dodanie pluginow do stripu
+	strip.AddDiagnosticStipPlugin(&diagnosticStipPlugin);
+	strip.AddMovingPointStripPlugin(&movingPointStripPlugin);
 
 	irrecv.enableIRIn();
-	//diagnosticStipPlugin.PowerOn();
-	movingPointStripPlugin.Start();
+
+	// wykonanie testu wszystkich urzadzen a potem uruchomienie poruszajacego sie punktu
+	diagnosticStipPlugin.Execute(
+		DiagnosticStipPlugin::Action::TestAllDevices, 
+		DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
+	diagnosticStipPlugin.Start();
 }
 
 void loop()
@@ -100,9 +92,9 @@ bool isDevelMode() {
 #endif
 
 	if (devel)
-		PRINT(F("prod"));
-	else
 		PRINT(F("devel"));
+	else
+		PRINT(F("prod"));
 	PRINT(" mode\n");
 
 	return devel;

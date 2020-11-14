@@ -1,66 +1,113 @@
 #pragma once
 #include "Strip.h"
-#include "StripPlugin.h"
 #include "Timer.h"
-#include "RemoteController.h"
+
 
 class DiagnosticStipPlugin : public StripPlugin
 {
 public:
-	DiagnosticStipPlugin()
-	{
-		timer.elapsed += timerElapsedEventHandler.Set(
-			this, &DiagnosticStipPlugin::onTimerElapsed);
-	}
-	
+	enum class Action {
+		Idle = 0,
+		TestAllDevices,
+		StartMovingPointStripPlugin
+	};
+
 	virtual void Loop() override
 	{
 		if (state == State::Stopped)
 			return;
-		timer.Loop();
+
+		// czy minal czas wykonania nastepnej akcji/kroku
+		unsigned long startedAt = timerStartedAt;
+		if (Timer2::ItsTime(
+			timerResolution, timerCapacity,
+			&startedAt, timerCountTo,
+			NULL))
+		{
+			timerStartedAt = startedAt;
+			switch ((Action)actionFirst)
+			{
+			case Action::Idle:
+				break;
+			case Action::TestAllDevices:
+				switch (actionStep++)
+				{
+				case 0: strip.SetLeds(CRGB::White); strip.updated = true; TimerStart();               break;
+				case 1: strip.SetLeds(CRGB::Red);   strip.updated = true; TimerStart();               break;
+				case 2: strip.SetLeds(CRGB::Green); strip.updated = true; TimerStart();               break;
+				case 3: strip.SetLeds(CRGB::Blue);  strip.updated = true; TimerStart();               break;
+				case 4: strip.SetLeds(CRGB::Black); strip.updated = true; TimerStart(); ActionNext(); break;
+				}
+				break;
+			case Action::StartMovingPointStripPlugin:
+				strip.GetMovingPointStripPlugin()->Start();
+				ActionNext();
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
-	// zapala na chwile wszystkie diody po wlaczeniu zasilania w celach diagnostycznych
-	void PowerOn() {
-		state = State::Started;
-		timer.interval = 1000;
-		timer.Start();
-		PowerOn(0);
+	// wykonaj akcje first a potem akcje next
+	void Execute(enum Action first, enum Action next = Action::Idle)
+	{
+		actionFirst = (byte)first;
+		actionNext = (byte)next;
+		actionStep = 0;
+		TimerStart();
 	}
 
 private:
-	TimerOLD timer;
-	EventHandler<DiagnosticStipPlugin, TimerOLD::EventArgs> timerElapsedEventHandler;
-	enum class Function { PowerOn, None } function;
+	// rozdzielczosc timera
+	constexpr static Timer2::Resolution timerResolution = Timer2::Resolution::s1;
 
-	void onTimerElapsed(TimerOLD::EventArgs& args)
+	// pojemnosc timera
+	constexpr static Timer2::Capacity timerCapacity = Timer2::Capacity::bit1;
+
+	// czas wystartowania timera
+	byte timerStartedAt : static_cast<int>(timerCapacity);
+
+	// po ilu interwalach wystrzelic timer
+	byte timerCountTo : static_cast<int>(timerCapacity);
+
+	// akcje do sekwencyjnego wykonania
+	byte actionFirst: 2; // enum Action
+	byte actionNext : 2;  // enum Action 
+
+	// kolejny krok akcji
+	byte actionStep : 4;
+
+	// przejdz do wykonania nastepnej akcji
+	void ActionNext()
 	{
-		byte callNo = args.elapsedIntervalsFromStart - args.elapsedIntervals + 1;
-		switch (function)
-		{
-		case Function::PowerOn: PowerOn(callNo); break;
-		case Function::None: break;
-		}
+		actionFirst = actionNext;
+		actionNext = (byte)Action::Idle;
+		if (actionFirst == (byte)Action::Idle)
+			TimerStop();
+		else
+			TimerStart();
 	}
 
-	void PowerOn(byte callNo)
+	// uruchom timer wykonywania akcji
+	void TimerStart()
 	{
-		CRGB color;
-		switch (callNo)
-		{
-		case 0: // zaswiec wszystkie diody na bialo      
-			Serial.print(F("PowerOn..."));
-			strip.SetLeds(CRGB::White);
-			break;
-		default:
-			// zgas wszystkie diody - procedura zakonczona
-			strip.SetLeds(CRGB::Black);
-			timer.Stop();
-			function = Function::None;
-			Serial.println(F("done"));
-			strip.StartAllPlugins();
-			break;
-		}
-		strip.updated = true;
+		timerStartedAt = Timer2::Start(timerResolution, timerCapacity);
+		timerCountTo = 1;
+	}
+
+	// zatrzymaj timer wykonywania akcji
+	void TimerStop()
+	{
+		timerStartedAt = Timer2::Stop();
+		timerCountTo = 0;
+	}
+
+	// obsluga eventow
+	bool Receive(Event::Name eventName) override
+	{
+		return false;
 	}
 };
+
+// sizeof(DiagnosticStipPlugin) = sizeof(StripPlugin):3 + 2 = 5

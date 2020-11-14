@@ -7,9 +7,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\emdr.ino" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="__vm\.Emdr.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -30,5 +27,8 @@
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\RemoteController.cpp" />
     <ClCompile Include="..\MemoryFree.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Emdr.ino" />
   </ItemGroup>
 </Project>

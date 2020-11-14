@@ -3,5 +3,6 @@
 
 class StripPlugin : public Plugin
 {
-public:
 };
+
+// sizeof(StrinPlugin) = 3

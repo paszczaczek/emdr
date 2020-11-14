@@ -172,7 +172,7 @@ public:
 		if (state == State::Stopped)
 		{
 			Plugin::Start();
-			//movingCounter.Start();
+			movingTimerStartedAt = Timer2::Now(movingTimerInterval, movingTimerCapacity);
 			//sessionTimer.Start();
 			PRINTLN(F("Start"));
 			//PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));
