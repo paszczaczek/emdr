@@ -24,8 +24,8 @@ namespace EmdrEmulator
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Timer _timer;
-        private Model model = new Model();
+        private readonly Timer _timer;
+        private readonly Model model = new Model();
 
         public MainWindow()
         {
@@ -103,7 +103,7 @@ namespace EmdrEmulator
         }
 
         private static bool _loopCallbackWorking = false;
-        private TimerCallback LoopCallback = (object state) =>
+        private readonly TimerCallback LoopCallback = (object state) =>
         {
             if (_loopCallbackWorking)
                 return;
@@ -132,9 +132,11 @@ namespace EmdrEmulator
             {
                 get
                 {
-                    var model = new Model();
-                    model.SerialMonitor = "setup\nloop\nFastLED.show";
-                    model.Strip = EmdrEmulator.Strip.Model.EmdrDesignTime;
+                    var model = new Model
+                    {
+                        SerialMonitor = "setup\nloop\nFastLED.show",
+                        Strip = EmdrEmulator.Strip.Model.EmdrDesignTime
+                    };
 
                     return model;
                 }

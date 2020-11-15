@@ -31,6 +31,9 @@
     <Filter Include="ClassDiagrams">
       <UniqueIdentifier>{f63a8c7e-122a-44b5-a99b-4baff7879c09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EmdrController">
+      <UniqueIdentifier>{3b220436-fc62-493a-9ae1-dd70949fe6da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -85,17 +88,11 @@
     <ClInclude Include="..\Plugin.h">
       <Filter>Emdr</Filter>
     </ClInclude>
-    <ClInclude Include="..\RemoteController.h">
-      <Filter>Emdr</Filter>
-    </ClInclude>
     <ClInclude Include="IRremote.h">
       <Filter>IRremote</Filter>
     </ClInclude>
     <ClInclude Include="MemoryFree.h">
       <Filter>MemoryFree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Debug.h">
-      <Filter>Emdr</Filter>
     </ClInclude>
     <ClInclude Include="..\DiagnosticStripPlugin.h">
       <Filter>Emdr</Filter>
@@ -107,6 +104,12 @@
       <Filter>Emdr</Filter>
     </ClInclude>
     <ClInclude Include="..\Device.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EmdrController\RemoteController.h">
+      <Filter>EmdrController</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Debug.h">
       <Filter>Emdr</Filter>
     </ClInclude>
   </ItemGroup>
@@ -131,9 +134,6 @@
     </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\RemoteController.cpp">
-      <Filter>Emdr</Filter>
     </ClCompile>
     <ClCompile Include="MemoryFree.cpp">
       <Filter>MemoryFree</Filter>

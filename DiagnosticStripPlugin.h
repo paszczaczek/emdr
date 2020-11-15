@@ -50,7 +50,7 @@ public:
 	}
 
 	// wykonaj akcje first a potem akcje next
-	void Execute(enum Action first, enum Action next = Action::Idle)
+	void Execute(Action first, Action next = Action::Idle)
 	{
 		actionFirst = (byte)first;
 		actionNext = (byte)next;
