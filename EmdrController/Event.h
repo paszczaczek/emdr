@@ -22,5 +22,5 @@ public:
 		CHANEL_MINUS
 	};
 
-	static void Send(Name name);
+	static void Send(Name name) {};
 };

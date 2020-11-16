@@ -100,9 +100,6 @@
     <ClInclude Include="..\RemoteControllerStripPlugin.h">
       <Filter>Emdr</Filter>
     </ClInclude>
-    <ClInclude Include="..\Event.h">
-      <Filter>Emdr</Filter>
-    </ClInclude>
     <ClInclude Include="..\Device.h">
       <Filter>Emdr</Filter>
     </ClInclude>
@@ -110,6 +107,9 @@
       <Filter>EmdrController</Filter>
     </ClInclude>
     <ClInclude Include="..\Debug.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EmdrController\Event.h">
       <Filter>Emdr</Filter>
     </ClInclude>
   </ItemGroup>
@@ -138,10 +138,10 @@
     <ClCompile Include="MemoryFree.cpp">
       <Filter>MemoryFree</Filter>
     </ClCompile>
-    <ClCompile Include="..\Event.cpp">
+    <ClCompile Include="..\MovingPointStripPlugin.cpp">
       <Filter>Emdr</Filter>
     </ClCompile>
-    <ClCompile Include="..\MovingPointStripPlugin.cpp">
+    <ClCompile Include="..\EmdrController\Event.cpp">
       <Filter>Emdr</Filter>
     </ClCompile>
   </ItemGroup>

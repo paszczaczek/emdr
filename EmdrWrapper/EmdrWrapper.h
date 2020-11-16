@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "Emdr.h"
 
-#include "Event.h"
+#include "EmdrController/Event.h"
 #include "RemoteController.h"
 
 using System::String;

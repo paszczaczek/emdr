@@ -1,10 +1,10 @@
 #pragma once
 //#include <stdint.h>
 #include <IRremote.h>
-#include <Arduino.h>
-#include "Debug.h"
-//#include "Timer.h"
+//#include <Arduino.h>
 #include "Event.h"
+//#include "Debug.h"
+//#include "Timer.h"
 
 extern IRrecv irrecv;
 
@@ -23,17 +23,17 @@ private:
 public:
 	void Loop() {
 		// jesli jest zakaz blokowania przerwan i dosc dlugo nie odebrano zadnego kodu,
-		if (isBlockingInterruptsDisallowed && millis() - lastCodeTime > 3000)
+		//if (isBlockingInterruptsDisallowed && millis() - lastCodeTime > 3000)
 		{
 			// to prawdopodobnie pilot nie bedzie w najblizszej chwili uzywany 
 			// uchylam zakaz uzywania przerwan
-			PRINT(F("IR: timeout -> ")); PRINTLN((int)Event::Name::BlockingInterruptsAllowed);
+			//PRINT(F("IR: timeout -> ")); PRINTLN((int)Event::Name::BlockingInterruptsAllowed);
 			isBlockingInterruptsDisallowed = false;
 			Event::Send(Event::Name::BlockingInterruptsAllowed);
 		}
 		if (irrecv.decode(&results)) {
 			ProcessCode();
-			lastCodeTime = millis();
+			//lastCodeTime = millis();
 			irrecv.resume();
 		}
 	}

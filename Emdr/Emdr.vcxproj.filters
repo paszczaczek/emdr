@@ -16,7 +16,6 @@
     <ClInclude Include="..\Plugin.h" />
     <ClInclude Include="..\StripPlugin.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
-    <ClInclude Include="..\Event.h" />
     <ClInclude Include="..\RemoteControllerStripPlugin.h" />
     <ClInclude Include="..\MemoryFree.h" />
     <ClInclude Include="..\Debug.h" />

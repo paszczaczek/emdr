@@ -9,7 +9,7 @@
 #include "Strip.h"
 #include "MovingPointStripPlugin.h"
 #include "RemoteController.h"
-#include "Event.h"
+#include "EmdrController/Event.h"
 #include "Device.h"
 #include "RemoteControllerStripPlugin.h"
 #include "DiagnosticStripPlugin.h"

@@ -139,8 +139,8 @@
     <ClInclude Include="..\Debug.h" />
     <ClInclude Include="..\Device.h" />
     <ClInclude Include="..\Emdr.h" />
+    <ClInclude Include="..\EmdrController\Event.h" />
     <ClInclude Include="..\EmdrController\RemoteController.h" />
-    <ClInclude Include="..\Event.h" />
     <ClInclude Include="..\EventHandler.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
     <ClInclude Include="..\Plugin.h" />
@@ -165,7 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
-    <ClCompile Include="..\Event.cpp" />
+    <ClCompile Include="..\EmdrController\Event.cpp" />
     <ClCompile Include="..\MovingPointStripPlugin.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />

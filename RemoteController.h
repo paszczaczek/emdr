@@ -3,7 +3,7 @@
 #include <IRremote.h>
 #include "Debug.h"
 #include "Timer.h"
-#include "Event.h"
+#include "EmdrController/Event.h"
 
 extern IRrecv irrecv;
 
