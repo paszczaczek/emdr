@@ -3,7 +3,6 @@
 #define FASTLED_INTERNAL
 #include <FastLED.h>
 #include "StripPlugin.h"
-#include "RemoteController.h"
 #include "Device.h"
 
 class Strip : public Device

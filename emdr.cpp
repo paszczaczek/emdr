@@ -8,10 +8,9 @@
 #include "EventHandler.h"
 #include "Strip.h"
 #include "MovingPointStripPlugin.h"
-#include "RemoteController.h"
+//#include "RemoteController.h"
 #include "EmdrController/Event.h"
 #include "Device.h"
-#include "RemoteControllerStripPlugin.h"
 #include "DiagnosticStripPlugin.h"
 
 bool isDevelMode();
@@ -30,13 +29,12 @@ constexpr int ENV_PIN = 4;     // pin for detecting production/development envir
 #define RC_PIN  2 // pin for remote controller
 
 // remote controller
-IRrecv irrecv(RC_PIN);
-RemoteController remoteController;
+//IRrecv irrecv(RC_PIN);
+//RemoteController remoteController;
 
 // strip plugins
 DiagnosticStipPlugin diagnosticStipPlugin;
 MovingPointStripPlugin movingPointStripPlugin;
-RemoteControllerStripPlugin remoteControllerstripPlugin;
 
 // strip
 Strip strip(STRIP_LEDS_MAX_CURRENT, STRIP_LEDS_BRIGHTNESS);
@@ -66,7 +64,7 @@ void setup()
 	strip.AddDiagnosticStipPlugin(&diagnosticStipPlugin);
 	strip.AddMovingPointStripPlugin(&movingPointStripPlugin);
 
-	irrecv.enableIRIn();
+	//irrecv.enableIRIn();
 
 	// wykonanie testu wszystkich urzadzen a potem uruchomienie poruszajacego sie punktu
 	diagnosticStipPlugin.Execute(
@@ -77,7 +75,7 @@ void setup()
 
 void loop()
 {
-	remoteController.Loop();
+	//remoteController.Loop();
 	stripDevice.Loop();
 }
 

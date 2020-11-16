@@ -5,21 +5,22 @@
 #include "Timer.h"
 //#include "RemoteController.h"
 #include "Emdr.h"
+#include "Debug.h"
 
 class MovingPointStripPlugin : public StripPlugin
 {
 private:
 	// pojemnosc timera poruszajacego punktem
-	static const Timer2::Capacity movingTimerCapacity = Timer2::Capacity::values256; // 8 bitow
+	static const Timer::Capacity movingTimerCapacity = Timer::Capacity::values256; // 8 bitow
 
 	// rozdzielczosc timera poruszajacego punktem
-	static const Timer2::Resolution movingTimerInterval = Timer2::Resolution::ms16;
+	static const Timer::Resolution movingTimerInterval = Timer::Resolution::ms16;
 
 	// pojemnosc timera zatrzymujacego poruszajacy sie punkt na krancach tasmy
-	static const Timer2::Capacity pauseTimerCapacity = Timer2::Capacity::values2; // 1 bit
+	static const Timer::Capacity pauseTimerCapacity = Timer::Capacity::values2; // 1 bit
 
 	// rozdzielczosc timera zatrzymujacego poruszajacy sie punkt na krancach tasmy
-	static const Timer2::Resolution pauseTimerResolution = Timer2::Resolution::s1;
+	static const Timer::Resolution pauseTimerResolution = Timer::Resolution::s1;
 
 	// czas trwania zabiegu
 	static const unsigned long sessionDuration = 60;
@@ -59,14 +60,14 @@ private:
 public:
 	MovingPointStripPlugin()
 	{
-		movingTimerStartedAt = Timer2::Now(movingTimerInterval, movingTimerCapacity);
+		movingTimerStartedAt = Timer::Now(movingTimerInterval, movingTimerCapacity);
 		movingFirstLedNo = 0;
 		movingLastLedNo = 0;
 		movingLedNo = 0;
 		movingLedDirection = 0;
 		movingTimerCountTo = 0;
 
-		pauseTimerStartedAt = Timer2::Now(pauseTimerResolution, pauseTimerCapacity);
+		pauseTimerStartedAt = Timer::Now(pauseTimerResolution, pauseTimerCapacity);
 		pauseTimerCountTo = 0;
 		pauseDuration = 2;
 	}
@@ -86,7 +87,7 @@ public:
 		
 		// przesuwanie swiecacego punktu
 		counterStartedAt = movingTimerStartedAt;
-		if (pauseTimerCountTo == 0 && Timer2::ItsTime(
+		if (pauseTimerCountTo == 0 && Timer::ItsTime(
 			movingTimerInterval, movingTimerCapacity,
 			&counterStartedAt, movingTimerCountTo,
 			&ommittedIntervals, 'm'))
@@ -97,13 +98,13 @@ public:
 
 		// pauza na krancowych diodach
 		counterStartedAt = pauseTimerStartedAt;
-		if (Timer2::ItsTime(
+		if (Timer::ItsTime(
 			pauseTimerResolution, pauseTimerCapacity,
 			&counterStartedAt, pauseTimerCountTo,
 			&ommittedIntervals))
 		{
 			pauseTimerStartedAt = counterStartedAt;
-			movingTimerStartedAt = Timer2::Now(movingTimerInterval, movingTimerCapacity);
+			movingTimerStartedAt = Timer::Now(movingTimerInterval, movingTimerCapacity);
 			pauseTimerCountTo = 0;
 		}
 	}
@@ -159,7 +160,7 @@ public:
 
 			{
 				// uruchamiany timer odliczajacy pauze
-				pauseTimerStartedAt = Timer2::Now(pauseTimerResolution, pauseTimerCapacity);
+				pauseTimerStartedAt = Timer::Now(pauseTimerResolution, pauseTimerCapacity);
 				pauseTimerCountTo = pauseDuration;
 				break;
 			}
@@ -172,7 +173,7 @@ public:
 		if (state == State::Stopped)
 		{
 			Plugin::Start();
-			movingTimerStartedAt = Timer2::Now(movingTimerInterval, movingTimerCapacity);
+			movingTimerStartedAt = Timer::Now(movingTimerInterval, movingTimerCapacity);
 			//sessionTimer.Start();
 			PRINTLN(F("Start"));
 			//PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));

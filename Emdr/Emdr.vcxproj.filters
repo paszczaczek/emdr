@@ -16,16 +16,13 @@
     <ClInclude Include="..\Plugin.h" />
     <ClInclude Include="..\StripPlugin.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
-    <ClInclude Include="..\RemoteControllerStripPlugin.h" />
     <ClInclude Include="..\MemoryFree.h" />
     <ClInclude Include="..\Debug.h" />
     <ClInclude Include="..\DiagnosticStripPlugin.h" />
-    <ClInclude Include="..\RemoteController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\MemoryFree.cpp" />
-    <ClCompile Include="..\RemoteController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Emdr.ino" />

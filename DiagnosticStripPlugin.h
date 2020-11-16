@@ -19,7 +19,7 @@ public:
 
 		// czy minal czas wykonania nastepnej akcji/kroku
 		unsigned long startedAt = timerStartedAt;
-		if (Timer2::ItsTime(
+		if (Timer::ItsTime(
 			timerResolution, timerCapacity,
 			&startedAt, timerCountTo,
 			NULL))
@@ -60,10 +60,10 @@ public:
 
 private:
 	// rozdzielczosc timera
-	constexpr static Timer2::Resolution timerResolution = Timer2::Resolution::s1;
+	constexpr static Timer::Resolution timerResolution = Timer::Resolution::s1;
 
 	// pojemnosc timera
-	constexpr static Timer2::Capacity timerCapacity = Timer2::Capacity::bit1;
+	constexpr static Timer::Capacity timerCapacity = Timer::Capacity::bit1;
 
 	// czas wystartowania timera
 	byte timerStartedAt : static_cast<int>(timerCapacity);
@@ -92,14 +92,14 @@ private:
 	// uruchom timer wykonywania akcji
 	void TimerStart()
 	{
-		timerStartedAt = Timer2::Start(timerResolution, timerCapacity);
+		timerStartedAt = Timer::Start(timerResolution, timerCapacity);
 		timerCountTo = 1;
 	}
 
 	// zatrzymaj timer wykonywania akcji
 	void TimerStop()
 	{
-		timerStartedAt = Timer2::Stop();
+		timerStartedAt = Timer::Stop();
 		timerCountTo = 0;
 	}
 
