@@ -13,7 +13,7 @@ namespace EmdrWrapperTests
 		
 		TEST_METHOD(TestMethod1)
 		{
-			Timer::Resolution interval = Timer::Resolution::ms1;
+			Timer::Interval interval = Timer::Interval::ms1;
 			Timer::Capacity capacity = Timer::Capacity::bits3;
 			unsigned long startedAt = 7;
 			unsigned long countTo = 3;

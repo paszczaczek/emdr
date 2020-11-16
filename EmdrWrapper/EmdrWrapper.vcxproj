@@ -141,7 +141,6 @@
     <ClInclude Include="..\Emdr.h" />
     <ClInclude Include="..\EmdrController\Event.h" />
     <ClInclude Include="..\EmdrController\RemoteController.h" />
-    <ClInclude Include="..\EventHandler.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
     <ClInclude Include="..\Plugin.h" />
     <ClInclude Include="..\DiagnosticStripPlugin.h" />
@@ -166,7 +165,6 @@
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\EmdrController\Event.cpp" />
-    <ClCompile Include="..\MovingPointStripPlugin.cpp" />
     <ClCompile Include="Arduino.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="FastLED.cpp" />

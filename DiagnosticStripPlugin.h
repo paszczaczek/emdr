@@ -60,7 +60,7 @@ public:
 
 private:
 	// rozdzielczosc timera
-	constexpr static Timer::Resolution timerResolution = Timer::Resolution::s1;
+	constexpr static Timer::Interval timerResolution = Timer::Interval::s1;
 
 	// pojemnosc timera
 	constexpr static Timer::Capacity timerCapacity = Timer::Capacity::bit1;

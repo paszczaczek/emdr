@@ -5,7 +5,6 @@
 #include "Debug.h"
 #include "MemoryFree.h"
 #include "Timer.h"
-#include "EventHandler.h"
 #include "Strip.h"
 #include "MovingPointStripPlugin.h"
 //#include "RemoteController.h"

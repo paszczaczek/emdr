@@ -14,13 +14,13 @@ private:
 	static const Timer::Capacity movingTimerCapacity = Timer::Capacity::values256; // 8 bitow
 
 	// rozdzielczosc timera poruszajacego punktem
-	static const Timer::Resolution movingTimerInterval = Timer::Resolution::ms16;
+	static const Timer::Interval movingTimerInterval = Timer::Interval::ms16;
 
 	// pojemnosc timera zatrzymujacego poruszajacy sie punkt na krancach tasmy
 	static const Timer::Capacity pauseTimerCapacity = Timer::Capacity::values2; // 1 bit
 
 	// rozdzielczosc timera zatrzymujacego poruszajacy sie punkt na krancach tasmy
-	static const Timer::Resolution pauseTimerResolution = Timer::Resolution::s1;
+	static const Timer::Interval pauseTimerResolution = Timer::Interval::s1;
 
 	// czas trwania zabiegu
 	static const unsigned long sessionDuration = 60;

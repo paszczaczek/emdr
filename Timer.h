@@ -10,7 +10,7 @@ class Timer
 public:
 
 	// Czas trwania interwalu.
-	enum class Resolution : byte {
+	enum class Interval : byte {
 		ms1 = 0, ms2, ms4, ms8, ms16, ms32, ms64, ms128, ms256, ms512, ms1024,
 		s2, s4, s8, s16, s32, s64,
 		m2, m4, m8, m16, m32, m64,
@@ -92,7 +92,7 @@ public:
 
 	// Czy nadszel czas wystrzelenia licznika.
 	static bool ItsTime(
-		Resolution resolution,
+		Interval interval,
 		Capacity capacity,
 		unsigned long* startedAt,
 		unsigned long countTo,
@@ -109,8 +109,8 @@ public:
 		if (!IsStarted(countTo))
 			return false;
 
-		unsigned long now = Now(resolution, capacity);
-		unsigned long max = Window(resolution, capacity, -1);
+		unsigned long now = Now(interval, capacity);
+		unsigned long max = Window(interval, capacity, -1);
 		unsigned long elapsed;
 		// przypadek 1
 		if (now >= *startedAt)
@@ -186,13 +186,13 @@ public:
 #endif
 	}
 
-	static unsigned long Now(Resolution interval, Capacity capacity)
+	static unsigned long Now(Interval interval, Capacity capacity)
 	{
 		return Window(interval, capacity, millis());
 	}
 
 
-	static unsigned long Window(Resolution interval, Capacity capacity, unsigned long ms)
+	static unsigned long Window(Interval interval, Capacity capacity, unsigned long ms)
 	{
 		// ........ ........ ..XXXXXX X......  - window i millis()
 		byte shiftLeft = (byte)interval;
@@ -218,7 +218,7 @@ public:
 
 	// Czy nadszedl czas na wystrzelenie timera?
 	static bool ItsTime(
-		Resolution resolution,
+		Interval resolution,
 		Capacity capacity,
 		unsigned long& startedAt)
 	{
@@ -226,7 +226,7 @@ public:
 	}
 
 	// Uruchomienie timera.
-	static unsigned long Start(Resolution resolution, Capacity capacity)
+	static unsigned long Start(Interval resolution, Capacity capacity)
 	{
 		return Now(resolution, capacity);
 	}
