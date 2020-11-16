@@ -106,8 +106,14 @@
     <ClInclude Include="..\Debug.h">
       <Filter>Emdr</Filter>
     </ClInclude>
+    <ClInclude Include="..\EmdrController\EmdrController.h">
+      <Filter>EmdrController</Filter>
+    </ClInclude>
     <ClInclude Include="..\EmdrController\Event.h">
-      <Filter>Emdr</Filter>
+      <Filter>EmdrController</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EmdrController\EventName.h">
+      <Filter>EmdrController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -135,8 +141,11 @@
     <ClCompile Include="MemoryFree.cpp">
       <Filter>MemoryFree</Filter>
     </ClCompile>
+    <ClCompile Include="..\EmdrController\EmdrController.cpp">
+      <Filter>EmdrController</Filter>
+    </ClCompile>
     <ClCompile Include="..\EmdrController\Event.cpp">
-      <Filter>Emdr</Filter>
+      <Filter>EmdrController</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

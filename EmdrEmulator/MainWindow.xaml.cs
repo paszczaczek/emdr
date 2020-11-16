@@ -33,14 +33,19 @@ namespace EmdrEmulator
             DataContext = model;
 
             // obsługa Serial
-            EmdrWrapper.Serial.writeEvent += Serial_WriteEventHandler;
+            EmdrWrapper.EmdrSketch.Serial.writeEvent += Serial_WriteEventHandler;
 
             // obsługa FastLED
-            unsafe { EmdrWrapper.FastLED.addLedsEvent += FastLED_AddLedsEventHandler; }
-            unsafe { EmdrWrapper.FastLED.showEvent += FastLED_ShowEventHandler; }
+            unsafe { EmdrWrapper.EmdrSketch.FastLED.addLedsEvent += FastLED_AddLedsEventHandler; }
+            unsafe { EmdrWrapper.EmdrSketch.FastLED.showEvent += FastLED_ShowEventHandler; }
+
+            // obsluga Event
+            unsafe { EmdrWrapper.EmdrControllerSketch.Event.sendEvent += Event_SendEventHandler; }
+
 
             // uruchomienie funkcji setup()
-            EmdrWrapper.Sketch.setup();
+            EmdrWrapper.EmdrSketch.setup();
+            EmdrWrapper.EmdrControllerSketch.setup();
 
             // okresowe uruchamianie funcji loop()
             _timer = new Timer(LoopCallback, null, 0, 20);
@@ -102,13 +107,31 @@ namespace EmdrEmulator
             catch (TaskCanceledException) { }
         }
 
+        private unsafe void Event_SendEventHandler(int _name)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    Name name = (Name)_name;
+                    string text = $"Event.Name: {name}\n";
+                    model.SerialMonitor += text;
+                    serialMonitorScrollViewer.ScrollToBottom();
+                    Debug.Write(text);
+                });
+            }
+            catch (TaskCanceledException) { }
+        }
+
+
         private static bool _loopCallbackWorking = false;
         private readonly TimerCallback LoopCallback = (object state) =>
         {
             if (_loopCallbackWorking)
                 return;
             _loopCallbackWorking = true;
-            EmdrWrapper.Sketch.loop();
+            EmdrWrapper.EmdrSketch.loop();
+            EmdrWrapper.EmdrControllerSketch.loop();
             _loopCallbackWorking = false;
         };
 

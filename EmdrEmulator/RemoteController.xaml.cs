@@ -27,11 +27,15 @@ namespace EmdrEmulator
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            // w tag jest enum Name
             string tag = (string)((Button)sender).Tag;
-            if (int.TryParse(tag, out int button))
-                EmdrWrapper.RemoteController.ButtonReceived(button);
-            else
-                EmdrWrapper.RemoteController.ButtonReceived(0);
+            if (!Enum.TryParse<Name>(tag, out Name eventName))
+                eventName = global::Name.UnknowCode;
+
+            // zamieniamy EventName na IRCode
+            int IRCode = EmdrWrapper.EmdrControllerSketch.RemoteController
+                .EventNameToIRCode((int)eventName);
+            EmdrWrapper.EmdrControllerSketch.irrecv.DecodeReturnValue(IRCode);
         }
     }
 }

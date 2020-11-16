@@ -6,6 +6,8 @@
   <ItemGroup>
     <ClInclude Include="RemoteController.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="EmdrController.h" />
+    <ClInclude Include="EventName.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EmdrController.cpp" />

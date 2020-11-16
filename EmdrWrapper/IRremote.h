@@ -170,11 +170,19 @@ class decode_results
 class IRrecv
 {
 	public:
-		IRrecv(int recvpin) {}
+		IRrecv(int recvpin) { _decodeReturnValue = 0; }
 		//IRrecv (int recvpin, int blinkpin);
 
 		//void  blink13    (int blinkflag) ;
-		int   decode(decode_results *results) { return 0; }
+
+		unsigned int _decodeReturnValue;
+		int   decode(decode_results* results) { 
+			if (!_decodeReturnValue)
+				return 0; 
+			results->value = _decodeReturnValue;
+			_decodeReturnValue = 0;
+			return 1;
+		}
 		void  enableIRIn() {}
 		//bool  isIdle     ( ) ;
 		void  resume() {}

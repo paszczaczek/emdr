@@ -325,7 +325,7 @@ public:
 		controller->setLeds(data, nLedsOrOffset);
 		controllers.push_back(controller);
 
-		EmdrWrapper::FastLED::OnAddLeds(nLedsOrOffset);
+		EmdrWrapper::EmdrSketch::FastLED::OnAddLeds(nLedsOrOffset);
 
 		return *controller;
 	}

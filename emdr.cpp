@@ -1,7 +1,7 @@
 #define FASTLED_INTERNAL
 #include <Arduino.h>
 #include <FastLED.h>
-#include <IRremote.h>
+//#include <IRremote.h>
 #include "Debug.h"
 #include "MemoryFree.h"
 #include "Timer.h"
@@ -25,7 +25,7 @@ bool isDevelMode();
 
 constexpr int ENV_PIN = 4;     // pin for detecting production/development environmetn;
 
-#define RC_PIN  2 // pin for remote controller
+//#define RC_PIN  2 // pin for remote controller
 
 // remote controller
 //IRrecv irrecv(RC_PIN);

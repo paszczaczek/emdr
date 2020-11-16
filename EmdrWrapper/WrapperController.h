@@ -9,11 +9,11 @@ class WrapperController : public CLEDController {
 		for (int i = 0; i < nLeds; i++)
 			memcpy(leds + i, &data, sizeof(data));
 
-		EmdrWrapper::FastLED::OnShow(leds->raw, size());
+		EmdrWrapper::EmdrSketch::FastLED::OnShow(leds->raw, size());
 	};
 
 	virtual void show(const CRGB * data, int nLeds, CRGB scale) override 
 	{
-		EmdrWrapper::FastLED::OnShow(data->raw, nLeds);
+		EmdrWrapper::EmdrSketch::FastLED::OnShow(data->raw, nLeds);
 	};
 };

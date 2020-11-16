@@ -172,13 +172,16 @@ public:
 	{
 		if (state == State::Stopped)
 		{
+			PRINTLN(F("Start"));
 			Plugin::Start();
 			movingTimerStartedAt = Timer::Now(movingTimerInterval, movingTimerCapacity);
-			//sessionTimer.Start();
-			PRINTLN(F("Start"));
+			
 			//PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));
 			if (movingLastLedNo == 0)
 				movingLastLedNo = (byte)strip.controller->size() - 1;
+
+			strip.controller->leds()[movingFirstLedNo] = movingColor;
+			strip.updated = true;
 		}
 		else if (state == State::Paused)
 		{
@@ -239,12 +242,12 @@ private:
 		{
 		case Event::Name::UnknowCode:
 			break;
-		case Event::Name::BlockingInterruptsDisallowed:
+		//case Event::Name::BlockingInterruptsDisallowed:
 			//movingCounter.Pause();
-			break;
-		case Event::Name::BlockingInterruptsAllowed:
+			//break;
+		//case Event::Name::BlockingInterruptsAllowed:
 			//movingCounter.Resume();
-			break;
+			//break;
 		case Event::Name::Start:
 			Start();
 			break;
@@ -254,12 +257,12 @@ private:
 		case Event::Name::Pause:
 			Pause();
 			break;
-		case Event::Name::CHANEL_PLUS:
-			ChangeMovingSpeed(true);
-			break;
-		case Event::Name::CHANEL_MINUS:
-			ChangeMovingSpeed(false);
-			break;
+		//case Event::Name::CHANEL_PLUS:
+			//ChangeMovingSpeed(true);
+			//break;
+		//case Event::Name::CHANEL_MINUS:
+			//ChangeMovingSpeed(false);
+			//break;
 		}
 
 		return false;

@@ -10,7 +10,7 @@ extern IRrecv irrecv;
 
 class RemoteController
 {
-private: 
+private:
 	// odczytany kod z pilota
 	decode_results results;
 
@@ -29,7 +29,7 @@ public:
 			// uchylam zakaz uzywania przerwan
 			//PRINT(F("IR: timeout -> ")); PRINTLN((int)Event::Name::BlockingInterruptsAllowed);
 			isBlockingInterruptsDisallowed = false;
-			Event::Send(Event::Name::BlockingInterruptsAllowed);
+			//Event::Send(Event::Name::BlockingInterruptsAllowed);
 		}
 		if (irrecv.decode(&results)) {
 			ProcessCode();
@@ -64,7 +64,7 @@ private:
 			isBlockingInterruptsDisallowed = true;
 			//PRINT(F("UNKNOWN -> BLOCK"));
 			Event::Send(Event::Name::UnknowCode);
-			Event::Send(Event::Name::BlockingInterruptsDisallowed);
+			//Event::Send(Event::Name::BlockingInterruptsDisallowed);
 		}
 		else
 		{
@@ -76,19 +76,32 @@ private:
 		}
 	}
 
+	constexpr static int IR_CODE_START = 0x175;
+	constexpr static int IR_CODE_STOP = 0x176;
+	constexpr static int IR_CODE_PAUSE = 0x169;
+
 	// rozpoznaje kody z pilota
 	Event::Name GetEventName()
 	{
 		switch (results.value)
 		{
-		case 0x175: case 0x975: return Event::Name::Start;
-		case 0x176: case 0x976: return Event::Name::Stop;
-		case 0x169: case 0x969: return Event::Name::Pause;
+		case IR_CODE_START: case 0x975: return Event::Name::Start;
+		case IR_CODE_STOP:  case 0x976: return Event::Name::Stop;
+		case IR_CODE_PAUSE: case 0x969: return Event::Name::Pause;
+		default:                        return Event::Name::UnknowCode;
+		}
+	}
 
-		case 0x160: case 0x960: return Event::Name::CHANEL_PLUS;
-		case 0x161: case 0x961: return Event::Name::CHANEL_MINUS;
-
-		default: return Event::Name::UnknowCode;
+public:
+	int EventNameToIRCode(int _name) {
+		Event::Name name = static_cast<Event::Name>(_name);
+		switch (name)
+		{
+		case Event::Start:      return IR_CODE_START;
+		case Event::Stop:       return IR_CODE_STOP;
+		case Event::Pause:      return IR_CODE_PAUSE;
+		case Event::UnknowCode: return -1;
+		default:                return -1;
 		}
 	}
 };

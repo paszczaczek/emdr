@@ -1,2 +1,1 @@
-void setup() {}
-void loop() {}
+// setup() and loop() defined in EmdrController.cpp
