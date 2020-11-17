@@ -1,5 +1,4 @@
 #pragma once
-//#define FASTLED_ALLOW_INTERRUPTS 1
 #define FASTLED_INTERNAL
 #include <FastLED.h>
 #include "StripPlugin.h"
@@ -7,14 +6,25 @@
 
 class Strip : public Device
 {
+private:
+	constexpr static bool turnOnBuiltinLedOnStripUpdate = false;
+
 public:
 	Strip(int maxCurrent, byte ledsBrightness) :
 		ledsBrightness(ledsBrightness)
 	{
 		FastLED.setMaxPowerInVoltsAndMilliamps(5, maxCurrent);
 	}
-	
-	// konfiguracja paska ledow
+
+	// konfiguracja paska
+	void Setup()
+	{
+		// zgaszenie diody L, bo ciagle swieci i przeszkadza w nocy
+		pinMode(LED_BUILTIN, OUTPUT);
+		digitalWrite(LED_BUILTIN, LOW);
+	}
+
+	// konfiguracja kontrolera fastled
 	template<template<uint8_t DATA_PIN, EOrder RGB_ORDER> class CHIPSET, uint8_t DATA_PIN, EOrder RGB_ORDER>
 	void SetController()
 	{
@@ -65,7 +75,11 @@ public:
 
 		if (updated)
 		{
+			if constexpr (turnOnBuiltinLedOnStripUpdate)
+				digitalWrite(LED_BUILTIN, HIGH);
 			FastLED.show(ledsBrightness);
+			if constexpr (turnOnBuiltinLedOnStripUpdate)
+				digitalWrite(LED_BUILTIN, LOW);
 			updated = false;
 		}
 	}

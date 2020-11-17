@@ -59,6 +59,9 @@ void setup()
 		strip.SetController<WS2812B, STRIP_LEDS_PROD_PIN, GRB>();
 	}
 
+	// konfiguracja paska
+	strip.Setup();
+
 	// dodanie pluginow do stripu
 	strip.AddDiagnosticStipPlugin(&diagnosticStipPlugin);
 	strip.AddMovingPointStripPlugin(&movingPointStripPlugin);
