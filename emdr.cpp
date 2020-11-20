@@ -37,6 +37,8 @@ MovingPointStripPlugin movingPointStripPlugin;
 
 // strip
 Strip strip(STRIP_LEDS_MAX_CURRENT, STRIP_LEDS_BRIGHTNESS);
+
+// devices
 Device& stripDevice = strip;
 
 void setup()
@@ -48,7 +50,7 @@ void setup()
 	pinMode(ENV_PIN, INPUT_PULLUP);  
 	if (isDevelMode())
 	{
-		// w srodowisku devel tasma ma dlugosc 10 ledow, jest przyklejona do plyty glownej
+		// w srodowisku devel tasma ma dlugosc 6 ledow, jest przyklejona do plyty glownej
 		// i jest podlaczona do innego pinu
 		movingPointStripPlugin.Setup(10, 0, 5);
 		strip.SetController<WS2812B, STRIP_LEDS_DEVEL_PIN, GRB>();
@@ -61,10 +63,6 @@ void setup()
 
 	// konfiguracja paska
 	strip.Setup();
-
-	// dodanie pluginow do stripu
-	strip.AddDiagnosticStipPlugin(&diagnosticStipPlugin);
-	strip.AddMovingPointStripPlugin(&movingPointStripPlugin);
 
 	//irrecv.enableIRIn();
 

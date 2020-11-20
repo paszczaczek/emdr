@@ -4,6 +4,9 @@
 #include "StripPlugin.h"
 #include "Device.h"
 
+extern class DiagnosticStipPlugin diagnosticStipPlugin;
+extern class MovingPointStripPlugin movingPointStripPlugin;
+
 class Strip : public Device
 {
 private:
@@ -33,45 +36,37 @@ public:
 		FastLED.clear(true);
 	}
 
-	// dodanie pluginu poruszajacego sie punktu
-	void AddMovingPointStripPlugin(StripPlugin* movingPointStripPlugin)
-	{
-		plugins[movingPointStripPluginIdx] = movingPointStripPlugin;
-	}
-
 	// zwrocenie pluginu poruszajacego sie punktu
 	StripPlugin* GetMovingPointStripPlugin() {
-		return plugins[movingPointStripPluginIdx];
-	}
-
-	// dodanie pluginu diagnostycznego
-	void AddDiagnosticStipPlugin(StripPlugin* diagnosticStipPlugin)
-	{
-		plugins[diagnosticStipPluginIdx] = diagnosticStipPlugin;
+		return (StripPlugin*)&movingPointStripPlugin;
 	}
 
 	// zwrocenie pluginu diagnostycznego
 	StripPlugin* GetDiagnosticStipPlugin() {
-		return plugins[diagnosticStipPluginIdx];
+		return (StripPlugin*)&diagnosticStipPlugin;
 	}
 
 	void StartAllPlugins()
 	{
-		for (byte i = 0; i < pluginsCount; i++)
-			plugins[i]->Start();
+		((StripPlugin*)&diagnosticStipPlugin)->Start();
+		((StripPlugin*)&movingPointStripPlugin)->Start();
 	}
 
 	void StopAllPlugins()
 	{
-		for (byte i = 0; i < pluginsCount; i++)
-			plugins[i]->Stop();
+		((StripPlugin*)&diagnosticStipPlugin)->Stop();
+		((StripPlugin*)&movingPointStripPlugin)->Stop();
 	}
 
 	void Loop() override
 	{
-		for (byte i = 0; i < pluginsCount; i++)
-			if (plugins[i]->state != Plugin::State::Stopped)
-				plugins[i]->Loop();
+		auto diagnostic = (StripPlugin*)&diagnosticStipPlugin;
+		if (diagnostic->state != Plugin::State::Stopped)
+			diagnostic->Loop();
+
+		auto movingPoint = (StripPlugin*)&movingPointStripPlugin;
+		if (movingPoint->state != Plugin::State::Stopped)
+			movingPoint->Loop();
 
 		if (updated)
 		{
@@ -86,8 +81,11 @@ public:
 
 	bool Receive(Event::Name eventName) override
 	{
-		for (byte i = 0; i < pluginsCount; i++)
-			plugins[i]->Receive(eventName);
+		auto diagnostic = (StripPlugin*)&diagnosticStipPlugin;
+		diagnostic->Receive(eventName);
+
+		auto movingPoint = (StripPlugin*)&movingPointStripPlugin;
+		movingPoint->Receive(eventName);
 
 		return false;
 	}
@@ -104,11 +102,9 @@ public:
 
 private:
 	constexpr static int ledsCount = 179;
-	constexpr static int pluginsCount = 2;
 	constexpr static int diagnosticStipPluginIdx = 0;
 	constexpr static int movingPointStripPluginIdx = 1;
 	CRGB leds[ledsCount];
-	StripPlugin* plugins[pluginsCount];
 };
 
 extern Strip strip;
