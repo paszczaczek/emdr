@@ -77,6 +77,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EventName.cs" />
+    <Compile Include="IRCode.cs" />
     <Compile Include="RemoteController.xaml.cs">
       <DependentUpon>RemoteController.xaml</DependentUpon>
     </Compile>
@@ -139,6 +140,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>copy $(ProjectDir)..\EmdrController\EventName.h $(ProjectDir)EventName.cs</PreBuildEvent>
+    <PreBuildEvent>copy $(ProjectDir)..\EmdrController\EventName.h $(ProjectDir)EventName.cs
+copy $(ProjectDir)..\EmdrController\IRCode.h $(ProjectDir)IRCode.cs</PreBuildEvent>
   </PropertyGroup>
 </Project>

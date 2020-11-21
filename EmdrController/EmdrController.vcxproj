@@ -156,6 +156,7 @@
     <ClInclude Include="Event.h" />
     <None Include="EmdrController.ino" />
     <ClInclude Include="EventName.h" />
+    <ClInclude Include="IRCode.h" />
     <ClInclude Include="RemoteController.h">
       <FileType>CppCode</FileType>
     </ClInclude>

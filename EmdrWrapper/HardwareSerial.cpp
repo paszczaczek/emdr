@@ -31,7 +31,10 @@ size_t HardwareSerial::println()
 size_t HardwareSerial::print(int value, int format)
 {
 	char str[256] = "";
-	snprintf(str, sizeof(str), "%d", value);
+	if (format == HEX)
+		snprintf(str, sizeof(str), "0x%x", value);
+	else
+		snprintf(str, sizeof(str), "%d", value);
 	EmdrWrapper::EmdrSketch::Serial::OnWrite(str);
 	return strlen(str);
 }

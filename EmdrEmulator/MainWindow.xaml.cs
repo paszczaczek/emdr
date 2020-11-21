@@ -115,7 +115,7 @@ namespace EmdrEmulator
                 {
                     Name name = (Name)_name;
                     string text = $"Event.Name: {name}\n";
-                    model.SerialMonitor += text;
+                    //model.SerialMonitor += text;
                     serialMonitorScrollViewer.ScrollToBottom();
                     Debug.Write(text);
                 });

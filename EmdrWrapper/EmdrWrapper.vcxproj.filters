@@ -115,6 +115,9 @@
     <ClInclude Include="..\EmdrController\EventName.h">
       <Filter>EmdrController</Filter>
     </ClInclude>
+    <ClInclude Include="..\EmdrController\IRCode.h">
+      <Filter>EmdrController</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -72,7 +72,7 @@ namespace EmdrWrapper {
 		public:
 			static void DecodeReturnValue(int value)
 			{
-				::irrecv._decodeReturnValue = (unsigned int)value;
+				::remoteController.irrecv._decodeReturnValue = (unsigned int)value;
 			}
 		};
 
@@ -87,7 +87,7 @@ namespace EmdrWrapper {
 			}
 		};
 
-		ref class RemoteController
+		/*ref class RemoteController
 		{
 		public:
 			static int EventNameToIRCode(int name)
@@ -95,7 +95,7 @@ namespace EmdrWrapper {
 				return ::remoteController.EventNameToIRCode(name);
 		
 			}
-		};
+		};*/
 
 	};
 }

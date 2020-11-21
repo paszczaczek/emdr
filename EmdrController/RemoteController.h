@@ -1,39 +1,26 @@
 #pragma once
-//#include <stdint.h>
+#include <Arduino.h>
 #include <IRremote.h>
-//#include <Arduino.h>
 #include "Event.h"
-//#include "Debug.h"
-//#include "Timer.h"
-
-extern IRrecv irrecv;
+#include "IRCode.h"
 
 class RemoteController
 {
 private:
-	// odczytany kod z pilota
-	decode_results results;
-
-	// czas odczytania ostatniego kodu z pilota
-	unsigned long lastCodeTime = 0;
-
-	// czy zakaz blokowania przerwan obiwiazuje
-	bool isBlockingInterruptsDisallowed = false;
+	constexpr static int RC_PIN = 12;
 
 public:
+	RemoteController() : irrecv(RC_PIN) { }
+
+	void Setup()
+	{
+		irrecv.enableIRIn();
+		Serial.println(F("ir enabled"));
+	}
+
 	void Loop() {
-		// jesli jest zakaz blokowania przerwan i dosc dlugo nie odebrano zadnego kodu,
-		//if (isBlockingInterruptsDisallowed && millis() - lastCodeTime > 3000)
-		{
-			// to prawdopodobnie pilot nie bedzie w najblizszej chwili uzywany 
-			// uchylam zakaz uzywania przerwan
-			//PRINT(F("IR: timeout -> ")); PRINTLN((int)Event::Name::BlockingInterruptsAllowed);
-			isBlockingInterruptsDisallowed = false;
-			//Event::Send(Event::Name::BlockingInterruptsAllowed);
-		}
 		if (irrecv.decode(&results)) {
 			ProcessCode();
-			//lastCodeTime = millis();
 			irrecv.resume();
 		}
 	}
@@ -42,68 +29,71 @@ private:
 
 	// przetwarza kod odczytany z pilota
 	void ProcessCode() {
-		//PRINT(F("IR: ")); PRINT(results.value, HEX); PRINT(F(" -> "));
-
-		// probujemy rozpoznac kod
-		Event::Name eventName = GetEventName();
-		if (eventName != Event::Name::UnknowCode)
-		{
-			// kod rozpoznany
-			//PRINTLN((byte)eventName);
-			Event::Send(eventName);
-			return;
-		}
-
-		// kod nierozpoznany
-		if (!isBlockingInterruptsDisallowed)
-		{
-			// kod nierozpoznay i nie wiadomo czy dlatego ze:
-			// a. strip zablokowal przerwania przeklamujac odczyt kodu
-			// b. odczyt kodu jest poprawny ale go nie obslugujemy
-			// wysylamy zakaz blokowania przerwan, aby by to rozstrzygnac
-			isBlockingInterruptsDisallowed = true;
-			//PRINT(F("UNKNOWN -> BLOCK"));
-			Event::Send(Event::Name::UnknowCode);
-			//Event::Send(Event::Name::BlockingInterruptsDisallowed);
-		}
-		else
-		{
-			// kod nierozpoznany i wyslalismy juz wczesniej zakaz uzywania przerwan 
-			// oznacza to ze kod odczytal sie poprawnie, ale nie obslugujemy 
-			// wysylamy komunikat o nieznanym kodzie
-			//PRINTLN(F("UNKNOWN"));
-			Event::Send(Event::Name::UnknowCode);
-		}
+		Event::Name eventName = RecognizeIRCode();
+		SerialPrintCodes(results.value, eventName);
+		Event::Send(eventName);
+		return;
 	}
 
-	constexpr static int IR_CODE_START = 0x175;
-	constexpr static int IR_CODE_STOP = 0x176;
-	constexpr static int IR_CODE_PAUSE = 0x169;
-
 	// rozpoznaje kody z pilota
-	Event::Name GetEventName()
+	Event::Name RecognizeIRCode()
 	{
 		switch (results.value)
 		{
-		case IR_CODE_START: case 0x975: return Event::Name::Start;
-		case IR_CODE_STOP:  case 0x976: return Event::Name::Stop;
-		case IR_CODE_PAUSE: case 0x969: return Event::Name::Pause;
-		default:                        return Event::Name::UnknowCode;
+		case AverMediaIRCode::Digit1: return Event::Name::Digit1;
+		case AverMediaIRCode::Digit2: return Event::Name::Digit2;
+		case AverMediaIRCode::Digit3: return Event::Name::Digit3;
+		case AverMediaIRCode::Digit4: return Event::Name::Digit4;
+		case AverMediaIRCode::Digit5: return Event::Name::Digit5;
+		case AverMediaIRCode::Digit6: return Event::Name::Digit6;
+		case AverMediaIRCode::Digit7: return Event::Name::Digit7;
+		case AverMediaIRCode::Digit8: return Event::Name::Digit8;
+		case AverMediaIRCode::Digit9: return Event::Name::Digit9;
+		case AverMediaIRCode::Digit0: return Event::Name::Digit0;
+		default:                      return Event::Name::UnknowCode;
+		}
+	}
+
+	void SerialPrintCodes(unsigned long irCode, Event::Name eventName)
+	{
+		Serial.print(F("ir: "));
+		Serial.print(irCode, HEX);
+		Serial.print(F(" -> "));
+		switch (eventName)
+		{
+		case Event::UnknowCode: Serial.println(F("UnknowCode")); break;
+		case Event::Digit1:     Serial.println(F("Digit1")); break;
+		case Event::Digit2:     Serial.println(F("Digit2")); break;
+		case Event::Digit3:     Serial.println(F("Digit3")); break;
+		case Event::Digit4:     Serial.println(F("Digit4")); break;
+		case Event::Digit5:     Serial.println(F("Digit5")); break;
+		case Event::Digit6:     Serial.println(F("Digit6")); break;
+		case Event::Digit7:     Serial.println(F("Digit7")); break;
+		case Event::Digit8:     Serial.println(F("Digit8")); break;
+		case Event::Digit9:     Serial.println(F("Digit9")); break;
+		case Event::Digit0:     Serial.println(F("Digit0")); break;
 		}
 	}
 
 public:
-	int EventNameToIRCode(int _name) {
-		Event::Name name = static_cast<Event::Name>(_name);
-		switch (name)
-		{
-		case Event::Start:      return IR_CODE_START;
-		case Event::Stop:       return IR_CODE_STOP;
-		case Event::Pause:      return IR_CODE_PAUSE;
-		case Event::UnknowCode: return -1;
-		default:                return -1;
-		}
-	}
+	//int EventNameToIRCode(int _name) {
+	//	Event::Name name = static_cast<Event::Name>(_name);
+	//	switch (name)
+	//	{
+	//	case Event::Start:      return IR_CODE_START;
+	//	case Event::Stop:       return IR_CODE_STOP;
+	//	case Event::Pause:      return IR_CODE_PAUSE;
+	//	case Event::UnknowCode: return -1;
+	//	default:                return -1;
+	//	}
+	//}
+	
+	// odbiornik pilota
+	IRrecv irrecv;
+
+private:
+	// odczytany kod z pilota
+	decode_results results;
 };
 
 extern RemoteController remoteController;

@@ -143,6 +143,7 @@
     <ClInclude Include="..\EmdrController\EmdrController.h" />
     <ClInclude Include="..\EmdrController\Event.h" />
     <ClInclude Include="..\EmdrController\EventName.h" />
+    <ClInclude Include="..\EmdrController\IRCode.h" />
     <ClInclude Include="..\EmdrController\RemoteController.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
     <ClInclude Include="..\Plugin.h" />
