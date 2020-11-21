@@ -32,11 +32,11 @@ public:
 			case Action::TestAllDevices:
 				switch (actionStep++)
 				{
-				case 0: strip.SetLeds(CRGB::White); strip.updated = true; TimerStart();               break;
-				case 1: strip.SetLeds(CRGB::Red);   strip.updated = true; TimerStart();               break;
-				case 2: strip.SetLeds(CRGB::Green); strip.updated = true; TimerStart();               break;
-				case 3: strip.SetLeds(CRGB::Blue);  strip.updated = true; TimerStart();               break;
-				case 4: strip.SetLeds(CRGB::Black); strip.updated = true; TimerStart(); ActionNext(); break;
+				case 0: strip.SetAllLeds(CRGB::White); strip.updated = true; TimerStart();               break;
+				case 1: strip.SetAllLeds(CRGB::Red);   strip.updated = true; TimerStart();               break;
+				case 2: strip.SetAllLeds(CRGB::Green); strip.updated = true; TimerStart();               break;
+				case 3: strip.SetAllLeds(CRGB::Blue);  strip.updated = true; TimerStart();               break;
+				case 4: strip.SetAllLeds(CRGB::Black); strip.updated = true; TimerStart(); ActionNext(); break;
 				}
 				break;
 			case Action::StartMovingPointStripPlugin:

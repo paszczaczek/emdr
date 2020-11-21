@@ -11,8 +11,13 @@ class Strip : public Device
 {
 private:
 	constexpr static bool turnOnBuiltinLedOnStripUpdate = false;
+	constexpr static void* plugins[] = {
+		&diagnosticStipPlugin,
+		&movingPointStripPlugin
+	};
 
 public:
+	// konstruktor
 	Strip(int maxCurrent, byte ledsBrightness) :
 		ledsBrightness(ledsBrightness)
 	{
@@ -46,27 +51,21 @@ public:
 		return (StripPlugin*)&diagnosticStipPlugin;
 	}
 
-	void StartAllPlugins()
-	{
-		((StripPlugin*)&diagnosticStipPlugin)->Start();
-		((StripPlugin*)&movingPointStripPlugin)->Start();
-	}
-
+	// zatrzymanie wszystkich pluginow
 	void StopAllPlugins()
 	{
 		((StripPlugin*)&diagnosticStipPlugin)->Stop();
 		((StripPlugin*)&movingPointStripPlugin)->Stop();
 	}
 
+	// obsluga petli zdarzen
 	void Loop() override
 	{
-		auto diagnostic = (StripPlugin*)&diagnosticStipPlugin;
-		if (diagnostic->state != Plugin::State::Stopped)
-			diagnostic->Loop();
-
-		auto movingPoint = (StripPlugin*)&movingPointStripPlugin;
-		if (movingPoint->state != Plugin::State::Stopped)
-			movingPoint->Loop();
+		ForEachPlugins([](StripPlugin* plugin, Event::Name)
+			{
+				if (plugin->state != Plugin::State::Stopped)
+					plugin->Loop();
+			});
 
 		if (updated)
 		{
@@ -81,29 +80,50 @@ public:
 
 	bool Receive(Event::Name eventName) override
 	{
-		auto diagnostic = (StripPlugin*)&diagnosticStipPlugin;
-		diagnostic->Receive(eventName);
+		ForEachPlugins([](StripPlugin* plugin, Event::Name eventName)
+			{
+				plugin->Receive(eventName);
 
-		auto movingPoint = (StripPlugin*)&movingPointStripPlugin;
-		movingPoint->Receive(eventName);
+			}, eventName);
 
 		return false;
 	}
 
-	void SetLeds(CRGB color)
+	// ustawienie wszystkich ledow na wskazany kolor
+	void SetAllLeds(CRGB color)
 	{
 		for (int i = 0; i < controller->size(); i++)
 			controller->leds()[i] = color;
 	}
 
+	// czy stan strpu ulegl zmianie i trzeba odswiezyc diody
 	bool updated = false;
+
+	// kontroler ledow
 	CLEDController* controller = nullptr;
+
+	// jasnosc swiecenia wszystkich diod
 	byte ledsBrightness;
+
+private:
+
+	// wykonuje akcje dla wszystkich pluginow
+	void ForEachPlugins(
+		void (*action)(StripPlugin*, Event::Name), 
+		Event::Name eventName = Event::Name::UnknowCode)
+	{
+		for (size_t i = 0; i < pluginsCount; i++)
+		{
+			StripPlugin* plugin = (StripPlugin*)plugins[i];
+			(*action)(plugin, eventName);
+		}
+	}
 
 private:
 	constexpr static int ledsCount = 179;
 	constexpr static int diagnosticStipPluginIdx = 0;
 	constexpr static int movingPointStripPluginIdx = 1;
+	constexpr static int pluginsCount = sizeof(plugins) / sizeof(*plugins);
 	CRGB leds[ledsCount];
 };
 
