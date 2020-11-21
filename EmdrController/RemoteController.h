@@ -15,6 +15,7 @@ public:
 	void Setup()
 	{
 		irrecv.enableIRIn();
+		irrecv.blink13(true);
 		Serial.println(F("ir enabled"));
 	}
 

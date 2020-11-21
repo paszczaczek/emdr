@@ -173,7 +173,7 @@ class IRrecv
 		IRrecv(int recvpin) { _decodeReturnValue = 0; }
 		//IRrecv (int recvpin, int blinkpin);
 
-		//void  blink13    (int blinkflag) ;
+		void  blink13(int blinkflag) {}
 
 		unsigned int _decodeReturnValue;
 		int   decode(decode_results* results) { 
