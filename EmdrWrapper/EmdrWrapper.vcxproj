@@ -155,12 +155,15 @@
     <ClInclude Include="Arduino.h" />
     <ClInclude Include="ArduinoSTL.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="colorutils.h" />
     <ClInclude Include="controller.h" />
     <ClInclude Include="EmdrWrapper.h" />
     <ClInclude Include="FastLED.h" />
     <ClInclude Include="IRremote.h" />
+    <ClInclude Include="LCD_I2C.h" />
     <ClInclude Include="MemoryFree.h" />
     <ClInclude Include="pixeltypes.h" />
+    <ClInclude Include="Print.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="HardwareSerial.h" />
     <ClInclude Include="stdafx.h" />

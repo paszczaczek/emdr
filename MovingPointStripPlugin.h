@@ -1,9 +1,9 @@
 #pragma once
 #include <Arduino.h>
+#include <colorutils.h>
 #include "Strip.h"
 #include "StripPlugin.h"
 #include "Timer.h"
-//#include "RemoteController.h"
 #include "Emdr.h"
 #include "Debug.h"
 
@@ -82,6 +82,9 @@ public:
 	// petla zdarzen
 	virtual void Loop() override
 	{
+		// TODO
+		return;
+
 		unsigned long counterStartedAt;
 		unsigned long ommittedIntervals;
 		
@@ -182,6 +185,9 @@ public:
 
 			strip.controller->leds()[movingFirstLedNo] = movingColor;
 			strip.updated = true;
+
+			// TODO
+			FillRainbow();
 		}
 		else if (state == State::Paused)
 		{
@@ -267,4 +273,13 @@ private:
 
 		return false;
 	}
+
+	// ustawia wszystkie ledy w kolory teczy
+	void FillRainbow()
+	{
+		//float deltaHue = 255 / (float)strip.controller->size();
+		byte deltaHue = 255 / (movingLastLedNo - movingFirstLedNo + 1);
+		fill_rainbow(strip.controller->leds(), strip.controller->size(), 0, deltaHue);
+	}
+
 };

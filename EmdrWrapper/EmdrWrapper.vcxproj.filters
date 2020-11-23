@@ -34,6 +34,9 @@
     <Filter Include="EmdrController">
       <UniqueIdentifier>{3b220436-fc62-493a-9ae1-dd70949fe6da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LCD_I2C">
+      <UniqueIdentifier>{8e39db13-6af8-46f2-b864-bddf1c6e0043}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -117,6 +120,15 @@
     </ClInclude>
     <ClInclude Include="..\EmdrController\IRCode.h">
       <Filter>EmdrController</Filter>
+    </ClInclude>
+    <ClInclude Include="colorutils.h">
+      <Filter>FastLED</Filter>
+    </ClInclude>
+    <ClInclude Include="LCD_I2C.h">
+      <Filter>LCD_I2C</Filter>
+    </ClInclude>
+    <ClInclude Include="Print.h">
+      <Filter>Arduino</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
