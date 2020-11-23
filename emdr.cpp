@@ -1,6 +1,7 @@
 #define FASTLED_INTERNAL
 #include <Arduino.h>
 #include <FastLED.h>
+#include <Wire.h>
 //#include <IRremote.h>
 #include "Debug.h"
 #include "MemoryFree.h"
@@ -24,6 +25,7 @@ bool isDevelMode();
 #define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
 constexpr int ENV_PIN = 4;     // pin for detecting production/development environmetn;
+constexpr int emdrAddr = 9;
 
 //#define RC_PIN  2 // pin for remote controller
 
@@ -71,6 +73,22 @@ void setup()
 		DiagnosticStipPlugin::Action::TestAllDevices, 
 		DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
 	diagnosticStipPlugin.Start();
+
+  extern void onReceiveFromController();
+  Wire.begin(emdrAddr);
+  Wire.onReceive(onReceiveFromController);
+  Serial.println("wire started");
+}
+
+void onReceiveFromController()
+{
+  while (Wire.available()) 
+  {
+    byte b = Wire.read();
+    Serial.print("Received ");  
+    Serial.print(b);
+    Serial.println();
+  }
 }
 
 void loop()
@@ -97,5 +115,3 @@ bool isDevelMode() {
 
 	return devel;
 }
-
-
