@@ -74,13 +74,13 @@ void setup()
 		DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
 	diagnosticStipPlugin.Start();
 
-  extern void onReceiveFromController();
+  extern void onReceiveFromController(int);
   Wire.begin(emdrAddr);
   Wire.onReceive(onReceiveFromController);
   Serial.println("wire started");
 }
 
-void onReceiveFromController()
+void onReceiveFromController(int)
 {
   while (Wire.available()) 
   {

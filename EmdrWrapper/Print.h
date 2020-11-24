@@ -1,4 +1,13 @@
 #pragma once
+
+#define DEC 10
+#define HEX 16
+#define OCT 8
+#ifdef BIN // Prevent warnings if BIN is previously defined in "iotnx4.h" or similar
+#undef BIN
+#endif
+#define BIN 2
+
 class Print
 {
 private:
@@ -35,7 +44,7 @@ public:
     //size_t print(int, int = DEC);
     //size_t print(unsigned int, int = DEC);
     //size_t print(long, int = DEC);
-    //size_t print(unsigned long, int = DEC);
+    size_t print(unsigned long, int = DEC) { return 0; }
     //size_t print(double, int = 2);
     //size_t print(const Printable&);
 

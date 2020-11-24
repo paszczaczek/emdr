@@ -1,0 +1,4 @@
+#include <Wire.h>
+// Preinstantiate Objects //////////////////////////////////////////////////////
+
+TwoWire Wire = TwoWire();

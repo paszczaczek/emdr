@@ -66,8 +66,8 @@ public:
     void backlight() {}
     //void noBacklight();
 
-    /*void clear();
-    void home();
+    void clear() {}
+    /*void home();
     void leftToRight();
     void rightToLeft();
     void autoscroll();
