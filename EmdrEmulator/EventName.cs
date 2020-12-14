@@ -3,6 +3,12 @@
 // - EmdrEmulator (cs windows)
 // modyfikuj w projekcie *EmdrController*
 // plik z EmdrController jest kopiowany do EmdEmulator
+
+#if !__LINE__
+namespace EmdrEmulator
+{
+#endif
+
 enum Name
 {
 	UnknowCode = 0,
@@ -20,3 +26,7 @@ enum Name
 	Stop,
 	Pause
 };
+
+#if !__LINE__
+}
+#endif

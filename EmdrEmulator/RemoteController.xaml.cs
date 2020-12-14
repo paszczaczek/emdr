@@ -27,17 +27,8 @@ namespace EmdrEmulator
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            // w tag jest enum AverMediaIRCodes
-            string tag = (string)((Button)sender).Tag;
-
-            // parsujemy tag na enum AverMedia
-            int irCode;
-            if (Enum.TryParse(tag, out AverMediaIRCode averMediaIRCode))
-                irCode = (int)averMediaIRCode;
-            else
-                irCode = -1;
-
-            EmdrWrapper.EmdrControllerSketch.irrecv.DecodeReturnValue(irCode);
+            var irCode = (AverMediaIRCode)((Button)sender).Tag;
+            EmdrWrapper.EmdrControllerSketch.irrecv.DecodeReturnValue((int)irCode);
         }
     }
 }

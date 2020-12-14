@@ -2,7 +2,13 @@
 // - EmdrController (c++ arduino)
 // - EmdrEmulator (cs windows)
 // modyfikuj w projekcie *EmdrController*
-// plik z EmdrController jest kopiowany do EmdEmulator
+// plik z projektu EmdrController jest kopiowany do projektu EmdEmulator
+
+#if !__LINE__
+namespace EmdrEmulator
+{
+#endif
+
 enum AverMediaIRCode {
 	Digit1 = 0x40BFA05F, 
 	Digit2 = 0x40BF609F,
@@ -15,3 +21,7 @@ enum AverMediaIRCode {
 	Digit9 = 0x40BFF00F,
 	Digit0 = 0x40BF8877
 };
+
+#if !__LINE__
+}
+#endif
