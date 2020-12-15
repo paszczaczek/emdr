@@ -24,19 +24,10 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\EmdrWrapper\Arduino\Arduino.cpp">
-      <Filter>Arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EmdrWrapper\Arduino\HardwareSerial.cpp">
-      <Filter>Arduino</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\EmdrWrapper\Arduino\HardwareSerial.h">
-      <Filter>Arduino</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
