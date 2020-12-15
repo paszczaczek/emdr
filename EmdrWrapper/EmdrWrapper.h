@@ -3,7 +3,7 @@
 #include "Emdr.h"
 #include "EmdrController/EmdrController.h"
 #include "EmdrController/Event.h"
-#include "RemoteController.h"
+#include "EmdrController/RemoteController.h"
 
 using System::String;
 

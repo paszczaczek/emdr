@@ -42,38 +42,14 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="color.h">
-      <Filter>FastLED</Filter>
-    </ClInclude>
-    <ClInclude Include="controller.h">
-      <Filter>FastLED</Filter>
-    </ClInclude>
-    <ClInclude Include="FastLED.h">
-      <Filter>FastLED</Filter>
-    </ClInclude>
-    <ClInclude Include="pixeltypes.h">
-      <Filter>FastLED</Filter>
-    </ClInclude>
-    <ClInclude Include="Arduino.h">
-      <Filter>Arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="ArduinoSTL.h">
-      <Filter>Arduino</Filter>
-    </ClInclude>
     <ClInclude Include="..\Emdr.h">
       <Filter>Emdr</Filter>
-    </ClInclude>
-    <ClInclude Include="HardwareSerial.h">
-      <Filter>Arduino</Filter>
     </ClInclude>
     <ClInclude Include="..\Strip.h">
       <Filter>Emdr</Filter>
     </ClInclude>
     <ClInclude Include="..\Timer.h">
       <Filter>Emdr</Filter>
-    </ClInclude>
-    <ClInclude Include="WrapperController.h">
-      <Filter>FastLED</Filter>
     </ClInclude>
     <ClInclude Include="EmdrWrapper.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h">
@@ -84,12 +60,6 @@
     </ClInclude>
     <ClInclude Include="..\Plugin.h">
       <Filter>Emdr</Filter>
-    </ClInclude>
-    <ClInclude Include="IRremote.h">
-      <Filter>IRremote</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryFree.h">
-      <Filter>MemoryFree</Filter>
     </ClInclude>
     <ClInclude Include="..\DiagnosticStripPlugin.h">
       <Filter>Emdr</Filter>
@@ -118,46 +88,64 @@
     <ClInclude Include="..\EmdrController\IRCode.h">
       <Filter>EmdrController</Filter>
     </ClInclude>
-    <ClInclude Include="colorutils.h">
+    <ClInclude Include="FastLED\hsv2rgb.h">
       <Filter>FastLED</Filter>
     </ClInclude>
-    <ClInclude Include="LCD_I2C.h">
+    <ClInclude Include="FastLED\color.h">
+      <Filter>FastLED</Filter>
+    </ClInclude>
+    <ClInclude Include="FastLED\colorutils.h">
+      <Filter>FastLED</Filter>
+    </ClInclude>
+    <ClInclude Include="FastLED\controller.h">
+      <Filter>FastLED</Filter>
+    </ClInclude>
+    <ClInclude Include="FastLED\FastLED.h">
+      <Filter>FastLED</Filter>
+    </ClInclude>
+    <ClInclude Include="FastLED\pixeltypes.h">
+      <Filter>FastLED</Filter>
+    </ClInclude>
+    <ClInclude Include="FastLED\WrapperController.h">
+      <Filter>FastLED</Filter>
+    </ClInclude>
+    <ClInclude Include="Arduino\Arduino.h">
+      <Filter>Arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Arduino\ArduinoSTL.h">
+      <Filter>Arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Arduino\HardwareSerial.h">
+      <Filter>Arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Arduino\Print.h">
+      <Filter>Arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Arduino\Stream.h">
+      <Filter>Arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="Arduino\Wire.h">
+      <Filter>Arduino</Filter>
+    </ClInclude>
+    <ClInclude Include="IRemote\IRremote.h">
+      <Filter>IRremote</Filter>
+    </ClInclude>
+    <ClInclude Include="LCD_I2C\LCD_I2C.h">
       <Filter>LCD_I2C</Filter>
     </ClInclude>
-    <ClInclude Include="Print.h">
-      <Filter>Arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Wire.h">
-      <Filter>Arduino</Filter>
-    </ClInclude>
-    <ClInclude Include="Stream.h">
-      <Filter>Arduino</Filter>
+    <ClInclude Include="MemoryFree.h">
+      <Filter>Emdr</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Arduino.cpp">
-      <Filter>Arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="FastLED.cpp">
-      <Filter>FastLED</Filter>
-    </ClCompile>
     <ClCompile Include="..\Emdr.cpp">
       <Filter>Emdr</Filter>
     </ClCompile>
-    <ClCompile Include="HardwareSerial.cpp">
-      <Filter>Arduino</Filter>
-    </ClCompile>
-    <ClCompile Include="pixeltypes.cpp">
-      <Filter>FastLED</Filter>
-    </ClCompile>
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryFree.cpp">
-      <Filter>MemoryFree</Filter>
     </ClCompile>
     <ClCompile Include="..\EmdrController\EmdrController.cpp">
       <Filter>EmdrController</Filter>
@@ -165,8 +153,26 @@
     <ClCompile Include="..\EmdrController\Event.cpp">
       <Filter>EmdrController</Filter>
     </ClCompile>
-    <ClCompile Include="Wire.cpp">
+    <ClCompile Include="FastLED\hsv2rgb.cpp">
+      <Filter>FastLED</Filter>
+    </ClCompile>
+    <ClCompile Include="FastLED\FastLED.cpp">
+      <Filter>FastLED</Filter>
+    </ClCompile>
+    <ClCompile Include="FastLED\pixeltypes.cpp">
+      <Filter>FastLED</Filter>
+    </ClCompile>
+    <ClCompile Include="Arduino\Arduino.cpp">
       <Filter>Arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Arduino\HardwareSerial.cpp">
+      <Filter>Arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="Arduino\Wire.cpp">
+      <Filter>Arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryFree.cpp">
+      <Filter>Emdr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

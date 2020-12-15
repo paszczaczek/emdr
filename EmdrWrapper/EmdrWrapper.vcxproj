@@ -93,7 +93,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\EmdrController;$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)FastLed;$(ProjectDir)Arduino;$(ProjectDir)IRemote;$(ProjectDir)LCD_I2C;$(ProjectDir)..\EmdrController;$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ShowIncludes>false</ShowIncludes>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>true</SupportJustMyCode>
@@ -152,42 +152,44 @@
     <ClInclude Include="..\Strip.h" />
     <ClInclude Include="..\StripPlugin.h" />
     <ClInclude Include="..\Timer.h" />
-    <ClInclude Include="Arduino.h" />
-    <ClInclude Include="ArduinoSTL.h" />
-    <ClInclude Include="color.h" />
-    <ClInclude Include="colorutils.h" />
-    <ClInclude Include="controller.h" />
+    <ClInclude Include="Arduino\Arduino.h" />
+    <ClInclude Include="Arduino\ArduinoSTL.h" />
+    <ClInclude Include="Arduino\HardwareSerial.h" />
+    <ClInclude Include="Arduino\Print.h" />
+    <ClInclude Include="Arduino\Stream.h" />
+    <ClInclude Include="Arduino\Wire.h" />
     <ClInclude Include="EmdrWrapper.h" />
-    <ClInclude Include="FastLED.h" />
-    <ClInclude Include="IRremote.h" />
-    <ClInclude Include="LCD_I2C.h" />
+    <ClInclude Include="FastLED\color.h" />
+    <ClInclude Include="FastLED\colorutils.h" />
+    <ClInclude Include="FastLED\controller.h" />
+    <ClInclude Include="FastLED\FastLED.h" />
+    <ClInclude Include="FastLED\hsv2rgb.h" />
+    <ClInclude Include="FastLED\pixeltypes.h" />
+    <ClInclude Include="FastLED\WrapperController.h" />
+    <ClInclude Include="IRemote\IRremote.h" />
+    <ClInclude Include="LCD_I2C\LCD_I2C.h" />
     <ClInclude Include="MemoryFree.h" />
-    <ClInclude Include="pixeltypes.h" />
-    <ClInclude Include="Print.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="HardwareSerial.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Stream.h" />
-    <ClInclude Include="Wire.h" />
-    <ClInclude Include="WrapperController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\EmdrController\EmdrController.cpp" />
     <ClCompile Include="..\EmdrController\Event.cpp" />
-    <ClCompile Include="Arduino.cpp" />
+    <ClCompile Include="Arduino\Arduino.cpp" />
+    <ClCompile Include="Arduino\HardwareSerial.cpp" />
+    <ClCompile Include="Arduino\Wire.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="FastLED.cpp" />
-    <ClCompile Include="HardwareSerial.cpp" />
+    <ClCompile Include="FastLED\FastLED.cpp" />
+    <ClCompile Include="FastLED\hsv2rgb.cpp" />
+    <ClCompile Include="FastLED\pixeltypes.cpp" />
     <ClCompile Include="MemoryFree.cpp" />
-    <ClCompile Include="pixeltypes.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Wire.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

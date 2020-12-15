@@ -26,11 +26,56 @@ void fill_solid( struct CHSV* targetArray, int numToFill,
 				 const struct CHSV& hsvColor);
 #endif // MP_COMMENT
 
+//CRGB hsv2rgb(CHSV hsv)
+//{
+//    CRGB rgb;
+//    double H = hsv.h, S = hsv.s, V = hsv.v,
+//        P, Q, T,
+//        fract;
+//
+//    (H == 360.) ? (H = 0.) : (H /= 60.);
+//    fract = H - floor(H);
+//
+//    P = V * (1. - S);
+//    Q = V * (1. - S * fract);
+//    T = V * (1. - S * (1. - fract));
+//
+//    if (0. <= H && H < 1.)
+//        rgb = CRGB((uint8_t)V, (uint8_t)T, (uint8_t)P);
+//    else if (1. <= H && H < 2.)
+//        rgb = CRGB((uint8_t)Q, (uint8_t)V, (uint8_t)P);
+//    else if (2. <= H && H < 3.)
+//        rgb = CRGB((uint8_t)P, (uint8_t)V, (uint8_t)T);
+//    else if (3. <= H && H < 4.)
+//        rgb = CRGB((uint8_t)P, (uint8_t)Q, (uint8_t)V);
+//    else if (4. <= H && H < 5.)
+//        rgb = CRGB((uint8_t)T, (uint8_t)P, (uint8_t)V);
+//    else if (5. <= H && H < 6.)
+//        rgb = CRGB((uint8_t)V, (uint8_t)P, (uint8_t)Q);
+//    else
+//        rgb = CRGB(0, 0, 0);
+//
+//    return rgb;
+//}
+
+
 /// fill_rainbow - fill a range of LEDs with a rainbow of colors, at
 ///                full saturation and full value (brightness)
+
 void fill_rainbow(struct CRGB* pFirstLED, int numToFill,
     uint8_t initialhue,
-    uint8_t deltahue = 5) {}
+    uint8_t deltahue)
+{
+    CHSV hsv;
+    hsv.hue = initialhue;
+    hsv.val = 255;
+    hsv.sat = 240;
+    for (int i = 0; i < numToFill; i++) {
+        pFirstLED[i] = hsv;
+        //pFirstLED[i] = hsv2rgb(hsv);
+        hsv.hue += deltahue;
+    }
+}
 
 #ifdef MP_COMMENT
 
