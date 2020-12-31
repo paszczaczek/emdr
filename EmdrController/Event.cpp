@@ -17,3 +17,4 @@ void Event::Send(Event::Name name)
 	Wire.endTransmission(emdrI2CAddr);
 #endif
 }
+

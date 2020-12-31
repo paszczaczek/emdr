@@ -8,7 +8,6 @@
 #include "Timer.h"
 #include "Strip.h"
 #include "MovingPointStripPlugin.h"
-#include "EmdrController/RemoteController.h"
 #include "EmdrController/Event.h"
 #include "Device.h"
 #include "DiagnosticStripPlugin.h"
@@ -81,7 +80,9 @@ void onReceiveFromController(int)
   {
     int i = Wire.read();
 	Event::Name eventName = (Event::Name)i;
-	RemoteController::SerialPrintCodes(-1, eventName);    
+	Serial.println(eventName);
+	strip.Receive(eventName);
+	//RemoteController::SerialPrintCodes(-1, eventName);    
 
 	/*lcd.setCursor(0, 0);
 	lcd.print(cnt);*/

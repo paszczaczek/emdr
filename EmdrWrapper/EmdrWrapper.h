@@ -4,6 +4,7 @@
 #include "EmdrController/EmdrController.h"
 #include "EmdrController/Event.h"
 #include "EmdrController/RemoteController.h"
+#include "Wire.h"
 
 using System::String;
 
@@ -84,19 +85,11 @@ namespace EmdrWrapper {
 			static void OnSend(int name)
 			{
 				sendEvent(name);
+				::Wire._is_available = true;
+				::Wire._available_data = name;
+				::onReceiveFromController(0);
 			}
 		};
-
-		/*ref class RemoteController
-		{
-		public:
-			static int EventNameToIRCode(int name)
-			{
-				return ::remoteController.EventNameToIRCode(name);
-		
-			}
-		};*/
-
 	};
 }
 

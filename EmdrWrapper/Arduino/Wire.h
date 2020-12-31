@@ -65,8 +65,10 @@ class TwoWire : public Stream
  //   uint8_t requestFrom(int, int, int);
     virtual size_t write(uint8_t) { return 0; }
  //   virtual size_t write(const uint8_t *, size_t);
-   virtual int available(void) { return 0; }
-   virtual int read(void) { return 0; };
+    bool _is_available = false;
+    int _available_data = 0;
+   virtual int available(void) { return _is_available; }
+   virtual int read(void) { _is_available = false;  return _available_data; };
  //   virtual int peek(void);
  //   virtual void flush(void);
    void onReceive(void (*)(int)) {};

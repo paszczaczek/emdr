@@ -14,8 +14,8 @@ private:
 	static const Timer::Capacity movingTimerCapacity = Timer::Capacity::values256; // 8 bitow
 
 	// rozdzielczosc timera poruszajacego punktem
-	//static const Timer::Interval movingTimerInterval = Timer::Interval::ms16;
-	static const Timer::Interval movingTimerInterval = Timer::Interval::ms1;
+	static const Timer::Interval movingTimerInterval = Timer::Interval::ms16;
+	//static const Timer::Interval movingTimerInterval = Timer::Interval::ms1;
 
 	// pojemnosc timera zatrzymujacego poruszajacy sie punkt na krancach tasmy
 	static const Timer::Capacity pauseTimerCapacity = Timer::Capacity::values2; // 1 bit
@@ -245,6 +245,7 @@ private:
 	// obsluga eventow
 	bool Receive(Event::Name eventName) override
 	{
+		static uint8_t hue = 0;
 		switch (eventName)
 		{
 		case Event::Name::UnknowCode:
@@ -264,12 +265,17 @@ private:
 		case Event::Name::Pause:
 			Pause();
 			break;
-		//case Event::Name::CHANEL_PLUS:
-			//ChangeMovingSpeed(true);
-			//break;
-		//case Event::Name::CHANEL_MINUS:
-			//ChangeMovingSpeed(false);
-			//break;
+		case Event::Name::ChannelPlus:
+			Serial.print(F("C+ "));
+			Serial.println(hue += 10);
+			movingColor.setHue(hue);
+			break;
+		case Event::Name::ChannelMinus:
+			Serial.print(F("C- "));
+			Serial.println(hue -= 10);
+			movingColor.setHue(hue);
+			break;
+
 		}
 
 		return false;
