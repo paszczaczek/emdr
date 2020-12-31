@@ -9,17 +9,24 @@ namespace EmdrEmulator
 {
 #endif
 
-enum AverMediaIRCode {
-	Digit1 = 0x40BFA05F, 
-	Digit2 = 0x40BF609F,
-	Digit3 = 0x40BFE01F,
-	Digit4 = 0x40BF906F,
-	Digit5 = 0x40BF50AF,
-	Digit6 = 0x40BFD02F,
-	Digit7 = 0x40BFB04F,
-	Digit8 = 0x40BF708F,
-	Digit9 = 0x40BFF00F,
-	Digit0 = 0x40BF8877
+enum RC8205LX_IRCode {
+	Digit0 = 0x00,
+	Digit1 = 0x01, 
+	Digit2 = 0x02,
+	Digit3 = 0x03,
+	Digit4 = 0x04,
+	Digit5 = 0x05,
+	Digit6 = 0x06,
+	Digit7 = 0x07,
+	Digit8 = 0x08,
+	Digit9 = 0x09,
+	VolumePlus = 0x10,
+	VolumeMinus = 0x11,
+	ChannelPlus = 0x20,
+	ChannelMinus = 0x21,
+	Mute = 0x0d,
+	Power = 0x0c,
+	UnknownCode = -1
 };
 
 #if !__LINE__

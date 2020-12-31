@@ -11,7 +11,8 @@ namespace EmdrEmulator
 
 enum Name
 {
-	UnknowCode = 0,
+	UnknowCode = -1,
+	Digit0,
 	Digit1, 
 	Digit2, 
 	Digit3, 
@@ -21,7 +22,12 @@ enum Name
 	Digit7, 
 	Digit8, 
 	Digit9, 
-	Digit0,
+	VolumePlus,
+	VolumeMinus,
+	ChannelPlus,
+	ChannelMinus,
+	Mute,
+	Power,
 	Start,
 	Stop,
 	Pause

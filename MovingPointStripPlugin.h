@@ -14,7 +14,8 @@ private:
 	static const Timer::Capacity movingTimerCapacity = Timer::Capacity::values256; // 8 bitow
 
 	// rozdzielczosc timera poruszajacego punktem
-	static const Timer::Interval movingTimerInterval = Timer::Interval::ms16;
+	//static const Timer::Interval movingTimerInterval = Timer::Interval::ms16;
+	static const Timer::Interval movingTimerInterval = Timer::Interval::ms1;
 
 	// pojemnosc timera zatrzymujacego poruszajacy sie punkt na krancach tasmy
 	static const Timer::Capacity pauseTimerCapacity = Timer::Capacity::values2; // 1 bit
@@ -83,7 +84,7 @@ public:
 	virtual void Loop() override
 	{
 		// TODO
-		return;
+		//return;
 
 		unsigned long counterStartedAt;
 		unsigned long ommittedIntervals;
@@ -187,7 +188,7 @@ public:
 			strip.updated = true;
 
 			// TODO
-			FillRainbow();
+			//FillRainbow();
 		}
 		else if (state == State::Paused)
 		{

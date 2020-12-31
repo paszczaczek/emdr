@@ -3,7 +3,7 @@
 #include "EmdrController.h"
 #include "RemoteController.h"
 
-constexpr int emdrAddr = 9;
+//constexpr int emdrAddr = 9;
 RemoteController remoteController;
 
 // https://github.com/blackhack/LCD_I2C
@@ -16,31 +16,28 @@ void SETUP()
 {
 	Serial.begin(115200);
 	remoteController.Setup();
-  
-  Wire.begin();
- 
+
+	Wire.begin();
+
 	lcd.begin();
 	lcd.backlight();
 	lcd.print(" o  GOLE   ^o^");
 	lcd.setCursor(0, 1);
 	lcd.print("*|* BABY (*)|(*)");
-    lcd.clear();
+	lcd.clear();
 }
 
 void LOOP()
 {
 	remoteController.Loop();
 
-  const unsigned long int skip_max = (unsigned long int)1e5;
-  if (skip++ >= skip_max) {    
-    Serial.println(cnt);
-    lcd.setCursor(0, 0);
-    lcd.print(cnt);
-    skip = 0;
-    cnt++;
-    
-    Wire.beginTransmission(emdrAddr);
-    Wire.write(b++);
-    Wire.endTransmission(emdrAddr);
-  }
+	//const unsigned long int skip_max = (unsigned long int)1e5;
+	//if (skip++ >= skip_max) {
+	//	Serial.println(cnt);
+	//	lcd.setCursor(0, 0);
+	//	lcd.print(cnt);
+	//	skip = 0;
+	//	cnt++;
+
+	//}
 }

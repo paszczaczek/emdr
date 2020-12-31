@@ -8,7 +8,7 @@
 #include "Timer.h"
 #include "Strip.h"
 #include "MovingPointStripPlugin.h"
-//#include "RemoteController.h"
+#include "EmdrController/RemoteController.h"
 #include "EmdrController/Event.h"
 #include "Device.h"
 #include "DiagnosticStripPlugin.h"
@@ -25,13 +25,7 @@ bool isDevelMode();
 #define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
 constexpr int ENV_PIN = 4;     // pin for detecting production/development environmetn;
-constexpr int emdrAddr = 9;
-
-//#define RC_PIN  2 // pin for remote controller
-
-// remote controller
-//IRrecv irrecv(RC_PIN);
-//RemoteController remoteController;
+constexpr int emdrI2CAddr = 9;
 
 // strip plugins
 DiagnosticStipPlugin diagnosticStipPlugin;
@@ -69,13 +63,14 @@ void setup()
 	//irrecv.enableIRIn();
 
 	// wykonanie testu wszystkich urzadzen a potem uruchomienie poruszajacego sie punktu
-	diagnosticStipPlugin.Execute(
-		DiagnosticStipPlugin::Action::TestAllDevices, 
-		DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
-	diagnosticStipPlugin.Start();
+	//diagnosticStipPlugin.Execute(
+	//	DiagnosticStipPlugin::Action::TestAllDevices, 
+	//	DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
+	//diagnosticStipPlugin.Start();
+	movingPointStripPlugin.Start();
 
   extern void onReceiveFromController(int);
-  Wire.begin(emdrAddr);
+  Wire.begin(emdrI2CAddr);
   Wire.onReceive(onReceiveFromController);
   Serial.println("wire started");
 }
@@ -84,10 +79,13 @@ void onReceiveFromController(int)
 {
   while (Wire.available()) 
   {
-    byte b = Wire.read();
-    Serial.print("Received ");  
-    Serial.print(b);
-    Serial.println();
+    int i = Wire.read();
+	Event::Name eventName = (Event::Name)i;
+	RemoteController::SerialPrintCodes(-1, eventName);    
+
+	/*lcd.setCursor(0, 0);
+	lcd.print(cnt);*/
+
   }
 }
 

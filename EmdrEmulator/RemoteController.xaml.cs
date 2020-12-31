@@ -27,7 +27,7 @@ namespace EmdrEmulator
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var irCode = (AverMediaIRCode)((Button)sender).Tag;
+            var irCode = (RC8205LX_IRCode)((Button)sender).Tag;
             EmdrWrapper.EmdrControllerSketch.irrecv.DecodeReturnValue((int)irCode);
         }
     }

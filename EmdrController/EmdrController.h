@@ -1,4 +1,5 @@
 #pragma once
+#include <LCD_I2C.h>
 #include <IRremote.h>
 
 // EmdrWrapper linkuje Emdr.cpp i EmdrController.cpp a w obu s¹ funkcje setup i loop
@@ -16,3 +17,4 @@ extern void SETUP();
 extern void LOOP();
 
 extern IRrecv irrecv;
+extern LCD_I2C lcd;
