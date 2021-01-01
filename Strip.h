@@ -78,13 +78,13 @@ public:
 		}
 	}
 
-	bool Receive(Event::Name eventName) override
+	bool Receive(Event::Name eventReceived) override
 	{
-		ForEachPlugins([](StripPlugin* plugin, Event::Name eventName)
+		ForEachPlugins([](StripPlugin* plugin, Event::Name eventReceived)
 			{
-				plugin->Receive(eventName);
+				plugin->Receive(eventReceived);
 
-			}, eventName);
+			}, eventReceived);
 
 		return false;
 	}
@@ -110,12 +110,12 @@ private:
 	// wykonuje akcje dla wszystkich pluginow
 	void ForEachPlugins(
 		void (*action)(StripPlugin*, Event::Name), 
-		Event::Name eventName = Event::Name::UnknowCode)
+		Event::Name eventReceived = Event::Name::UnknowCode)
 	{
 		for (size_t i = 0; i < pluginsCount; i++)
 		{
 			StripPlugin* plugin = (StripPlugin*)plugins[i];
-			(*action)(plugin, eventName);
+			(*action)(plugin, eventReceived);
 		}
 	}
 

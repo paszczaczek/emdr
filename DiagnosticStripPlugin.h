@@ -104,7 +104,7 @@ private:
 	}
 
 	// obsluga eventow
-	bool Receive(Event::Name eventName) override
+	bool Receive(Event::Name eventReceived) override
 	{
 		return false;
 	}

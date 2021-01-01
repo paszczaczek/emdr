@@ -13,7 +13,7 @@ public:
 	virtual void Stop()   { state = State::Stopped; }
 	virtual void Pause()  { state = State::Paused; }
 
-	virtual bool Receive(Event::Name eventName) = 0;
+	virtual bool Receive(Event::Name eventReceived) = 0;
 
 };
 

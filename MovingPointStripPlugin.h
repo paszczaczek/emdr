@@ -7,6 +7,15 @@
 #include "Emdr.h"
 #include "Debug.h"
 
+void lcdPrintPerc(const __FlashStringHelper* name, byte percent)
+{
+	lcd.print(name);
+	lcd.print(':');
+	lcd.print(' ');
+	lcd.print(percent);
+	lcd.print(F("%  "));
+}
+
 class MovingPointStripPlugin : public StripPlugin
 {
 private:
@@ -243,10 +252,14 @@ private:
 	}
 
 	// obsluga eventow
-	bool Receive(Event::Name eventName) override
+	bool Receive(Event::Name eventReceived) override
 	{
+		const __FlashStringHelper* f_hue = F("hue");
 		static uint8_t hue = 0;
-		switch (eventName)
+
+		lcd.setCursor(0, 1);
+
+		switch (eventReceived)
 		{
 		case Event::Name::UnknowCode:
 			break;
@@ -266,16 +279,15 @@ private:
 			Pause();
 			break;
 		case Event::Name::ChannelPlus:
-			Serial.print(F("C+ "));
-			Serial.println(hue += 10);
+			hue += 5;
+			lcdPrintPerc(f_hue, hue * 100 / 255);
 			movingColor.setHue(hue);
 			break;
 		case Event::Name::ChannelMinus:
-			Serial.print(F("C- "));
-			Serial.println(hue -= 10);
+			hue -= 5;
+			lcdPrintPerc(f_hue, hue * 100 / 255);
 			movingColor.setHue(hue);
 			break;
-
 		}
 
 		return false;

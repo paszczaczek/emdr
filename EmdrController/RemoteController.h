@@ -26,7 +26,7 @@ public:
 		}
 	}
 
-	static void SerialPrintCodes(unsigned long irCode, Event::Name eventName)
+	static void SerialPrintCodes(unsigned long irCode, Event::Name eventReceived)
 	{
 		if (irCode != -1) 
 		{
@@ -35,7 +35,7 @@ public:
 			Serial.print(F(" -> "));
 		}
 
-		switch (eventName)
+		switch (eventReceived)
 		{
 		case Event::UnknowCode:		Serial.println(F("UnknowCode")); break;
 		case Event::Digit1:			Serial.println(F("Digit1")); break;
@@ -62,11 +62,11 @@ private:
 
 	// przetwarza kod odczytany z pilota
 	void ProcessCode() {
-		Event::Name eventName = RecognizeIRCode(results.value);
-		if (eventName == Event::Name::UnknowCode && results.value >= 0x800)
-			eventName = RecognizeIRCode(results.value - 0x800);
-		SerialPrintCodes(results.value, eventName);
-		Event::Send(eventName);
+		Event::Name eventReceived = RecognizeIRCode(results.value);
+		if (eventReceived == Event::Name::UnknowCode && results.value >= 0x800)
+			eventReceived = RecognizeIRCode(results.value - 0x800);
+		SerialPrintCodes(results.value, eventReceived);
+		Event::Send(eventReceived);
 
 		return;
 	}

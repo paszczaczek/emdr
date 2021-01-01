@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 #include <Wire.h>
-//#include <IRremote.h>
+#include <LCD_I2C.h>
 #include "Debug.h"
 #include "MemoryFree.h"
 #include "Timer.h"
@@ -13,6 +13,7 @@
 #include "DiagnosticStripPlugin.h"
 
 bool isDevelMode();
+void onReceiveFromController(int);
 
 #define MAX_CURRENT_FROM_EXT 1000 // Total maximum current draw when powered via external power supply
 #define MAX_CURRENT_FROM_USB  500 // Total maximum current draw from the Arduino when powered from a USB port
@@ -23,8 +24,13 @@ bool isDevelMode();
 #define STRIP_LEDS_BRIGHTNESS 2 // jasnosc swiecenie diod
 #define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
+// https://github.com/blackhack/LCD_I2C
+LCD_I2C lcd(0x27); // Default address of most PCF8574 modules, change according
+
 constexpr int ENV_PIN = 4;     // pin for detecting production/development environmetn;
 constexpr int emdrI2CAddr = 9;
+
+Event::Name eventReceived = Event::Name::UnknowCode;
 
 // strip plugins
 DiagnosticStipPlugin diagnosticStipPlugin;
@@ -39,10 +45,19 @@ Device& stripDevice = strip;
 void setup()
 {
 	Serial.begin(115200);
-	PRINT_FREEMEM(("setup"));
+	PRINT_FREEMEM(F("setup"));
+
+	// inicjalizacja polaczenia z remoteController'em
+	Wire.begin(emdrI2CAddr);
+	Wire.onReceive(onReceiveFromController);
+
+	// inicjalizacja wyswietlacza lcd
+	lcd.begin(true);
+	lcd.backlight();
+	lcd.print(F("emdr"));
 
 	// konfiguracja zalezy od srodowidka prod/devel
-	pinMode(ENV_PIN, INPUT_PULLUP);  
+	pinMode(ENV_PIN, INPUT_PULLUP);
 	if (isDevelMode())
 	{
 		// w srodowisku devel tasma ma dlugosc 6 ledow, jest przyklejona do plyty glownej
@@ -59,43 +74,33 @@ void setup()
 	// konfiguracja paska
 	strip.Setup();
 
-	//irrecv.enableIRIn();
-
 	// wykonanie testu wszystkich urzadzen a potem uruchomienie poruszajacego sie punktu
 	//diagnosticStipPlugin.Execute(
 	//	DiagnosticStipPlugin::Action::TestAllDevices, 
 	//	DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
 	//diagnosticStipPlugin.Start();
 	movingPointStripPlugin.Start();
-
-  extern void onReceiveFromController(int);
-  Wire.begin(emdrI2CAddr);
-  Wire.onReceive(onReceiveFromController);
-  Serial.println("wire started");
-}
-
-void onReceiveFromController(int)
-{
-  while (Wire.available()) 
-  {
-    int i = Wire.read();
-	Event::Name eventName = (Event::Name)i;
-	Serial.println(eventName);
-	strip.Receive(eventName);
-	//RemoteController::SerialPrintCodes(-1, eventName);    
-
-	/*lcd.setCursor(0, 0);
-	lcd.print(cnt);*/
-
-  }
 }
 
 void loop()
 {
-	//remoteController.Loop();
+	// obsluga odebranego kodu z remoteController'a
+	if (eventReceived != Event::Name::UnknowCode)
+	{
+		strip.Receive(eventReceived);
+		eventReceived = Event::Name::UnknowCode;
+	}
 	stripDevice.Loop();
 }
 
+// ISR do odbioru polecen z remoteController'a
+void onReceiveFromController(int)
+{
+	while (Wire.available())
+		eventReceived = (Event::Name)Wire.read();
+}
+
+// ustalenie trypu pracy devel/prod
 bool isDevelMode() {
 	// ustawienie hardware sa zalezne od srodowiska production/developement
 #ifdef _WIN32
@@ -106,11 +111,10 @@ bool isDevelMode() {
 	bool devel = digitalRead(ENV_PIN) == HIGH;
 #endif
 
-	if (devel)
-		PRINT(F("devel"));
-	else
-		PRINT(F("prod"));
-	PRINT(" mode\n");
+	const __FlashStringHelper* msg = devel ? F("dev") : F("prod");
+	PRINTLN(msg);
+	lcd.print(' ');
+	lcd.print(msg);
 
 	return devel;
 }
