@@ -184,6 +184,7 @@
     <ClCompile Include="FastLED\hsv2rgb.cpp" />
     <ClCompile Include="FastLED\pixeltypes.cpp" />
     <ClCompile Include="MemoryFree.cpp" />
+    <ClCompile Include="Print.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

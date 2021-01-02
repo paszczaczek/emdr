@@ -53,6 +53,18 @@ namespace EmdrWrapper {
 				showEvent(pinned, nLeds);
 			}
 		};
+
+		ref class lcd
+		{
+		public:
+			delegate void printDelegate(String^ text);
+			static event printDelegate^ printEvent;
+			static size_t OnPrint(const char text[])
+			{
+				printEvent(gcnew String(text));
+				return strlen(text);
+			}
+		};
 	};
 
 	public ref class EmdrControllerSketch

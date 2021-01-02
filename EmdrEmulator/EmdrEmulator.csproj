@@ -78,12 +78,19 @@
     </ApplicationDefinition>
     <Compile Include="EventName.cs" />
     <Compile Include="IRCode.cs" />
+    <Compile Include="LCD.xaml.cs">
+      <DependentUpon>LCD.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RemoteController.xaml.cs">
       <DependentUpon>RemoteController.xaml</DependentUpon>
     </Compile>
     <Compile Include="Strip.xaml.cs">
       <DependentUpon>Strip.xaml</DependentUpon>
     </Compile>
+    <Page Include="LCD.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

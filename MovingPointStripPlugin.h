@@ -9,11 +9,11 @@
 
 void lcdPrintPerc(const __FlashStringHelper* name, byte percent)
 {
-	lcd.print(name);
-	lcd.print(':');
-	lcd.print(' ');
-	lcd.print(percent);
-	lcd.print(F("%  "));
+	//lcd.print(name);
+	//lcd.print(':');
+	//lcd.print(' ');
+	//lcd.print(percent);
+	//lcd.print(F("%  "));
 }
 
 class MovingPointStripPlugin : public StripPlugin

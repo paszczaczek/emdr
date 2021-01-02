@@ -42,6 +42,8 @@ namespace EmdrEmulator
             // obsluga Event
             unsafe { EmdrWrapper.EmdrControllerSketch.Event.sendEvent += Event_SendEventHandler; }
 
+            // obsluga lcd
+            unsafe { EmdrWrapper.EmdrSketch.lcd.printEvent += Lcd_PrintEventHandler; }
 
             // uruchomienie funkcji setup()
             EmdrWrapper.EmdrSketch.setup();
@@ -55,7 +57,6 @@ namespace EmdrEmulator
         {
             try
             {
-
                 Dispatcher.Invoke(() =>
                 {
                     model.SerialMonitor += text;
@@ -123,6 +124,18 @@ namespace EmdrEmulator
             catch (TaskCanceledException) { }
         }
 
+        private void Lcd_PrintEventHandler(string text)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    model.Lcd.Line1 += text;
+                });
+            }
+            catch (TaskCanceledException) { }
+        }
+
 
         private static bool _loopCallbackWorking = false;
         private readonly TimerCallback LoopCallback = (object state) =>
@@ -151,6 +164,14 @@ namespace EmdrEmulator
                 set => SetProperty(ref _strip, value);
             }
 
+            private LCD.Model _lcd = new LCD.Model();
+
+            public LCD.Model Lcd
+            {
+                get => _lcd;
+                set => SetProperty(ref _lcd, value);
+            }
+
             public static Model DesignTime
             {
                 get
@@ -158,7 +179,8 @@ namespace EmdrEmulator
                     var model = new Model
                     {
                         SerialMonitor = "setup\nloop\nFastLED.show",
-                        Strip = EmdrEmulator.Strip.Model.EmdrDesignTime
+                        Strip = EmdrEmulator.Strip.Model.EmdrDesignTime,
+                        Lcd = LCD.Model.DesignTime
                     };
 
                     return model;
