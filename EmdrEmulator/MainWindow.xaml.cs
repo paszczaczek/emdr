@@ -44,6 +44,8 @@ namespace EmdrEmulator
 
             // obsluga lcd
             unsafe { EmdrWrapper.EmdrSketch.lcd.printEvent += Lcd_PrintEventHandler; }
+            unsafe { EmdrWrapper.EmdrSketch.lcd.setCursorEvent += Lcd_SetCursorEventHandler; }
+            unsafe { EmdrWrapper.EmdrSketch.lcd.backlightEvent += Lcd_BacklightEventHandler; }
 
             // uruchomienie funkcji setup()
             EmdrWrapper.EmdrSketch.setup();
@@ -130,12 +132,47 @@ namespace EmdrEmulator
             {
                 Dispatcher.Invoke(() =>
                 {
-                    model.Lcd.Line1 += text;
+                    int row = model.Lcd.Row;
+                    int col = model.Lcd.Col;
+                    model.Lcd.Lines[row] = model.Lcd.Lines[row]
+                        .PadRight(16)
+                        .Remove(col, text.Length)
+                        .Insert(col, text);
+                    model.Lcd.Col += text.Length;
+                    model.Lcd.Lines = new string[2]
+                    {
+                        model.Lcd.Lines[0],
+                        model.Lcd.Lines[1]
+                    };
                 });
             }
             catch (TaskCanceledException) { }
         }
 
+        private void Lcd_SetCursorEventHandler(byte col, byte row)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    model.Lcd.Col = col;
+                    model.Lcd.Row = row;
+                });
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        private void Lcd_BacklightEventHandler(bool on)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    model.Lcd.Backlight = on;
+                });
+            }
+            catch (TaskCanceledException) { }
+        }
 
         private static bool _loopCallbackWorking = false;
         private readonly TimerCallback LoopCallback = (object state) =>
@@ -165,7 +202,6 @@ namespace EmdrEmulator
             }
 
             private LCD.Model _lcd = new LCD.Model();
-
             public LCD.Model Lcd
             {
                 get => _lcd;

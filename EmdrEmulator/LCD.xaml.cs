@@ -30,27 +30,55 @@ namespace EmdrEmulator
 
         public class Model : ModelBase
         {
-            private string _line1;
-            public string Line1
+            private string[] _lines = new string[2] { "", "" };
+            public string[] Lines
             {
-                get => _line1;
-                set => SetProperty(ref _line1, value);
+                get => _lines;
+                set => SetProperty(ref _lines, value);
             }
 
-            private string _line2;
-            public string Line2
+            private int _row;
+            public int Row
             {
-                get => _line2;
-                set => SetProperty(ref _line2, value);
+                get => _row;
+                set
+                {
+                    if (value < 0 || value > 1)
+                        throw new ArgumentException("allowed value 0..1", "row");
+                    _row = value;
+                }
             }
+
+            private int _col;
+            public int Col
+            {
+                get => _col;
+                set
+                {
+                    if (value < 0 || value > 16)
+                        throw new ArgumentException("allowed value 0..16", "col");
+                    _col = value;
+                }
+            }
+
+            private bool _backlight;
+            public bool Backlight
+            {
+                get => _backlight;
+                set => SetProperty(ref _backlight, value);
+            }
+
 
             public static Model DesignTime
             {
                 get
                 {
                     var dataContext = new Model();
-                    dataContext.Line1 = "1234567890123456";
-                    dataContext.Line2 = "abcdefghijklmnou";
+                    dataContext.Lines = new string[2]
+                    {
+                        "1234567890123456",
+                        "abcdefghijklmnou"
+                    };
 
                     return dataContext;
                 }

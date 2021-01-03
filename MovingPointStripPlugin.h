@@ -6,15 +6,16 @@
 #include "Timer.h"
 #include "Emdr.h"
 #include "Debug.h"
+#include "lcd.h"
 
-void lcdPrintPerc(const __FlashStringHelper* name, byte percent)
-{
-	//lcd.print(name);
-	//lcd.print(':');
-	//lcd.print(' ');
-	//lcd.print(percent);
-	//lcd.print(F("%  "));
-}
+//void lcdPrintPerc(const __FlashStringHelper* name, byte percent)
+//{
+//	//lcd.print(name);
+//	//lcd.print(':');
+//	//lcd.print(' ');
+//	//lcd.print(percent);
+//	//lcd.print(F("%  "));
+//}
 
 class MovingPointStripPlugin : public StripPlugin
 {
@@ -280,12 +281,12 @@ private:
 			break;
 		case Event::Name::ChannelPlus:
 			hue += 5;
-			lcdPrintPerc(f_hue, hue * 100 / 255);
+			lcd.print(PropertyPercent(f_hue, hue * 100 / 255));
 			movingColor.setHue(hue);
 			break;
 		case Event::Name::ChannelMinus:
 			hue -= 5;
-			lcdPrintPerc(f_hue, hue * 100 / 255);
+			lcd.print(PropertyPercent(f_hue, hue * 100 / 255));
 			movingColor.setHue(hue);
 			break;
 		}

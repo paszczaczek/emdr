@@ -6,16 +6,25 @@
              xmlns:local="clr-namespace:EmdrEmulator"
              mc:Ignorable="d"
              d:DataContext="{x:Static local:LCD+Model.DesignTime}" >
-    <StackPanel Background="#FF4C8DFF" Width="180">
+    <StackPanel Width="135">
         <StackPanel.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="White"/>
-                <Setter Property="FontFamily" Value="Arcade"/>
-                <Setter Property="FontSize" Value="21"/>
-                <Setter Property="Margin" Value="5,0"></Setter>
+                <Setter Property="FontFamily" Value="Consolas"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Margin" Value="5,0"/>
             </Style>
         </StackPanel.Resources>
-        <TextBlock Text="{Binding Line1}"/>
-        <TextBlock Text="{Binding Line2}"/>
+        <StackPanel.Style>
+            <Style TargetType="{x:Type StackPanel}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Backlight}" Value="True">
+                        <Setter Property="Background" Value="#FF4C8DFF"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </StackPanel.Style>
+        <TextBlock Text="{Binding Lines[0]}"/>
+        <TextBlock Text="{Binding Lines[1]}"/>
     </StackPanel>
 </UserControl>

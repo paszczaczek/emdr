@@ -136,6 +136,12 @@
     <ClInclude Include="MemoryFree.h">
       <Filter>Emdr</Filter>
     </ClInclude>
+    <ClInclude Include="..\lcd.h">
+      <Filter>Emdr</Filter>
+    </ClInclude>
+    <ClInclude Include="Arduino\Printable.h">
+      <Filter>Arduino</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -174,8 +180,11 @@
     <ClCompile Include="MemoryFree.cpp">
       <Filter>Emdr</Filter>
     </ClCompile>
-    <ClCompile Include="Print.cpp">
+    <ClCompile Include="Arduino\Print.cpp">
       <Filter>Arduino</Filter>
+    </ClCompile>
+    <ClCompile Include="LCD_I2C.cpp">
+      <Filter>LCD_I2C</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

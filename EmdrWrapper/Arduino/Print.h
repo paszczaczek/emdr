@@ -1,4 +1,5 @@
 #pragma once
+#include "Printable.h"
 
 #define DEC 10
 #define HEX 16
@@ -40,13 +41,13 @@ public:
     //size_t print(const String&);
     size_t print(const char[]);
     size_t print(char);
-    //size_t print(unsigned char, int = DEC);
+    size_t print(unsigned char, int = DEC);
     //size_t print(int, int = DEC);
     //size_t print(unsigned int, int = DEC);
     //size_t print(long, int = DEC);
     //size_t print(unsigned long, int = DEC);
     //size_t print(double, int = 2);
-    //size_t print(const Printable&);
+    size_t print(const Printable&);
 
     //size_t println(const __FlashStringHelper*);
     //size_t println(const String& s);

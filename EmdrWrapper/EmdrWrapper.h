@@ -64,6 +64,20 @@ namespace EmdrWrapper {
 				printEvent(gcnew String(text));
 				return strlen(text);
 			}
+
+			delegate void setCursorDelegate(uint8_t col, uint8_t row);
+			static event setCursorDelegate^ setCursorEvent;
+			static void OnSetCursor(uint8_t col, uint8_t row) 
+			{
+				setCursorEvent(col, row);
+			}
+
+			delegate void backlightDelegate(bool on);
+			static event backlightDelegate^ backlightEvent;
+			static void OnBacklight(bool on)
+			{
+				backlightEvent(on);
+			}
 		};
 	};
 

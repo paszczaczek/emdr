@@ -145,6 +145,7 @@
     <ClInclude Include="..\EmdrController\EventName.h" />
     <ClInclude Include="..\EmdrController\IRCode.h" />
     <ClInclude Include="..\EmdrController\RemoteController.h" />
+    <ClInclude Include="..\lcd.h" />
     <ClInclude Include="..\MovingPointStripPlugin.h" />
     <ClInclude Include="..\Plugin.h" />
     <ClInclude Include="..\DiagnosticStripPlugin.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="Arduino\ArduinoSTL.h" />
     <ClInclude Include="Arduino\HardwareSerial.h" />
     <ClInclude Include="Arduino\Print.h" />
+    <ClInclude Include="Arduino\Printable.h" />
     <ClInclude Include="Arduino\Stream.h" />
     <ClInclude Include="Arduino\Wire.h" />
     <ClInclude Include="EmdrWrapper.h" />
@@ -178,13 +180,14 @@
     <ClCompile Include="..\EmdrController\Event.cpp" />
     <ClCompile Include="Arduino\Arduino.cpp" />
     <ClCompile Include="Arduino\HardwareSerial.cpp" />
+    <ClCompile Include="Arduino\Print.cpp" />
     <ClCompile Include="Arduino\Wire.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="FastLED\FastLED.cpp" />
     <ClCompile Include="FastLED\hsv2rgb.cpp" />
     <ClCompile Include="FastLED\pixeltypes.cpp" />
+    <ClCompile Include="LCD_I2C.cpp" />
     <ClCompile Include="MemoryFree.cpp" />
-    <ClCompile Include="Print.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

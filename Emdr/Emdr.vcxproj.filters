@@ -19,6 +19,7 @@
     <ClInclude Include="..\MemoryFree.h" />
     <ClInclude Include="..\Debug.h" />
     <ClInclude Include="..\DiagnosticStripPlugin.h" />
+    <ClInclude Include="..\lcd.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Emdr.cpp" />
