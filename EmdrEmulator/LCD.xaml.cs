@@ -73,14 +73,15 @@ namespace EmdrEmulator
             {
                 get
                 {
-                    var dataContext = new Model();
-                    dataContext.Lines = new string[2]
+                    var model = new Model();
+                    model.Lines = new string[2]
                     {
                         "1234567890123456",
                         "abcdefghijklmnou"
                     };
+                    model.Backlight = true;
 
-                    return dataContext;
+                    return model;
                 }
             }
         }

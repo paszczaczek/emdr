@@ -17,4 +17,3 @@ extern void SETUP();
 extern void LOOP();
 
 extern IRrecv irrecv;
-extern LCD_I2C lcd;

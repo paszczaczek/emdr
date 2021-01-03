@@ -78,6 +78,14 @@ namespace EmdrWrapper {
 			{
 				backlightEvent(on);
 			}
+
+			delegate void clearDelegate();
+			static event clearDelegate^ clearEvent;
+			static void OnClear()
+			{
+				clearEvent();
+			}
+
 		};
 	};
 

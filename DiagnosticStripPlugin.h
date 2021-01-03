@@ -32,11 +32,30 @@ public:
 			case Action::TestAllDevices:
 				switch (actionStep++)
 				{
-				case 0: strip.SetAllLeds(CRGB::White); strip.updated = true; TimerStart();               break;
-				case 1: strip.SetAllLeds(CRGB::Red);   strip.updated = true; TimerStart();               break;
-				case 2: strip.SetAllLeds(CRGB::Green); strip.updated = true; TimerStart();               break;
-				case 3: strip.SetAllLeds(CRGB::Blue);  strip.updated = true; TimerStart();               break;
-				case 4: strip.SetAllLeds(CRGB::Black); strip.updated = true; TimerStart(); ActionNext(); break;
+				case 0: 
+					// test lcd
+					lcd.clear();
+					lcd.backlight(); 
+					for (int r = 0; r < 2; r++)
+					{
+						lcd.setCursor(0, r);
+						for (int c = 0; c < 16; c++)
+							lcd.print('\xff');
+					}
+					// test ledow
+					strip.SetAllLeds(CRGB::White); strip.updated = true; TimerStart();
+					break;
+				//case 2: strip.SetAllLeds(CRGB::Red);   strip.updated = true; TimerStart(); break;
+				//case 3: strip.SetAllLeds(CRGB::Green); strip.updated = true; TimerStart(); break;
+				//case 4: strip.SetAllLeds(CRGB::Blue);  strip.updated = true; TimerStart(); break;
+				case 1: 
+					strip.SetAllLeds(CRGB::Black); strip.updated = true;
+					lcd.clear(); 
+					isDevelMode();
+					lcd.print(' ');
+					lcd.print(freeMemory());
+					lcd.print('b');
+					ActionNext(); break;
 				}
 				break;
 			case Action::StartMovingPointStripPlugin:

@@ -12,7 +12,7 @@
 #define LED_BUILTIN 13
 
 #define F(string_literal) string_literal
-#define __FlashStringHelper char
+typedef char __FlashStringHelper;
 
 typedef unsigned char byte;
 //extern const char *F(const char *str);

@@ -66,7 +66,7 @@ public:
     void backlight();
     void noBacklight();
 
-    void clear() {}
+    void clear();
     /*void home();
     void leftToRight();
     void rightToLeft();

@@ -6,4 +6,5 @@
 extern void setup();
 extern void loop();
 extern void onReceiveFromController(int);
-extern LCD_I2C lcd;
+extern bool isDevelMode();
+

@@ -24,8 +24,13 @@ size_t Print::print(unsigned char c, int format)
     return print(text);
 }
 
-
-size_t Print::print(const Printable& printable)
+size_t Print::print(int i, int format)
 {
-    return printable.printTo(*this);
+    char text[256] = "";
+    if (format == HEX)
+        snprintf(text, sizeof(text), "0x%x", i);
+    else
+        snprintf(text, sizeof(text), "%d", i);
+
+    return print(text);
 }

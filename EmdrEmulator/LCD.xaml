@@ -21,6 +21,10 @@
                     <DataTrigger Binding="{Binding Backlight}" Value="True">
                         <Setter Property="Background" Value="#FF4C8DFF"/>
                     </DataTrigger>
+                    <DataTrigger Binding="{Binding Backlight}" Value="False">
+                        <Setter Property="Background" Value="Gray"/>
+                    </DataTrigger>
+
                 </Style.Triggers>
             </Style>
         </StackPanel.Style>

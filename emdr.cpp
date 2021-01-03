@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 #include <Wire.h>
-#include <LCD_I2C.h>
+//#include <LCD_I2C.h>
 #include "Debug.h"
 #include "MemoryFree.h"
 #include "Timer.h"
@@ -24,8 +24,7 @@ void onReceiveFromController(int);
 #define STRIP_LEDS_BRIGHTNESS 2 // jasnosc swiecenie diod
 #define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
-// https://github.com/blackhack/LCD_I2C
-LCD_I2C lcd(0x27); // Default address of most PCF8574 modules, change according
+Lcd lcd;
 
 constexpr int ENV_PIN = 4;     // pin for detecting production/development environmetn;
 constexpr int emdrI2CAddr = 9;
@@ -53,8 +52,6 @@ void setup()
 
 	// inicjalizacja wyswietlacza lcd
 	lcd.begin(true);
-	lcd.backlight();
-	lcd.print(F("emdr"));
 
 	// konfiguracja zalezy od srodowidka prod/devel
 	pinMode(ENV_PIN, INPUT_PULLUP);
@@ -75,11 +72,11 @@ void setup()
 	strip.Setup();
 
 	// wykonanie testu wszystkich urzadzen a potem uruchomienie poruszajacego sie punktu
-	//diagnosticStipPlugin.Execute(
-	//	DiagnosticStipPlugin::Action::TestAllDevices, 
-	//	DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
-	//diagnosticStipPlugin.Start();
-	movingPointStripPlugin.Start();
+	diagnosticStipPlugin.Execute(
+		DiagnosticStipPlugin::Action::TestAllDevices, 
+		DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
+	diagnosticStipPlugin.Start();
+	//movingPointStripPlugin.Start();
 }
 
 void loop()
@@ -90,6 +87,7 @@ void loop()
 		strip.Receive(eventReceived);
 		eventReceived = Event::Name::UnknowCode;
 	}
+	lcd.loop();
 	stripDevice.Loop();
 }
 
@@ -111,10 +109,12 @@ bool isDevelMode() {
 	bool devel = digitalRead(ENV_PIN) == HIGH;
 #endif
 
-	const __FlashStringHelper* msg = devel ? F("dev") : F("prod");
-	PRINTLN(msg);
-	lcd.print(' ');
-	lcd.print(msg);
+	const __FlashStringHelper* emdr = F("emdr ");
+	const __FlashStringHelper* mode = devel ? F("dev") : F("prod");
+	PRINT(emdr);
+	PRINTLN(mode);
+	lcd.print(emdr);
+	lcd.print(mode);
 
 	return devel;
 }

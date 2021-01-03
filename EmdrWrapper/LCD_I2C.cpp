@@ -15,3 +15,8 @@ void LCD_I2C::noBacklight()
 {
     EmdrWrapper::EmdrSketch::lcd::OnBacklight(false);
 }
+
+void LCD_I2C::clear()
+{
+    EmdrWrapper::EmdrSketch::lcd::OnClear();
+}

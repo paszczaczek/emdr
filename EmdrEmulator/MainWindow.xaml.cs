@@ -46,6 +46,7 @@ namespace EmdrEmulator
             unsafe { EmdrWrapper.EmdrSketch.lcd.printEvent += Lcd_PrintEventHandler; }
             unsafe { EmdrWrapper.EmdrSketch.lcd.setCursorEvent += Lcd_SetCursorEventHandler; }
             unsafe { EmdrWrapper.EmdrSketch.lcd.backlightEvent += Lcd_BacklightEventHandler; }
+            unsafe { EmdrWrapper.EmdrSketch.lcd.clearEvent += Lcd_ClearEventHandler; }
 
             // uruchomienie funkcji setup()
             EmdrWrapper.EmdrSketch.setup();
@@ -169,6 +170,20 @@ namespace EmdrEmulator
                 Dispatcher.Invoke(() =>
                 {
                     model.Lcd.Backlight = on;
+                });
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        private void Lcd_ClearEventHandler()
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    model.Lcd.Lines = new string[2] { "", "" };
+                    model.Lcd.Row = 0;
+                    model.Lcd.Col = 0;
                 });
             }
             catch (TaskCanceledException) { }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Printable.h"
+#include "Arduino.h"
 
 #define DEC 10
 #define HEX 16
@@ -42,7 +43,7 @@ public:
     size_t print(const char[]);
     size_t print(char);
     size_t print(unsigned char, int = DEC);
-    //size_t print(int, int = DEC);
+    size_t print(int, int = DEC);
     //size_t print(unsigned int, int = DEC);
     //size_t print(long, int = DEC);
     //size_t print(unsigned long, int = DEC);
