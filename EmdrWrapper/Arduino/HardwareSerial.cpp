@@ -47,5 +47,4 @@ size_t HardwareSerial::println(int value, int format)
 	return strlen(str);
 }
 
-
 HardwareSerial Serial;

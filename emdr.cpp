@@ -28,8 +28,10 @@ Lcd lcd;
 
 constexpr int ENV_PIN = 4;     // pin for detecting production/development environmetn;
 constexpr int emdrI2CAddr = 9;
+const __FlashStringHelper* emdr;
 
 Event::Name eventReceived = Event::Name::UnknowCode;
+void powerOffReceive(Event::Name eventReceived);
 
 // strip plugins
 DiagnosticStipPlugin diagnosticStipPlugin;
@@ -43,6 +45,8 @@ Device& stripDevice = strip;
 
 void setup()
 {
+	emdr = F("emdr");
+
 	Serial.begin(115200);
 	PRINT_FREEMEM(F("setup"));
 
@@ -73,18 +77,33 @@ void setup()
 
 	// wykonanie testu wszystkich urzadzen a potem uruchomienie poruszajacego sie punktu
 	diagnosticStipPlugin.Execute(
-		DiagnosticStipPlugin::Action::TestAllDevices, 
-		DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
+		DiagnosticStipPlugin::Action::TestAllDevices,
+		//DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
+		DiagnosticStipPlugin::Action::Idle);
 	diagnosticStipPlugin.Start();
-	//movingPointStripPlugin.Start();
 }
 
 void loop()
 {
+	if (Serial.available() > 0) 
+	{
+		char c = Serial.read();
+
+		if (c == '?')
+		{
+			lcd.setCursor(0, 1);
+			lcd.print(F("poweroff"));
+
+			Serial.print(emdr);
+			Serial.print('\n');
+		}
+	}
+
 	// obsluga odebranego kodu z remoteController'a
 	if (eventReceived != Event::Name::UnknowCode)
 	{
 		strip.Receive(eventReceived);
+		powerOffReceive(eventReceived);
 		eventReceived = Event::Name::UnknowCode;
 	}
 	lcd.loop();
@@ -109,12 +128,33 @@ bool isDevelMode() {
 	bool devel = digitalRead(ENV_PIN) == HIGH;
 #endif
 
-	const __FlashStringHelper* emdr = F("emdr ");
 	const __FlashStringHelper* mode = devel ? F("dev") : F("prod");
 	PRINT(emdr);
+	PRINT(' ');
 	PRINTLN(mode);
 	lcd.print(emdr);
+	lcd.print(' ');
 	lcd.print(mode);
 
 	return devel;
+}
+
+void powerOffReceive(Event::Name eventReceived)
+{
+	const __FlashStringHelper* suspend = F("suspend");
+	const __FlashStringHelper* hibernate = F("hibernate");
+
+	switch (eventReceived)
+	{
+	case Event::Power:
+		Serial.print(suspend);
+		Serial.print('\n');
+		lcd.setCursor(0, 1);
+		lcd.print(suspend);
+		lcd.print(' ');
+		lcd.print(' ');
+		lcd.print(' ');
+		lcd.print(' ');
+		break;
+	}
 }

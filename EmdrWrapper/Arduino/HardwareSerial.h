@@ -16,5 +16,10 @@ public:
 	size_t print(int value, int format = DEC);
 	size_t println(int value, int format = DEC);
 	size_t println();
+
+	bool _is_available = false;
+	int _available_data = 0;
+	int available(void) { return _is_available; }
+	int read(void) { _is_available = false;  return _available_data; };
 };
 extern HardwareSerial Serial;

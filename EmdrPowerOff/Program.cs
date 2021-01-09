@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Management;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EmdrPowerOff
@@ -12,7 +14,11 @@ namespace EmdrPowerOff
     {
         private static ManagementEventWatcher comInsertWatcher;
         private static ManagementEventWatcher comRemoveWatcher;
-        private static string[] oldSerialPorts = { };
+        private static string[] oldPortNames = { };
+        private static string arduinoPortName;
+        private static SerialPort arduinoSerialPort = new SerialPort();
+        private static Thread readThread = new Thread(Read);
+        static bool _continue;
 
         static void Main(string[] args)
         {
@@ -53,52 +59,118 @@ namespace EmdrPowerOff
 
         private static void ComInsertEventHandler()
         {
-            lock (oldSerialPorts)
+            lock (oldPortNames)
             {
-                var allSerialPorts = SerialPort.GetPortNames();
-                var serialPorts = allSerialPorts.Except(oldSerialPorts).ToArray();
-                oldSerialPorts = allSerialPorts;
+                var allPortNames = SerialPort.GetPortNames();
+                var portNames = allPortNames.Except(oldPortNames).ToArray();
+                oldPortNames = allPortNames;
 
-                foreach (string serialPort in serialPorts)
+                foreach (string portName in portNames)
                 {
-                    bool isArduino = IsArduinoDevice(serialPort, out string deviceId, out string deviceName);
-                    if (isArduino)
-                        Console.WriteLine($"arduino detected at {deviceId}");
+                    if (IsArduinoDevice(portName, out string deviceName))
+                        OpenArduinoSerialPort(portName, deviceName);
                 }
             }
         }
 
         private static void ComRemoveEventHandler()
         {
-            lock (oldSerialPorts)
+            lock (oldPortNames)
             {
-                var allSerialPorts = SerialPort.GetPortNames();
-                var serialPorts = oldSerialPorts.Except(allSerialPorts);
-                oldSerialPorts = allSerialPorts;
+                var allPortNames = SerialPort.GetPortNames();
+                var portNames = oldPortNames.Except(allPortNames);
+                oldPortNames = allPortNames;
 
-                foreach (string serialPort in serialPorts)
-                    Console.WriteLine($"removed {serialPort}");
+                foreach (string portName in portNames)
+                    if (portName == arduinoPortName)
+                        CloseArduinoSerialPort(portName);
+                    else
+                        Console.WriteLine($"removed {portName}");
             }
         }
 
-        private static bool IsArduinoDevice(string serialPort, out string deviceId, out string deviceName)
+        private static bool IsArduinoDevice(string portName, out string deviceName)
         {
-            deviceId = null;
             deviceName = null;
 
             ManagementObjectSearcher mos = new ManagementObjectSearcher(
-                    $"Select * from Win32_SerialPort where DeviceId = '{serialPort}'");
+                    $"Select * from Win32_SerialPort where DeviceId = '{portName}'");
             foreach (var mo in mos.Get())
             {
-                deviceId = mo["DeviceID"].ToString();
                 deviceName = mo["Name"].ToString();
-                Console.WriteLine($"inserted {deviceId}: {deviceName}");
-                return deviceName.Contains("Arduino");
+                Console.WriteLine($"inserted {portName}: {deviceName}");
+                bool isArduino = deviceName.Contains("Arduino");
+                if (isArduino)
+                    Console.WriteLine("arduino inserted");
+                return isArduino;
             }
 
-            Console.WriteLine($"inserted {serialPort}: ?");
-
+            Console.WriteLine($"inserted {portName}: ?");
             return false;
         }
+
+        private static void OpenArduinoSerialPort(string portName, string deviceName)
+        {
+            arduinoPortName = portName;
+            arduinoSerialPort.PortName = portName;
+            arduinoSerialPort.BaudRate = 115200;
+            arduinoSerialPort.ReadTimeout = 500;
+            arduinoSerialPort.WriteTimeout = 500;
+
+            //arduinoSerialPort.DataReceived += ArduinoSerialPort_DataReceived;
+            arduinoSerialPort.Open();
+            _continue = true;
+            readThread.Start();
+            Console.WriteLine("arduino opened");
+
+            const string hello = "?";
+            arduinoSerialPort.Write(hello);
+            Console.WriteLine($"arduino < {hello}");
+
+            //string recv = arduinoSerialPort.ReadExisting();
+            //Console.WriteLine($"received from arduino: {recv}");
+        }
+
+        private static void ArduinoSerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            //Console.WriteLine($"received from arduino: {0}", arduinoSerialPort.ReadExisting());
+            //arduinoSerialPort.Close();
+        }
+
+        private static void CloseArduinoSerialPort(string portName)
+        {
+            Console.WriteLine($"arduino removed");
+            arduinoPortName = null;
+        }
+
+        public static void Read()
+        {
+            while (_continue)
+            {
+                try
+                {
+                    //string message = arduinoSerialPort.ReadLine();
+                    string recv = arduinoSerialPort.ReadLine();
+                    Console.WriteLine($"arduino > {recv}");
+                    switch (recv)
+                    {
+                        case "emdr":
+                            Console.WriteLine("emdr ready");
+                            break;
+                        case "suspend":
+                            Console.WriteLine("suspending...");
+                            SetSuspendState(false, true, true);
+                            Console.WriteLine("awoken");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch (TimeoutException) { }
+            }
+        }
+
+        [DllImport("PowrProf.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern bool SetSuspendState(bool hiberate, bool forceCritical, bool disableWakeEvent);
     }
 }

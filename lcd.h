@@ -21,6 +21,14 @@ public:
 		return LCD_I2C::print(flash);
 	}
 
+#if !WIN32
+	size_t print(const char* s)
+	{
+		TimerStart();
+		return LCD_I2C::print(s);
+	}
+#endif
+
 	size_t print(char c)
 	{
 		TimerStart();

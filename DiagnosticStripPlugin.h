@@ -55,7 +55,9 @@ public:
 					lcd.print(' ');
 					lcd.print(freeMemory());
 					lcd.print('b');
-					ActionNext(); break;
+					lcd.setCursor(0, 0);
+					ActionNext();
+					break;
 				}
 				break;
 			case Action::StartMovingPointStripPlugin:

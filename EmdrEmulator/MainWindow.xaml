@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -19,7 +20,8 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <local:Strip DataContext="{Binding Strip}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Top"/>
-        <ScrollViewer x:Name="serialMonitorScrollViewer" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2">
+        <TextBox x:Name="serialInput" Grid.Row="1" Grid.Column="0" Text="1234" Background="Black" Foreground="LightGray"/>
+        <ScrollViewer x:Name="serialMonitorScrollViewer" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2">
             <TextBlock Text="{Binding SerialMonitor}" Foreground="LightGray"/>
         </ScrollViewer>
         <local:LCD DataContext="{Binding Lcd}" Grid.Row="1" Grid.Column="1"/>
