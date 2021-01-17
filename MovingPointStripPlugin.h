@@ -1,12 +1,14 @@
 #pragma once
 #include <Arduino.h>
 #include <colorutils.h>
+#include <math.h>
 #include "Strip.h"
 #include "StripPlugin.h"
 #include "Timer.h"
 #include "Emdr.h"
 #include "Debug.h"
 #include "lcd.h"
+#include "Storage.h"
 
 class MovingPointStripPlugin : public StripPlugin
 {
@@ -44,7 +46,7 @@ private:
 
 	// czas wystartowania timera poruszajacego punktem (next unsigned int)
 	unsigned int movingTimerStartedAt : static_cast<int>(movingTimerCapacity);
-	
+
 	// kierunek poruszania sie punktu
 	unsigned int movingLedDirection : 1;
 
@@ -89,7 +91,7 @@ public:
 
 		unsigned long counterStartedAt;
 		unsigned long ommittedIntervals;
-		
+
 		// przesuwanie swiecacego punktu
 		counterStartedAt = movingTimerStartedAt;
 		if (pauseTimerCountTo == 0 && Timer::ItsTime(
@@ -180,7 +182,7 @@ public:
 			PRINTLN(F("Start"));
 			Plugin::Start();
 			movingTimerStartedAt = Timer::Now(movingTimerInterval, movingTimerCapacity);
-			
+
 			//PRINT(F("session: ")); PRINT(sessionDuration); PRINTLN(F("s"));
 			if (movingLastLedNo == 0)
 				movingLastLedNo = (byte)strip.controller->size() - 1;
@@ -246,21 +248,69 @@ private:
 	// obsluga eventow
 	bool Receive(Event::Name eventReceived) override
 	{
-		const __FlashStringHelper* f_hue = F("hue");
+		constexpr byte eoeFun = static_cast<byte>(Storage::MovingPointStripPlugin_Fun::EOE);
+		constexpr byte firstFun = 0;
+		byte fun = static_cast<byte>(storage.movingPointStripPlugin_Fun);
+
 		static uint8_t hue = 0;
 
 		lcd.setCursor(0, 1);
 
 		switch (eventReceived)
 		{
+		case Event::ChannelPlus:
+			// zmiana aktywnej funkcji na nastepna
+			if (fun + 1 == eoeFun)
+				fun = firstFun;
+			else
+				fun++;
+			storage.movingPointStripPlugin_Fun =
+				static_cast<Storage::MovingPointStripPlugin_Fun>(fun);
+			break;
+
+		case Event::ChannelMinus:
+			// zmiana aktywnej funkcji na poprzednia
+			if (fun == firstFun)
+				fun = eoeFun - 1;
+			else
+				fun--;
+			storage.movingPointStripPlugin_Fun =
+				static_cast<Storage::MovingPointStripPlugin_Fun>(fun);
+			break;
+
+		case Event::VolumePlus:
+		case Event::VolumeMinus:
+		case Event::Digit0:
+		case Event::Digit1:
+		case Event::Digit2:
+		case Event::Digit3:
+		case Event::Digit4:
+		case Event::Digit5:
+		case Event::Digit6:
+		case Event::Digit7:
+		case Event::Digit8:
+		case Event::Digit9:
+			// zwiekszenie wartosci aktywnej funkcji
+			switch (storage.movingPointStripPlugin_Fun)
+			{
+			case Storage::MovingPointStripPlugin_Fun::SetHue:
+				SetHue(eventReceived);
+				break;
+			case Storage::MovingPointStripPlugin_Fun::SetSpeed:
+			case Storage::MovingPointStripPlugin_Fun::SetBrightness:
+				break;
+			}
+			break;
+
+
 		case Event::Name::UnknowCode:
 			break;
-		//case Event::Name::BlockingInterruptsDisallowed:
-			//movingCounter.Pause();
-			//break;
-		//case Event::Name::BlockingInterruptsAllowed:
-			//movingCounter.Resume();
-			//break;
+			//case Event::Name::BlockingInterruptsDisallowed:
+				//movingCounter.Pause();
+				//break;
+			//case Event::Name::BlockingInterruptsAllowed:
+				//movingCounter.Resume();
+				//break;
 		case Event::Name::Start:
 			Start();
 			break;
@@ -270,19 +320,50 @@ private:
 		case Event::Name::Pause:
 			Pause();
 			break;
-		case Event::Name::ChannelPlus:
-			hue += 5;
-			lcd.printPropPerc(f_hue, hue * 100 / 255);
-			movingColor.setHue(hue);
-			break;
-		case Event::Name::ChannelMinus:
-			hue -= 5;
-			lcd.printPropPerc(f_hue, hue * 100 / 255);
-			movingColor.setHue(hue);
-			break;
+			//case Event::Name::VolumePlus:
+			//	hue += 5;
+			//	lcd.printPropPerc(f_hue, hue * 100 / 255);
+			//	movingColor.setHue(hue);
+			//	break;
+			//case Event::Name::VolumeMinus:
+			//	hue -= 5;
+			//	lcd.printPropPerc(f_hue, hue * 100 / 255);
+			//	movingColor.setHue(hue);
+			//	break;
 		}
 
 		return false;
+	}
+
+	void SetHue(Event::Name eventName)
+	{
+		const __FlashStringHelper* f_hue = F("hue");
+
+		switch (eventName)
+		{
+		case Event::Digit0: storage.movingPointStripPlugin_Hue = PercentToByte(0); break;
+		case Event::Digit1: storage.movingPointStripPlugin_Hue = PercentToByte(10); break;
+		case Event::Digit2: storage.movingPointStripPlugin_Hue = PercentToByte(20); break;
+		case Event::Digit3: storage.movingPointStripPlugin_Hue = PercentToByte(30); break;
+		case Event::Digit4: storage.movingPointStripPlugin_Hue = PercentToByte(40); break;
+		case Event::Digit5: storage.movingPointStripPlugin_Hue = PercentToByte(50); break;
+		case Event::Digit6: storage.movingPointStripPlugin_Hue = PercentToByte(60); break;
+		case Event::Digit7: storage.movingPointStripPlugin_Hue = PercentToByte(70); break;
+		case Event::Digit8: storage.movingPointStripPlugin_Hue = PercentToByte(80); break;
+		case Event::Digit9: storage.movingPointStripPlugin_Hue = PercentToByte(90); break;
+		case Event::VolumePlus: storage.movingPointStripPlugin_Hue += PercentToByte(1); break;
+		case Event::VolumeMinus: storage.movingPointStripPlugin_Hue -= PercentToByte(1); break;
+		}
+		lcd.printPropPerc(
+			f_hue,
+			static_cast<byte>(storage.movingPointStripPlugin_Hue * 100 / 255));
+		movingColor.setHue(storage.movingPointStripPlugin_Hue);
+	}
+
+
+	byte PercentToByte(byte percent)
+	{
+		return static_cast<byte>(round(percent * 255 / 100.00));
 	}
 
 	// ustawia wszystkie ledy w kolory teczy

@@ -150,6 +150,7 @@
     <ClInclude Include="..\Plugin.h" />
     <ClInclude Include="..\DiagnosticStripPlugin.h" />
     <ClInclude Include="..\RemoteControllerStripPlugin.h" />
+    <ClInclude Include="..\Storage.h" />
     <ClInclude Include="..\Strip.h" />
     <ClInclude Include="..\StripPlugin.h" />
     <ClInclude Include="..\Timer.h" />
@@ -178,6 +179,7 @@
     <ClCompile Include="..\Emdr.cpp" />
     <ClCompile Include="..\EmdrController\EmdrController.cpp" />
     <ClCompile Include="..\EmdrController\Event.cpp" />
+    <ClCompile Include="..\Storage.cpp" />
     <ClCompile Include="Arduino\Arduino.cpp" />
     <ClCompile Include="Arduino\HardwareSerial.cpp" />
     <ClCompile Include="Arduino\Print.cpp" />

@@ -11,6 +11,9 @@
 #include "EmdrController/Event.h"
 #include "Device.h"
 #include "DiagnosticStripPlugin.h"
+#include "Storage.h"
+
+Storage storage;
 
 bool isDevelMode();
 void onReceiveFromController(int);
@@ -78,8 +81,8 @@ void setup()
 	// wykonanie testu wszystkich urzadzen a potem uruchomienie poruszajacego sie punktu
 	diagnosticStipPlugin.Execute(
 		DiagnosticStipPlugin::Action::TestAllDevices,
-		//DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
-		DiagnosticStipPlugin::Action::Idle);
+		DiagnosticStipPlugin::Action::StartMovingPointStripPlugin);
+		//DiagnosticStipPlugin::Action::Idle);
 	diagnosticStipPlugin.Start();
 }
 

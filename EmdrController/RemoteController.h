@@ -16,7 +16,7 @@ public:
 	{
 		irrecv.enableIRIn();
 		irrecv.blink13(true);
-		Serial.println(F("rc: ir enabled"));
+		//Serial.println(F("rc: ir enabled"));
 	}
 
 	void Loop() {
@@ -30,9 +30,9 @@ public:
 	{
 		if (irCode != -1) 
 		{
-			Serial.print(F("rc: ir: "));
-			Serial.print(irCode, HEX);
-			Serial.print(F(" -> "));
+			//Serial.print(F("rc: ir: "));
+			//Serial.print(irCode, HEX);
+			//Serial.print(F(" -> "));
 		}
 
 		switch (eventReceived)

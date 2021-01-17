@@ -11,11 +11,13 @@
 #define INPUT_PULLUP 0x2
 #define LED_BUILTIN 13
 
+#define min(a,b) ((a)<(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
+
 #define F(string_literal) string_literal
 typedef char __FlashStringHelper;
 
-typedef unsigned char byte;
-//extern const char *F(const char *str);
+typedef uint8_t byte;
 
 extern unsigned long millis(void);
 extern void delay(unsigned long);

@@ -62,7 +62,8 @@ public:
 		TimerStart();
 		return
 			printProp(name, value) +
-			print('%');
+			print('%') + 
+			print(' ');
 	}
 
 	void setup()
