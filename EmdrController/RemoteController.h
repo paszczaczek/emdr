@@ -30,9 +30,9 @@ public:
 	{
 		if (irCode != -1) 
 		{
-			//Serial.print(F("rc: ir: "));
-			//Serial.print(irCode, HEX);
-			//Serial.print(F(" -> "));
+			Serial.print(F("rc: ir: "));
+			Serial.print(irCode, HEX);
+			Serial.print(F(" -> "));
 		}
 
 		switch (eventReceived)
@@ -54,6 +54,7 @@ public:
 		case Event::ChannelMinus:	Serial.println(F("ChannelMinus")); break;
 		case Event::Power:			Serial.println(F("Power")); break;
 		case Event::Mute:			Serial.println(F("Mute")); break;
+		case Event::Display:		Serial.println(F("Display")); break;
 		}
 	}
 
@@ -92,6 +93,7 @@ private:
 		case RC8205LX_IRCode::ChannelMinus: return Event::Name::ChannelMinus;
 		case RC8205LX_IRCode::Power:		return Event::Name::Power;
 		case RC8205LX_IRCode::Mute:			return Event::Name::Mute;
+		case RC8205LX_IRCode::Display:		return Event::Name::Display;
 		default:							return Event::Name::UnknowCode;
 		}
 	}

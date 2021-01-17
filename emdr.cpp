@@ -24,7 +24,6 @@ void onReceiveFromController(int);
 #define STRIP_LEDS_PROD_PIN   7 // pin for long celling strip for production
 #define STRIP_LEDS_DEVEL_PIN  3 // pin for short strip on board for development
 #define STRIP_LEDS_PIN_RC     8 // pin for remote control strip
-#define STRIP_LEDS_BRIGHTNESS 2 // jasnosc swiecenie diod
 #define STRIP_LEDS_MAX_CURRENT MAX_CURRENT_FROM_USB
 
 Lcd lcd;
@@ -41,7 +40,7 @@ DiagnosticStipPlugin diagnosticStipPlugin;
 MovingPointStripPlugin movingPointStripPlugin;
 
 // strip
-Strip strip(STRIP_LEDS_MAX_CURRENT, STRIP_LEDS_BRIGHTNESS);
+Strip strip(STRIP_LEDS_MAX_CURRENT);
 
 // devices
 Device& stripDevice = strip;
@@ -56,6 +55,10 @@ void setup()
 	// inicjalizacja polaczenia z remoteController'em
 	Wire.begin(emdrI2CAddr);
 	Wire.onReceive(onReceiveFromController);
+
+	storage.movingPointStripPlugin_Brightness = 1;
+	storage.movingPointStripPlugin_Hue = 0;
+	storage.movingPointStripPlugin_Speed = 10;
 
 	// inicjalizacja wyswietlacza lcd
 	lcd.begin(true);

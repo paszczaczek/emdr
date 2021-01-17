@@ -78,9 +78,11 @@ public:
 
 	void Setup(byte movingTimerCountTo = 1, byte movingFirstLedNo = 0, byte movingLastLedNo = 0)
 	{
-		this->movingTimerCountTo = movingTimerCountTo;
+		//this->movingTimerCountTo = movingTimerCountTo;
+		this->movingTimerCountTo = storage.movingPointStripPlugin_Speed;
 		this->movingFirstLedNo = movingFirstLedNo;
 		this->movingLastLedNo = movingLastLedNo;
+		movingColor.setHue(storage.movingPointStripPlugin_Hue);
 	}
 
 	// petla zdarzen
@@ -190,6 +192,9 @@ public:
 			strip.controller->leds()[movingFirstLedNo] = movingColor;
 			strip.updated = true;
 
+			lcd.printFun(F("moving point"));
+			Receive(Event::Display);
+
 			// TODO
 			//FillRainbow();
 		}
@@ -230,35 +235,21 @@ public:
 	}
 
 private:
-	// zwiekszenie lub zmniejszenie predkosci poruszajacego sie punktu
-	void ChangeMovingSpeed(bool increase)
-	{
-		if (increase)
-		{
-			if (movingTimerCountTo < 255)
-				movingTimerCountTo++;
-		}
-		else
-		{
-			if (movingTimerCountTo > 1)
-				movingTimerCountTo--;
-		}
-	}
-
 	// obsluga eventow
-	bool Receive(Event::Name eventReceived) override
+	bool Receive(Event::Name receivedEvent) override
 	{
 		constexpr byte eoeFun = static_cast<byte>(Storage::MovingPointStripPlugin_Fun::EOE);
 		constexpr byte firstFun = 0;
 		byte fun = static_cast<byte>(storage.movingPointStripPlugin_Fun);
+		const __FlashStringHelper* f_speed = F("speed");
+		const __FlashStringHelper* f_hue = F("hue");
+		const __FlashStringHelper* f_brightness = F("brightness");
 
-		static uint8_t hue = 0;
+		static byte value = 0;
 
-		lcd.setCursor(0, 1);
-
-		switch (eventReceived)
+		switch (receivedEvent)
 		{
-		case Event::ChannelPlus:
+		case Event::VolumePlus:
 			// zmiana aktywnej funkcji na nastepna
 			if (fun + 1 == eoeFun)
 				fun = firstFun;
@@ -266,9 +257,9 @@ private:
 				fun++;
 			storage.movingPointStripPlugin_Fun =
 				static_cast<Storage::MovingPointStripPlugin_Fun>(fun);
-			break;
+			goto Display;
 
-		case Event::ChannelMinus:
+		case Event::VolumeMinus:
 			// zmiana aktywnej funkcji na poprzednia
 			if (fun == firstFun)
 				fun = eoeFun - 1;
@@ -276,10 +267,12 @@ private:
 				fun--;
 			storage.movingPointStripPlugin_Fun =
 				static_cast<Storage::MovingPointStripPlugin_Fun>(fun);
-			break;
+			goto Display;
 
-		case Event::VolumePlus:
-		case Event::VolumeMinus:
+		Display:
+		case Event::Display:
+		case Event::ChannelPlus:
+		case Event::ChannelMinus:
 		case Event::Digit0:
 		case Event::Digit1:
 		case Event::Digit2:
@@ -293,24 +286,28 @@ private:
 			// zwiekszenie wartosci aktywnej funkcji
 			switch (storage.movingPointStripPlugin_Fun)
 			{
-			case Storage::MovingPointStripPlugin_Fun::SetHue:
-				SetHue(eventReceived);
-				break;
 			case Storage::MovingPointStripPlugin_Fun::SetSpeed:
+				value = storage.movingPointStripPlugin_Speed;
+				value = SetFunValueLog(value, receivedEvent, f_speed);
+				if (receivedEvent != Event::Display)
+					movingTimerCountTo = storage.movingPointStripPlugin_Speed = value;
+				break;
+			case Storage::MovingPointStripPlugin_Fun::SetHue:
+				storage.movingPointStripPlugin_Hue =
+					SetFunValue(storage.movingPointStripPlugin_Hue, receivedEvent, f_hue);
+					movingColor.setHue(storage.movingPointStripPlugin_Hue);
+					strip.controller->leds()[movingLedNo] = movingColor;
+					strip.updated = true;
+				break;
 			case Storage::MovingPointStripPlugin_Fun::SetBrightness:
+				storage.movingPointStripPlugin_Brightness =
+					SetFunValueLog(storage.movingPointStripPlugin_Brightness, receivedEvent, f_brightness);
+					strip.SetBrightness(storage.movingPointStripPlugin_Brightness);
 				break;
 			}
 			break;
-
-
 		case Event::Name::UnknowCode:
 			break;
-			//case Event::Name::BlockingInterruptsDisallowed:
-				//movingCounter.Pause();
-				//break;
-			//case Event::Name::BlockingInterruptsAllowed:
-				//movingCounter.Resume();
-				//break;
 		case Event::Name::Start:
 			Start();
 			break;
@@ -332,34 +329,62 @@ private:
 			//	break;
 		}
 
+		strip.updated = true;
+
 		return false;
 	}
 
-	void SetHue(Event::Name eventName)
+	byte SetFunValue(short value, Event::Name eventName, const __FlashStringHelper* lcdName)
 	{
-		const __FlashStringHelper* f_hue = F("hue");
-
 		switch (eventName)
 		{
-		case Event::Digit0: storage.movingPointStripPlugin_Hue = PercentToByte(0); break;
-		case Event::Digit1: storage.movingPointStripPlugin_Hue = PercentToByte(10); break;
-		case Event::Digit2: storage.movingPointStripPlugin_Hue = PercentToByte(20); break;
-		case Event::Digit3: storage.movingPointStripPlugin_Hue = PercentToByte(30); break;
-		case Event::Digit4: storage.movingPointStripPlugin_Hue = PercentToByte(40); break;
-		case Event::Digit5: storage.movingPointStripPlugin_Hue = PercentToByte(50); break;
-		case Event::Digit6: storage.movingPointStripPlugin_Hue = PercentToByte(60); break;
-		case Event::Digit7: storage.movingPointStripPlugin_Hue = PercentToByte(70); break;
-		case Event::Digit8: storage.movingPointStripPlugin_Hue = PercentToByte(80); break;
-		case Event::Digit9: storage.movingPointStripPlugin_Hue = PercentToByte(90); break;
-		case Event::VolumePlus: storage.movingPointStripPlugin_Hue += PercentToByte(1); break;
-		case Event::VolumeMinus: storage.movingPointStripPlugin_Hue -= PercentToByte(1); break;
+		case Event::Display: break;
+		case Event::Digit0: value = 0; break; 
+		case Event::Digit1: value = 25 * 1; break;
+		case Event::Digit2: value = 25 * 2; break;
+		case Event::Digit3: value = 25 * 3; break;
+		case Event::Digit4: value = 25 * 4; break;
+		case Event::Digit5: value = 25 * 5; break;
+		case Event::Digit6: value = 25 * 6; break;
+		case Event::Digit7: value = 25 * 7; break;
+		case Event::Digit8: value = 25 * 8; break;
+		case Event::Digit9: value = 25 * 9; break;
+		case Event::ChannelPlus: value += 1; break;
+		case Event::ChannelMinus: value -= 1; break;
 		}
-		lcd.printPropPerc(
-			f_hue,
-			static_cast<byte>(storage.movingPointStripPlugin_Hue * 100 / 255));
-		movingColor.setHue(storage.movingPointStripPlugin_Hue);
+		value = max(0, value);
+		value = min(255, value);
+
+		lcd.printProp(lcdName, value);
+
+		return static_cast<byte>(value);
 	}
 
+	byte SetFunValueLog(short value, Event::Name eventName, const __FlashStringHelper* lcdName)
+	{
+		switch (eventName)
+		{
+		case Event::Display: break;
+		case Event::Digit0: value = 0; break;
+		case Event::Digit1: value = 1; break;
+		case Event::Digit2: value = 2; break;
+		case Event::Digit3: value = 4; break;
+		case Event::Digit4: value = 8; break;
+		case Event::Digit5: value = 16; break;
+		case Event::Digit6: value = 32; break;
+		case Event::Digit7: value = 64; break;
+		case Event::Digit8: value = 128; break;
+		case Event::Digit9: value = 255; break;
+		case Event::ChannelPlus: value += 1; break;
+		case Event::ChannelMinus: value -= 1; break;
+		}
+		value = max(0, value);
+		value = min(255, value);
+
+		lcd.printProp(lcdName, value);
+
+		return static_cast<byte>(value);
+	}
 
 	byte PercentToByte(byte percent)
 	{

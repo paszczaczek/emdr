@@ -26,6 +26,7 @@ enum RC8205LX_IRCode {
 	ChannelMinus = 0x21,
 	Mute = 0x0d,
 	Power = 0x0c,
+	Display = 0x3c,
 	UnknownCode = -1
 };
 

@@ -47,9 +47,23 @@ public:
 		return LCD_I2C::print(i, format);
 	}
 
+	size_t printFun(const __FlashStringHelper* name)
+	{
+		TimerStart();
+		clear();
+		setCursor(0, 0);
+		return
+			print(name);
+	}
+
+
 	size_t printProp(const __FlashStringHelper* name, const byte value)
 	{
 		TimerStart();
+		setCursor(0, 1);
+		for (size_t i = 0; i < 16; i++)
+			print(' ');
+		setCursor(0, 1);
 		return
 			print(name) +
 			print(':') +
@@ -60,10 +74,13 @@ public:
 	size_t printPropPerc(const __FlashStringHelper* name, const byte value)
 	{
 		TimerStart();
-		return
+		size_t printed =
 			printProp(name, value) +
-			print('%') + 
-			print(' ');
+			print('%');
+		for (size_t i = printed; i < 16; i++)
+			printed += print(' ');
+
+		return printed;
 	}
 
 	void setup()
@@ -120,7 +137,7 @@ private:
 	constexpr static Timer::Interval timerResolution = Timer::Interval::s1;
 
 	// pojemnosc timera
-	constexpr static Timer::Capacity timerCapacity = Timer::Capacity::bits2;
+	constexpr static Timer::Capacity timerCapacity = Timer::Capacity::bits3;
 
 	// czas wystartowania timera
 	byte timerStartedAt : static_cast<int>(timerCapacity);
@@ -132,7 +149,7 @@ private:
 	void TimerStart()
 	{
 		timerStartedAt = Timer::Start(timerResolution, timerCapacity);
-		timerCountTo = 3;
+		timerCountTo = -1;
 		LCD_I2C::backlight();
 	}
 

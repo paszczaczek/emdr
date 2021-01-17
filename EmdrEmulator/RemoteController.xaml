@@ -15,6 +15,7 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
             <RowDefinition Height="10"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
@@ -53,6 +54,16 @@
 
         <Button Grid.Row="6" Grid.Column="1" Content="0" Tag="{x:Static local:RC8205LX_IRCode.Digit0}" Click="Button_Click"/>
 
-        <Button Grid.Row="8" Grid.Column="1" Content="?" Tag="{x:Static local:RC8205LX_IRCode.UnknownCode}" Click="Button_Click"/>
+        <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="D" Tag="{x:Static local:RC8205LX_IRCode.Display}" Click="Button_Click"/>
+        </Grid>
+
+        <Button Grid.Row="9" Grid.Column="1" Content="?" Tag="{x:Static local:RC8205LX_IRCode.UnknownCode}" Click="Button_Click"/>
     </Grid>
 </UserControl>

@@ -28,6 +28,7 @@ enum Name
 	ChannelMinus,
 	Mute,
 	Power,
+	Display,
 	Start,
 	Stop,
 	Pause

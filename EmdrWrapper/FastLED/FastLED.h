@@ -188,9 +188,9 @@ typedef uint8_t(*power_func)(uint8_t scale, uint32_t data);
 /// @nosubgrouping
 */
 class CFastLED {
-	/*
 	// int m_nControllers;
 	uint8_t  m_Scale; 				///< The current global brightness scale setting
+	/*
 	uint16_t m_nFPS;					///< Tracking for current FPS value
 	uint32_t m_nMinMicros;		///< minimum �s between frames, used for capping frame rates.
 	uint32_t m_nPowerData;		///< max power use parameter
@@ -498,15 +498,15 @@ public:
 	}
 	//@}
 #endif
-
+*/
 	/// Set the global brightness scaling
 	/// @param scale a 0-255 value for how much to scale all leds before writing them out
-	void setBrightness(uint8_t scale) { m_Scale = scale; }
+	void setBrightness(uint8_t scale); // { m_Scale = scale; }
 
 	/// Get the current global brightness setting
 	/// @returns the current global brightness value
-	uint8_t getBrightness() { return m_Scale; }
-	*/
+	uint8_t getBrightness(); // { return m_Scale; }
+
 
 	/// Set the maximum power to be used, given in volts and milliamps.
 	/// @param volts - how many volts the leds are being driven at (usually 5)

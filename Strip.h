@@ -3,6 +3,7 @@
 #include <FastLED.h>
 #include "StripPlugin.h"
 #include "Device.h"
+#include "Storage.h"
 
 extern class DiagnosticStipPlugin diagnosticStipPlugin;
 extern class MovingPointStripPlugin movingPointStripPlugin;
@@ -18,8 +19,7 @@ private:
 
 public:
 	// konstruktor
-	Strip(int maxCurrent, byte ledsBrightness) :
-		ledsBrightness(ledsBrightness)
+	Strip(int maxCurrent)
 	{
 		FastLED.setMaxPowerInVoltsAndMilliamps(5, maxCurrent);
 	}
@@ -30,6 +30,8 @@ public:
 		// zgaszenie diody L, bo ciagle swieci i przeszkadza w nocy
 		pinMode(LED_BUILTIN, OUTPUT);
 		digitalWrite(LED_BUILTIN, LOW);
+		ledsBrightness = storage.movingPointStripPlugin_Brightness;
+		updated = true;
 	}
 
 	// konfiguracja kontrolera fastled
@@ -39,6 +41,7 @@ public:
 		pinMode(DATA_PIN, OUTPUT);
 		controller = &FastLED.addLeds<CHIPSET, DATA_PIN, RGB_ORDER>(leds, ledsCount);
 		FastLED.clear(true);
+		FastLED.setBrightness(0);
 	}
 
 	// zwrocenie pluginu poruszajacego sie punktu
@@ -94,6 +97,11 @@ public:
 	{
 		for (int i = 0; i < controller->size(); i++)
 			controller->leds()[i] = color;
+	}
+
+	void SetBrightness(uint8_t scale)
+	{
+		ledsBrightness = scale;
 	}
 
 	// czy stan strpu ulegl zmianie i trzeba odswiezyc diody
